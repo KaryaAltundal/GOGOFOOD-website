@@ -193,5 +193,10 @@
   color: #000;               /* Siyah */
   font-weight: bold;         /* Kalın */
   margin-bottom: 10px;
+}.alt-gorsel {
+  width: 300px;        /* Resmin genişliğini buradan ayarlayabilirsin */
+  height: auto;        /* Boyu genişliğine göre otomatik ayarlansın (resim yamulmaz) */
+  margin-top: 20px;    /* Tablo ile arasında boşluk bırakır */
+  display: block;      /* Resmi bir blok olarak görür */
 }
   
