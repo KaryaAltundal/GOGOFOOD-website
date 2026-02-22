@@ -1,5 +1,8 @@
 
-e.g.
 [1] OpenAI, "All conversation" Gemini shared conversation. [Online].
 Available: https://gemini.google.com/share/60ba4626fb60
 Accessed: Feb. 20, 2026.
+
+[2] OpenAI, "conversation for uploading photo" Gemini shared conversation. [Online].
+Available: https://gemini.google.com/share/c7aebc798484
+Accessed: Feb. 22, 2026.
