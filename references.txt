@@ -6,3 +6,7 @@ Accessed: Feb. 20, 2026.
 [2] OpenAI, "conversation for uploading photo" Gemini shared conversation. [Online].
 Available: https://gemini.google.com/share/c7aebc798484
 Accessed: Feb. 22, 2026.
+
+[2] OpenAI, "conversation for button and design" Gemini shared conversation. [Online].
+Available: https://gemini.google.com/share/a694ec862b2d
+Accessed: Feb. 27, 2026.
