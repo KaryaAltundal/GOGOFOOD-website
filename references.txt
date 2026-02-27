@@ -10,3 +10,11 @@ Accessed: Feb. 22, 2026.
 [2] OpenAI, "conversation for button and design" Gemini shared conversation. [Online].
 Available: https://gemini.google.com/share/a694ec862b2d
 Accessed: Feb. 27, 2026.
+
+[3] OpenAI, "conversation for actived button for yazıyı değiştir" Gemini shared conversation. [Online].
+Available: https://gemini.google.com/share/4efdd558fa9f
+Accessed: Feb. 27, 2026.
+
+[4] OpenAI, "conversation for tabloyu değiştir " Gemini shared conversation. [Online].
+Available: https://gemini.google.com/share/c49e8b518b9a
+Accessed: Feb. 27, 2026.
