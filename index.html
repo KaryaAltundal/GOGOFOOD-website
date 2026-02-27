@@ -47,12 +47,12 @@
 
     <main class="content">
       <section class="card">
-        <h1 class="card__title">1. Hafta: HTML & CSS Sayfa İskeleti</h1>
-        <p class="card__text">
-          Bu örnekte <strong>üst menü</strong>, <strong>yan menü</strong> ve ortada
-          <strong>3x5 tablo</strong> bulunuyor. Öğrenciler için sınıfta “kutu modeli, padding,
-          margin, border, hover, active” gibi konuları göstermek için ideal.
-        </p>
+       <h1 class="card__title" id="ana-baslik">1. Hafta: HTML & CSS Sayfa İskeleti</h1>
+        <p class="card__text" id="ana-metin">
+    Bu örnekte <strong>üst menü</strong>, <strong>yan menü</strong> ve ortada
+    <strong>3x5 tablo</strong> bulunuyor. Öğrenciler için sınıfta “kutu modeli, padding,
+    margin, border, hover, active” gibi konuları göstermek için ideal.
+  </p>
 
         <div class="badges">
           <span class="badge">HTML Semantik</span>
@@ -60,7 +60,8 @@
           <span class="badge">Tablo</span>
           <span class="badge">Hover</span>
         </div>
-        <button class="btn">Yazıları Değiştir</button>
+        
+        <button class="btn" onclick="icerigiDegistir()">Yazıları Değiştir</button>
       </section>
 
       <section class="card">
@@ -98,7 +99,7 @@
         </p>
       </section>
 <section class="card photoCard">
-  <h2 class="card__subtitle">Ders Fotoğrafı</h2>
+  <h2 class="card__subtitle"></h2>
   <img src="lab1_foto.png" class="foto">
   <button class="btn">Resmi Değiştir</button>
 </section>
@@ -110,5 +111,6 @@
       </footer>
     </main>
   </div>
+  <script src="javascript.js"></script>
 </body>
 </html>
