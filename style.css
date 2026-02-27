@@ -1,202 +1,192 @@
 
-    /* 1. Üst barın genel ayarları (Siyah şerit) */
-    body {
+   body {
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  
-  /* Yazıların daha yumuşak görünmesi için */
   -webkit-font-smoothing: antialiased;
-  
   font-size: 16px;
-  
   line-height: 1.5;
 }
-    .topbar {
-      background-color: #000000; /* Tam siyah arka plan */
-      display: flex;             /* İçindeki her şeyi yan yana dizen sihirli komut */
-      align-items: center;       /* İçindekileri yukarıdan aşağıya tam ortalar */
-      padding: 15px 25px;        /* Üstten-alttan 15px, sağdan-soldan 25px boşluk */
-      color: white;              /* Yazı rengi beyaz olsun */
-    }
 
-    /* 2. Logo (CENG Web Demo) ayarı */
-    .brand {
-      font-weight: bold;        
-      margin-right: 30px;        /* Sağ tarafına boşluk bırakır, menüyü kendinden uzaklaştırır */
-    }
+.topbar {
+  background-color: #000000;
+  display: flex;
+  align-items: center;
+  padding: 15px 25px;
+  color: white;
+}
 
-    /* 3. Menü Link Grubu (Anasayfa, Duyurular...) */
-    .topnav {
-      display: flex;             /* Linklerin kendi içinde de yan yana durmasını sağlar */
-      gap: 20px;                 /* Linklerin arasına 20px mesafe koyar */
-    }
+.brand {
+  font-weight: bold;
+  margin-right: 30px;
+}
 
-    /* 4. Tek tek linklerin rengi */
-    .topnav__link {
-      color: #b0b0b0;            /* Gri renk kodu */
-      text-decoration: none;     /* Linklerin altındaki çizgiyi kaldırır */
-    }
+.topnav {
+  display: flex;
+  gap: 20px;
+}
 
-    /* 5. "Can" yazısını en sağa itmek için */
-    .user {
-      margin-left: auto;         /* Solundaki tüm boşluğu iter ve "Can"ı en sağa yaslar */
-    }
+.topnav__link {
+  color: #b0b0b0;
+  text-decoration: none;
+}
 
-    .user__pill {
-      background-color: #333;    /* İsim arkasında hafif gri bir kutu */
-      padding: 5px 15px;
-      border-radius: 5px;        /* Köşeleri hafif yuvarlar */
-    }
-    /* 1. Yan Menü ve Ana İçeriği Yan Yana Getir */
+.user {
+  margin-left: auto;
+}
+
+.user__pill {
+  background-color: #333;
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
 .layout {
-  display: flex;        /* Sidebar ve Content'i yan yana dizer */
-  padding: 20px;        /* Sayfa kenarlarından boşluk bırakır */
-  gap: 20px;            /* Menü ile yazı alanı arasında boşluk bırakır */
-  background-color: #f4f4f4; /* Sayfa arka planını hafif gri yapalım ki beyaz kutu belli olsun */
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+  background-color: #f4f4f4;
 }
 
-/* 2. Sol taraftaki Beyaz Kutu (Sidebar) */
 .sidebar {
-  background-color: #ffffff; /* Beyaz kare/kutu */
-  width: 200px;              /* Genişliğini sabitleyelim */
-  padding: 20px;             /* İçerideki yazıların kenara yapışmaması için */
-  border-radius: 8px;        /* Köşeleri hafif yuvarlatılmış modern durur */
-  display: flex;             /* İçindeki linkleri yönetmek için */
-  flex-direction: column;    /* Linklerin ALT ALTA dizilmesini sağlar */
-  gap: 15px;                 /* Linklerin arasına boşluk bırakır */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Hafif bir gölge ile havada durma efekti */
+  background-color: #ffffff;
+  width: 200px;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* 3. "Menü" Başlığı */
 .sidebar__title {
-  color: #000000;            /* Menü başlığı siyah */
+  color: #000000;
   font-size: 18px;
-  margin-top: 0;             /* Gereksiz üst boşluğu siler */
-  border-bottom: 1px solid #eee; /* Altına ince bir çizgi çeker */
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
   padding-bottom: 10px;
 }
 
-/* 4. Linklerin Rengi (Ödevler, Kaynaklar vs.) */
 .sidebar__link {
-  color: #888888;            /* İstediğin gri renk */
-  text-decoration: none;     /* Alt çizgiyi kaldırır */
+  color: #888888;
+  text-decoration: none;
   font-size: 15px;
 }
 
 .sidebar__link.is-active {
-  background-color: rgba(128, 0, 128, 0.15); /* Mor rengin %15 şeffaf hali */
-  color: #800080;                /* Yazı rengi tam mor */
-  font-weight: bold;             /* Yazıyı kalın yapar */
-  padding: 10px 15px;            /* Kutunun içindeki boşluk (Yazı kenara yapışmasın) */
-  border-radius: 8px;            /* Kutunun köşelerini yuvarlatır */
-  display: block;                /* Arka planın tüm satırı kaplamasını sağlar */
-  border-left: 4px solid #800080; /* Soluna mor bir çizgi atarak şıklık katar */
+  background-color: rgba(128, 0, 128, 0.15);
+  color: #800080;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: block;
+  border-left: 4px solid #800080;
 }
+
 .content {
-  flex: 1;               /* Yan menüden kalan tüm boşluğu bu alan kaplasın */
+  flex: 1;
 }
-/* İpucu Kutusu (Sidebar içindeki küçük kart) */
+
 .sidebar__card {
-  background-color: #f2f2f2; /* Arka planı gri yapar */
-  padding: 15px;             /* İçindeki yazıların kenarlara yapışmasını engeller */
-  border-radius: 10px;       /* Köşeleri yuvarlatır */
-  margin-top: 30px;          /* Üstteki menü linklerinden aşağıya iter */
-  border-left: 4px solid #333; /* Sol tarafa siyah kalın bir çizgi ekler (Vurgu için) */
+  background-color: #f2f2f2;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 30px;
+  border-left: 4px solid #333;
 }
 
-/* İpucu Başlığı */
 .sidebar__cardTitle {
-  color: #000;               /* Başlık siyah */
+  color: #000;
   font-size: 14px;
-  margin-top: 0;             /* Gereksiz üst boşluğu sıfırlar */
-  margin-bottom: 8px;        /* Altındaki metinle arasını açar */
-  display: block;            /* Kendi başına bir satır kaplamasını sağlar */
+  margin-top: 0;
+  margin-bottom: 8px;
+  display: block;
 }
 
-/* İpucu Metni */
 .sidebar__cardText {
-  color: #666;               /* Metin rengini biraz daha yumuşak bir gri yapar */
-  font-size: 13px;           /* Bilgi notu olduğu için biraz küçültüyoruz */
-  margin: 0;                 /* Paragrafın kendi boşluklarını sıfırlar */
-  line-height: 1.4;          /* Satır aralığını düzenler */
-}
-/* 2. Beyaz Dikdörtgen (Kart Yapısı) */
-.card {
-  background-color: #ffffff; /* Beyaz arka plan */
-  padding: 30px;             /* İçerideki yazıların kenara yapışmaması için */
-  border-radius: 15px;       /* Kenarları yuvarlatılmış */
-  margin-bottom: 20px;       /* Altındaki tabloyla arasına boşluk */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Çok hafif, şık bir gölge */
+  color: #666;
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
 }
 
-/* 3. Başlık ve Metin Renkleri */
+.card {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
 .card__title {
-  color: #000;               /* Başlık siyah */
+  color: #000;
   margin-top: 0;
 }
 
 .card__text {
-  color: #555;               /* Metin koyu gri */
-  line-height: 1.6;          /* Satır aralarını açarak okunurluğu artırır */
+  color: #555;
+  line-height: 1.6;
 }
 
-/* 4. En Alttaki Kutucukların Dizilimi (Badges) */
 .badges {
-  display: flex;             /* Kutucukları yan yana dizer */
-  gap: 10px;                 /* Aralarında 10px boşluk bırakır */
-  margin-top: 20px;          /* Üstteki yazıdan uzaklaştırır */
-  flex-wrap: wrap;           /* Ekran daralırsa kutucuklar aşağı kaysın */
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
-/* 5. Gri Kutucukların (Badge) Kendisi */
 .badge {
-  background-color: #eeeeee; /* Arka plan açık gri */
-  color: #333;               /* Yazı koyu gri */
-  padding: 6px 15px;         /* Kutunun iç boşluğu */
-  border-radius: 20px;       /* Kenarları tam yuvarlak (hap şeklinde) */
-  font-size: 13px;           /* Biraz daha küçük, şık dursun */
-  font-weight: bold;         /* Yazılar belirgin olsun */
+  background-color: #eeeeee;
+  color: #333;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: bold;
 }
-/* 1. Tablonun Genel Ayarları */
+
 .dataTable {
-  width: 100%;               /* Tablo bulunduğu alanı tam kaplasın */
-  border-collapse: collapse; /* Hücre kenarlarını birleştirir (çift çizgiyi yok eder) */
-  margin-top: 20px;          /* Üstteki başlıkla arasına boşluk */
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-/* 2. Tablo Başlıkları (En üstteki Gri Satır) */
 .dataTable thead th {
-  background-color: #f2f2f2; /* İstediğin gri arka plan */
-  color: #333;               /* Koyu gri/siyah yazı rengi */
-  padding: 12px;             /* Yazıların etrafındaki iç boşluk */
-  text-align: left;          /* Yazıları sola yaslar */
-  border-bottom: 2px solid #ddd; /* Başlığın altına hafif kalın bir çizgi */
+  background-color: #f2f2f2;
+  color: #333;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
 }
 
-/* 3. Tablo Satırları (Beyaz ve Aralıklı Görünüm) */
 .dataTable tbody td {
-  background-color: #ffffff; /* Satırların arka planı beyaz */
-  padding: 12px;             /* Yazıların birbirine yapışmaması için boşluk */
-  border-bottom: 1px solid #eee; /* Satırlar arasına ince ayırıcı çizgi */
-  color: #555;               /* Yazı rengini biraz yumuşatıyoruz */
+  background-color: #ffffff;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  color: #555;
 }
 
-/* 4. Tablo Altındaki "Not" Yazısı */
 .muted {
-  margin-top: 15px;          /* Tablodan uzaklaştırır */
-  color: #888;               /* Rengini gri yapar */
-  font-size: 0.9rem;         /* Biraz daha küçük görünmesini sağlar */
-  font-style: italic;        /* İtalik yaparak vurgular */
+  margin-top: 15px;
+  color: #888;
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
-/* 5. "Örnek Veri Tablosu" Başlığı */
 .card__subtitle {
-  color: #000;               /* Siyah */
-  font-weight: bold;         /* Kalın */
+  color: #000;
+  font-weight: bold;
   margin-bottom: 10px;
-}.alt-gorsel {
-  width: 300px;        /* Resmin genişliğini buradan ayarlayabilirsin */
-  height: auto;        /* Boyu genişliğine göre otomatik ayarlansın (resim yamulmaz) */
-  margin-top: 20px;    /* Tablo ile arasında boşluk bırakır */
-  display: block;      /* Resmi bir blok olarak görür */
 }
-  
+
+.alt-gorsel {
+  width: 300px;
+  height: auto;
+  margin-top: 20px;
+  display: block;
+}
+.photoCard .foto{
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  margin-top: 15px;
+  border-radius: 12px;
+}
