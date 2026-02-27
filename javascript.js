@@ -1,5 +1,5 @@
 function icerigiDegistir() {
-    console.log("Butona tıklandı!"); // Çalışıp çalışmadığını konsoldan görmek için
+   
 
     const baslik = document.getElementById("ana-baslik");
     const metin = document.getElementById("ana-metin");
@@ -36,5 +36,13 @@ function tabloyuDegistir() {
    
     rows.forEach(row => table.appendChild(row));
     
-    console.log("Tablo harf notuna göre sıralandı!");
+   
+}
+
+
+function resmiDegistir() {
+    const resim = document.getElementById("ders-resmi");
+    
+     resim.src = "kedi.jpeg"; 
+    
 }
