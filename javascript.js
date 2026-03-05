@@ -46,3 +46,24 @@ function resmiDegistir() {
      resim.src = "kedi.jpeg"; 
     
 }
+
+document.addEventListener('mousemove', (e) => {
+    const gozBebekleri = document.querySelectorAll('.goz-bebegi');
+    
+    gozBebekleri.forEach(goz => {
+       
+        const rect = goz.getBoundingClientRect();
+        const gozX = rect.left + rect.width / 2;
+        const gozY = rect.top + rect.height / 2;
+
+        
+        const aci = Math.atan2(e.clientY - gozY, e.clientX - gozX);
+        
+        
+        const mesafe = 6;
+        const x = Math.cos(aci) * mesafe;
+        const y = Math.sin(aci) * mesafe;
+
+        goz.style.transform = `translate(${x}px, ${y}px)`;
+    });
+});
