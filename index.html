@@ -43,6 +43,13 @@
           Bu sayfa: header + aside + main düzenini gösterir.
         </p>
       </div>
+<div class="sidebar__card" style="border-left: 4px solid #800080;">
+  <h3 class="sidebar__cardTitle">JS BUG</h3>
+  <p class="sidebar__cardText">
+    The <strong>typeof null</strong> bug is a historical flaw in JavaScript where the operator incorrectly identifies the primitive value <strong>null</strong> as an <strong>"object"</strong> instead of <strong>"null."</strong> This behavior originates from the language’s first version, where values were stored in 32-bit units with <strong>type tags</strong>; because the tag for <strong>Objects</strong> was <strong>000</strong> and <strong>null</strong> was represented as a null pointer (all zeros), the engine miscategorized it. Despite being a recognized error, it is preserved in the ECMAScript standard for <strong>backward compatibility</strong> to prevent "breaking the web" for legacy systems. This technical nuance is a classic example of how early design decisions persist in computer science. Consequently, the industry standard for a computer engineering student is to use <strong>strict equality</strong> (<code>value === null</code>) for accurate null checks.
+  </p>
+</div>
+
     </aside>
 
     <main class="content">
