@@ -1,10 +1,64 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Öğrenci Not Sistemi";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <h2>Student Grade Table</h2>
+
+   
+    <div class="text-end mb-2">
+        <button id="calculateBtn" class="btn btn-primary">Calculate Grades</button>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Midterm</th>
+                <th>Final</th>
+                <th>Letter Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.StudentNames.Length; i++)
+            {
+                <tr class="student-row">
+                    <td>@(i + 1)</td>
+                    <td>@Model.StudentNames[i]</td>
+                    <td class="midterm" data-value="@Model.MidtermGrades[i]">@Model.MidtermGrades[i]</td>
+                    <td class="final" data-value="@Model.FinalGrades[i]">@Model.FinalGrades[i]</td>
+                    <td class="letter-grade">-</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="alert alert-secondary mt-3">
+        Calculation: Midterm 40% Final: 60%
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById('calculateBtn').addEventListener('click', function () {
+            const rows = document.querySelectorAll('.student-row');
+
+            rows.forEach(row => {
+                const vize = parseFloat(row.querySelector('.midterm').getAttribute('data-value'));
+                const final = parseFloat(row.querySelector('.final').getAttribute('data-value'));
+
+                const ortalama = (vize * 0.4) + (final * 0.6);
+
+                let harfNotu = "";
+                if (ortalama >= 85) harfNotu = "AA";
+                else if (ortalama >= 70) harfNotu = "BB";
+                else if (ortalama >= 50) harfNotu = "CC";
+                else harfNotu = "FF";
+
+                row.querySelector('.letter-grade').innerText = harfNotu;
+            });
+        });
+    </script>
+}
