@@ -1,63 +1,199 @@
 ﻿@page
 @model IndexModel
+
+<link rel="stylesheet" href="~/css/style.css" />
 @{
     ViewData["Title"] = "Öğrenci Not Sistemi";
 }
 
-<div class="container mt-4">
-    <h2>Student Grade Table</h2>
 
-   
-    <div class="text-end mb-2">
+
+<header class="topbar">
+    <div class="brand">CENG Web Demo</div>
+
+    <nav class="topnav" aria-label="Üst Menü">
+      <a class="topnav__link is-active" href="#">Anasayfa</a>
+      <a class="topnav__link" href="#">Duyurular</a>
+      <a class="topnav__link" href="#">Notlar</a>
+      <a class="topnav__link" href="#">İletişim</a>
+    </nav>
+
+    <div class="user">
+      <span class="user__pill">Karya</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Yan Menü">
+      <h2 class="sidebar__title">Menü</h2>
+      <a class="sidebar__link is-active" href="#">Dashboard</a>
+      <a class="sidebar__link" href="#">Ödevler</a>
+      <a class="sidebar__link" href="#">Kaynaklar</a>
+      <a class="sidebar__link" href="#">Ders Planı</a>
+      <a class="sidebar__link" href="#">Ayarlar</a>
+
+      <div class="sidebar__card">
+        <h3 class="sidebar__cardTitle">İpucu</h3>
+        <p class="sidebar__cardText">
+          Bu sayfa: header + aside + main düzenini gösterir.
+        </p>
+      </div>
+<div class="sidebar__card" style="border-left: 4px solid #800080;">
+  <h3 class="sidebar__cardTitle">JS BUG</h3>
+  <p class="sidebar__cardText">
+    The <strong>typeof null</strong> bug is a historical flaw in JavaScript where the operator incorrectly identifies the primitive value <strong>null</strong> as an <strong>"object"</strong> instead of <strong>"null."</strong> This behavior originates from the language’s first version, where values were stored in 32-bit units with <strong>type tags</strong>; because the tag for <strong>Objects</strong> was <strong>000</strong> and <strong>null</strong> was represented as a null pointer (all zeros), the engine miscategorized it. Despite being a recognized error, it is preserved in the ECMAScript standard for <strong>backward compatibility</strong> to prevent "breaking the web" for legacy systems. This technical nuance is a classic example of how early design decisions persist in computer science. Consequently, the industry standard for a computer engineering student is to use <strong>strict equality</strong> (<code>value === null</code>) for accurate null checks.
+  </p>
+</div>
+
+    </aside>
+
+    <main class="content">
+      <section class="card">
+       <h1 class="card__title" id="ana-baslik">1. Hafta: HTML & CSS Sayfa İskeleti</h1>
+        <p class="card__text" id="ana-metin">
+    Bu örnekte <strong>üst menü</strong>, <strong>yan menü</strong> ve ortada
+    <strong>3x5 tablo</strong> bulunuyor. Öğrenciler için sınıfta “kutu modeli, padding,
+    margin, border, hover, active” gibi konuları göstermek için ideal.
+  </p>
+
+        <div class="badges">
+          <span class="badge">HTML Semantik</span>
+          <span class="badge">Flexbox</span>
+          <span class="badge">Tablo</span>
+          <span class="badge">Hover</span>
+        </div>
+        
+        <button class="btn" onclick="icerigiDegistir()">Yazıları Değiştir</button>
+      </section>
+      <section class="card">
+    <h2 class="card__subtitle">Dynamic Grade Calculation Table</h2>
+    
+    <div class="text-end mb-3">
         <button id="calculateBtn" class="btn btn-primary">Calculate Grades</button>
     </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>#</th>
-                <th>Student Name</th>
-                <th>Midterm</th>
-                <th>Final</th>
-                <th>Letter Grade</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.StudentNames.Length; i++)
-            {
-                <tr class="student-row">
-                    <td>@(i + 1)</td>
-                    <td>@Model.StudentNames[i]</td>
-                    <td class="midterm" data-value="@Model.MidtermGrades[i]">@Model.MidtermGrades[i]</td>
-                    <td class="final" data-value="@Model.FinalGrades[i]">@Model.FinalGrades[i]</td>
-                    <td class="letter-grade">-</td>
+    <div class="tableWrap">
+        <table class="dataTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Midterm</th>
+                    <th>Final</th>
+                    <th>Letter Grade</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-    <div class="alert alert-secondary mt-3">
-        Calculation: Midterm 40% Final: 60%
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.StudentNames.Length; i++)
+                {
+                    <tr class="student-row">
+                        <td>@(i + 1)</td>
+                        <td>@Model.StudentNames[i]</td>
+                        @* 'vize' yerine 'midterm' kullandık *@
+                        <td class="midterm" data-value="@Model.MidtermGrades[i]">@Model.MidtermGrades[i]</td>
+                        <td class="final" data-value="@Model.FinalGrades[i]">@Model.FinalGrades[i]</td>
+                        <td class="letter-grade">-</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
-</div>
 
+    <div class="alert alert-secondary mt-3" style="font-size: 0.9rem; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+        <strong>Calculation:</strong> $Average = (Midterm \times 0.4) + (Final \times 0.6)$
+    </div>
+</section>
+<section class="card kedi-kart">
+  <div class="kedi">
+    <div class="kulak kulak-sol"></div>
+    <div class="kulak kulak-sag"></div>
+    <div class="yuz">
+      <div class="goz-alani">
+        <div class="goz"><div class="goz-bebegi"></div></div>
+        <div class="goz"><div class="goz-bebegi"></div></div>
+      </div>
+      <div class="burun"></div>
+    </div>
+  </div>
+</section>s
+      <section class="card">
+        <h2 class="card__subtitle">Örnek Veri Tablosu (3 x 5)</h2>
+
+        <div class="tableWrap">
+          <table class="dataTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Öğrenci</th>
+                <th>Vize</th>
+                <th>Final</th>
+                <th>Harf</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>1</td><td>Ayşe Kaya</td><td>78</td><td>85</td><td>BA</td>
+              </tr>
+              <tr>
+                <td>2</td><td>Mehmet Demir</td><td>65</td><td>72</td><td>CB</td>
+              </tr>
+              <tr>
+                <td>3</td><td>Elif Yılmaz</td><td>90</td><td>93</td><td>AA</td>
+              </tr>
+            </tbody>
+          </table>
+          
+        </div>
+<button class="btn" onclick="tabloyuDegistir()">Tabloyu Değiştir</button>
+        <p class="muted">
+          Not: Bu tablo 3 satır (öğrenci) ve 5 sütun içerir.
+        </p>
+      </section>
+
+
+<section class="card photoCard">
+  <h2 class="card__subtitle"></h2>
+  <img src="~/images/lab1_foto.png" class="foto" id="ders-resmi">
+  
+  <button class="btn" onclick="resmiDegistir()">Resmi Değiştir</button>
+</section>
+      <footer class="footer">
+        <span>© 2026 - Web Programming</span>
+        <span class="footer__sep">•</span>
+        <a class="footer__link" href="#">Gizlilik</a>
+        <a class="footer__link" href="#">Yardım</a>
+      </footer>
+    </main>
+  </div>
+ 
 @section Scripts {
+    @* Eski projenden gelen harici JS dosyasını buraya bağlıyoruz *@
+    <script src="~/js/javascript.js"></script>
+
     <script>
+        
         document.getElementById('calculateBtn').addEventListener('click', function () {
+            
             const rows = document.querySelectorAll('.student-row');
-
+            
             rows.forEach(row => {
-                const vize = parseFloat(row.querySelector('.midterm').getAttribute('data-value'));
+                
+                const midterm = parseFloat(row.querySelector('.midterm').getAttribute('data-value'));
                 const final = parseFloat(row.querySelector('.final').getAttribute('data-value'));
+                
+                
+                const average = (midterm * 0.4) + (final * 0.6);
 
-                const ortalama = (vize * 0.4) + (final * 0.6);
+                
+                let letterGrade = "";
+                if (average >= 85) letterGrade = "AA";
+                else if (average >= 70) letterGrade = "BB";
+                else if (average >= 50) letterGrade = "CC";
+                else letterGrade = "FF";
 
-                let harfNotu = "";
-                if (ortalama >= 85) harfNotu = "AA";
-                else if (ortalama >= 70) harfNotu = "BB";
-                else if (ortalama >= 50) harfNotu = "CC";
-                else harfNotu = "FF";
-
-                row.querySelector('.letter-grade').innerText = harfNotu;
+                
+                row.querySelector('.letter-grade').innerText = letterGrade;
             });
         });
     </script>
