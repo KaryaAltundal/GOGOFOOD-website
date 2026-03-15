@@ -1,3 +1,3 @@
-Color Palette Generator
-Landing Page Demo
+Color Palette Generator,
+Landing Page Demo,
 Portfolio Website
