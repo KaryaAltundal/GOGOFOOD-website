@@ -4,64 +4,203 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<style>
+    body {
+        background-color: #ffffff;
+    }
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+    .register-wrapper {
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 15px;
+    }
+
+    .register-card {
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border-radius: 22px;
+        padding: 35px 30px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    .register-title {
+        text-align: center;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 5px;
+    }
+
+    .register-subtitle {
+        text-align: center;
+        color: #777;
+        margin-bottom: 30px;
+        font-size: 0.95rem;
+    }
+
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .form-group-custom {
+        margin-bottom: 18px;
+    }
+
+    .form-control.custom-input {
+        border-radius: 14px;
+        height: 54px;
+        border: 1px solid #ddd;
+        padding: 12px 14px;
+        box-shadow: none;
+    }
+
+    .form-control.custom-input:focus {
+        border-color: #000000;
+        box-shadow: 0 0 0 0.15rem rgba(176,125,98,0.18);
+    }
+
+    .custom-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #000000;
+        display: block;
+    }
+
+    .photo-upload-box {
+        border: 1px solid #ddd;
+        border-radius: 18px;
+        padding: 20px;
+        text-align: center;
+        background: #fafafa;
+    }
+
+    .photo-preview {
+        width: 110px;
+        height: 110px;
+        border-radius: 20px;
+        object-fit: cover;
+        display: none;
+        margin: 0 auto 15px auto;
+        border: 1px solid #ddd;
+    }
+
+    .register-btn {
+        width: 100%;
+        height: 58px;
+        border: none;
+        border-radius: 30px;
+        background-color: #870eff;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-top: 12px;
+        transition: 0.2s ease;
+    }
+
+    .register-btn:hover {
+        background-color: #000000;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid-2 {
+            grid-template-columns: 1fr;
+        }
+
+        .register-card {
+            padding: 25px 20px;
+        }
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-card">
+        <h1 class="register-title">Register</h1>
+        <p class="register-subtitle">Create your account and complete your profile.</p>
+
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="form-grid-2">
+                <div class="form-group-custom">
+                    <label asp-for="Input.Name" class="custom-label"></label>
+                    <input asp-for="Input.Name" class="form-control custom-input" />
+                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group-custom">
+                    <label asp-for="Input.Surname" class="custom-label"></label>
+                    <input asp-for="Input.Surname" class="form-control custom-input" />
+                    <span asp-validation-for="Input.Surname" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group-custom">
+                <label asp-for="Input.Address" class="custom-label"></label>
+                <input asp-for="Input.Address" class="form-control custom-input" />
+                <span asp-validation-for="Input.Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group-custom">
+                <label asp-for="Input.ProfilePhoto" class="custom-label"></label>
+                <div class="photo-upload-box">
+                    <img id="photoPreview" class="photo-preview" alt="Photo Preview" />
+                    <input asp-for="Input.ProfilePhoto" type="file" class="form-control custom-input" accept="image/*" onchange="previewPhoto(event)" />
+                </div>
+                <span asp-validation-for="Input.ProfilePhoto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group-custom">
+                <label asp-for="Input.Email" class="custom-label"></label>
+                <input asp-for="Input.Email" class="form-control custom-input" autocomplete="username" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+            <div class="form-grid-2">
+                <div class="form-group-custom">
+                    <label asp-for="Input.Password" class="custom-label"></label>
+                    <input asp-for="Input.Password" class="form-control custom-input" autocomplete="new-password" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group-custom">
+                    <label asp-for="Input.ConfirmPassword" class="custom-label"></label>
+                    <input asp-for="Input.ConfirmPassword" class="form-control custom-input" autocomplete="new-password" />
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+            <button id="registerSubmit" type="submit" class="register-btn">Register</button>
         </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function previewPhoto(event) {
+            const input = event.target;
+            const preview = document.getElementById('photoPreview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }

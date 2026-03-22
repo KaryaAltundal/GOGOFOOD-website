@@ -1,0 +1,3 @@
+[1] OpenAI, “opened scaffold and fixed the issues about dotnet ver9 and 10" ChatGPT shared conversation. [Online].
+Available: https://chatgpt.com/share/69b96073-56fc-8013-8cc4-d1dd2d208e89
+Accessed: March 17, 2026.

@@ -1,22 +1,24 @@
-using Microsoft.AspNetCore.Mvc;
+using Lab3.Data;
+using Lab3.Models.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
-namespace Lab3.Pages; 
-
-public class IndexModel : PageModel
+namespace Lab3.Pages
 {
-    
-    public string[] StudentNames { get; private set; } = [];
-    public int[] MidtermGrades { get; private set; } = [];
-    public int[] FinalGrades { get; private set; } = [];
-    public string[] LetterGrades { get; private set; } = [];
-
-    public void OnGet()
+    public class IndexModel : PageModel
     {
-        
-        StudentNames = new[] { "Ayşe", "Mehmet", "Zeynep" };
-        MidtermGrades = new[] { 70, 55, 90 };
-        FinalGrades = new[] { 80, 60, 75 };
-        LetterGrades = new[] { "-", "-", "-" };
+        private readonly ApplicationDbContext _context;
+
+        public List<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+
+        public IndexModel(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task OnGetAsync()
+        {
+            Users = await _context.Users.ToListAsync();
+        }
     }
 }

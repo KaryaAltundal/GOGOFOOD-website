@@ -20,6 +20,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
+using Microsoft.AspNetCore.Http;
+using System.IO;
+
 namespace Lab3.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -70,35 +73,40 @@ namespace Lab3.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public class InputModel
-        {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
-            [Display(Name = "Email")]
-            public string Email { get; set; }
+{
+    [Required]
+    [StringLength(50)]
+    [Display(Name = "Name")]
+    public string Name { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
-            public string Password { get; set; }
+    [Required]
+    [StringLength(50)]
+    [Display(Name = "Surname")]
+    public string Surname { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
-            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-            public string ConfirmPassword { get; set; }
-        }
+    [StringLength(250)]
+    [Display(Name = "Address")]
+    public string Address { get; set; }
+
+    [Display(Name = "Profile Photo")]
+    public IFormFile ProfilePhoto { get; set; }
+
+    [Required]
+    [EmailAddress]
+    [Display(Name = "Email")]
+    public string Email { get; set; }
+
+    [Required]
+    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+    [DataType(DataType.Password)]
+    [Display(Name = "Password")]
+    public string Password { get; set; }
+
+    [DataType(DataType.Password)]
+    [Display(Name = "Confirm password")]
+    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+    public string ConfirmPassword { get; set; }
+}
 
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -111,13 +119,30 @@ namespace Lab3.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
-            {
-                var user = CreateUser();
+         if (ModelState.IsValid)
+{
+    var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
+    user.Name = Input.Name;
+    user.Surname = Input.Surname;
+    user.Address = Input.Address;
+
+    if (Input.ProfilePhoto != null && Input.ProfilePhoto.Length > 0)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            await Input.ProfilePhoto.CopyToAsync(memoryStream);
+            user.ProfilePhotoData = memoryStream.ToArray();
+        }
+
+        user.ProfilePhotoFileName = Input.ProfilePhoto.FileName;
+        user.ProfilePhotoContentType = Input.ProfilePhoto.ContentType;
+        user.ProfilePhotoSize = Input.ProfilePhoto.Length;
+    }
+
+    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+    var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
