@@ -27,14 +27,14 @@
     .section-title {
         font-size: 2rem;
         font-weight: bold;
-        color: #000000;
+        color: black;
         margin-bottom: 20px;
     }
 
     .small-badge {
         float: right;
         background: #f3a2ff;
-        color: #000000;
+        color: black;
         padding: 5px 12px;
         border-radius: 20px;
         font-size: 0.85rem;
@@ -48,7 +48,7 @@
     }
 
     thead {
-        background-color: #000000;
+        background-color: black;
         color: white;
     }
 
@@ -89,6 +89,9 @@
         color: #999;
         margin: 15px 0;
         background-color: #fafafa;
+        padding: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .gallery-btn {
@@ -103,17 +106,44 @@
     }
 
     .gallery-btn:hover {
-        background-color: #870eff;
+        background-color: #6f00d8;
+    }
+
+    .gallery-thumb {
+        width: 130px;
+        height: 130px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1px solid #f3a2ff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .carousel-image {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 14px;
+        background-color: #fafafa;
+    }
+
+    .empty-message {
+        width: 100%;
+        text-align: center;
+        color: #999;
+        font-size: 1rem;
+    }
+
+    .hidden-input {
+        display: none;
     }
 </style>
 
 <div class="page-container">
 
+    <!-- REGISTERED USERS -->
     <div class="card-box">
-        <div>
-            <span class="small-badge">@Model.Users.Count user(s)</span>
-            <div class="section-title">Registered Users</div>
-        </div>
+        <span class="small-badge">@Model.Users.Count user(s)</span>
+        <div class="section-title">Registered Users</div>
 
         <table>
             <thead>
@@ -153,26 +183,94 @@
         </table>
     </div>
 
+    <!-- JS METHOD -->
     <div class="card-box">
-        <span class="small-badge">0 image(s)</span>
+        <span class="small-badge"><span id="jsImageCount">0</span> image(s)</span>
         <div class="section-title" style="font-size:1.8rem;">JS Method (Folder Gallery)</div>
 
-        <div class="gallery-box">
-            No images loaded yet.
+        <div id="jsGalleryBox" class="gallery-box">
+            <div class="empty-message">No images loaded yet.</div>
         </div>
 
         <div style="text-align:center;">
-            <button class="gallery-btn">Add Gallery</button>
+            <input type="file" id="fileInput" class="hidden-input" multiple accept="image/*">
+            <button type="button" class="gallery-btn" onclick="document.getElementById('fileInput').click()">Add Gallery</button>
         </div>
     </div>
 
+    <!-- C# METHOD -->
     <div class="card-box">
-        <span class="small-badge">0 image(s)</span>
+        <span class="small-badge">@Model.CarouselImages.Count image(s)</span>
         <div class="section-title" style="font-size:1.8rem;">C# Method (Carousel)</div>
 
-        <div class="gallery-box">
-            Carousel area will be added here.
-        </div>
+        @if (Model.CarouselImages.Count > 0)
+        {
+            <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @for (int i = 0; i < Model.CarouselImages.Count; i++)
+                    {
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <img src="@Model.CarouselImages[i]" class="d-block w-100 carousel-image" alt="Carousel Image @(i + 1)">
+                        </div>
+                    }
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="gallery-box">
+                <div class="empty-message">No images found in wwwroot/carousel</div>
+            </div>
+        }
     </div>
 
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const input = document.getElementById("fileInput");
+            const gallery = document.getElementById("jsGalleryBox");
+            const count = document.getElementById("jsImageCount");
+
+            if (!input || !gallery || !count) return;
+
+            input.addEventListener("change", function () {
+                gallery.innerHTML = "";
+                let c = 0;
+
+                for (let file of input.files) {
+                    if (file.type.startsWith("image/")) {
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            const img = document.createElement("img");
+                            img.src = e.target.result;
+                            img.className = "gallery-thumb";
+                            gallery.appendChild(img);
+                        };
+
+                        reader.readAsDataURL(file);
+                        c++;
+                    }
+                }
+
+                count.innerText = c;
+
+                if (c === 0) {
+                    gallery.innerHTML = '<div class="empty-message">No images loaded yet.</div>';
+                }
+            });
+        });
+    </script>
+}
