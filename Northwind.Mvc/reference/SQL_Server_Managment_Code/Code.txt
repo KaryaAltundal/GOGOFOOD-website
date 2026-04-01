@@ -1,0 +1,18 @@
+USE Northwind;
+GO
+
+CREATE TABLE dbo.ShipperContactInfos (
+    ContactInfoID INT PRIMARY KEY IDENTITY(1,1),
+    ShipperID INT NOT NULL,
+    Email NVARCHAR(100),
+    Website NVARCHAR(200),
+    Phone NVARCHAR(30),
+    Address NVARCHAR(200),
+    City NVARCHAR(100),
+    Country NVARCHAR(100),
+    PostalCode NVARCHAR(20),
+    CONSTRAINT FK_ShipperContactInfos_Shippers
+        FOREIGN KEY (ShipperID)
+        REFERENCES dbo.Shippers(ShipperID)
+);
+GO

@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Northwind.Mvc.Models;
+
+public partial class Shipper
+{
+    public int ShipperId { get; set; }
+
+    public string CompanyName { get; set; } = null!;
+
+    public string? Phone { get; set; }
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<ShipperContactInfo> ShipperContactInfos { get; set; } = new List<ShipperContactInfo>();
+}
