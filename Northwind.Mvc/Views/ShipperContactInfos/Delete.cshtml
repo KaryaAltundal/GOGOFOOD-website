@@ -1,0 +1,42 @@
+@model Northwind.Mvc.Models.ShipperContactInfo
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h3 class="text-danger">Delete this record?</h3>
+<p>This action cannot be undone.</p>
+
+<dl class="row">
+    <dt class="col-sm-3">Shipper</dt>
+    <dd class="col-sm-9">@Model.Shipper.CompanyName</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Website</dt>
+    <dd class="col-sm-9">@Model.Website</dd>
+
+    <dt class="col-sm-3">Phone</dt>
+    <dd class="col-sm-9">@Model.Phone</dd>
+
+    <dt class="col-sm-3">Address</dt>
+    <dd class="col-sm-9">@Model.Address</dd>
+
+    <dt class="col-sm-3">City</dt>
+    <dd class="col-sm-9">@Model.City</dd>
+
+    <dt class="col-sm-3">Country</dt>
+    <dd class="col-sm-9">@Model.Country</dd>
+
+    <dt class="col-sm-3">Postal Code</dt>
+    <dd class="col-sm-9">@Model.PostalCode</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.ContactInfoId" />
+
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

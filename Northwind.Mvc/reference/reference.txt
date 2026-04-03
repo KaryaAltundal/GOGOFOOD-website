@@ -11,3 +11,8 @@ Accessed: April 1, 2026.
 [3] OpenAI, "copied the table " ChatGPT shared conversation. [Online].
 Available: https://chatgpt.com/share/69cf8108-bbac-838e-8486-5f0462bd801d
 Accessed: April 3, 2026.
+
+
+[3] OpenAI, "added features for edit and delete for the first table" ChatGPT shared conversation. [Online].
+Available: https://chatgpt.com/share/69cf8629-c7c0-8385-9c36-cc02b97bab75
+Accessed: April 3, 2026.

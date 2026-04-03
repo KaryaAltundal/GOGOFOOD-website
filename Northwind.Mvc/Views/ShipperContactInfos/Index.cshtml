@@ -37,8 +37,8 @@
                 <td>@item.Country</td>
                 <td>@item.PostalCode</td>
                 <td>
-                    <a href="#">Edit</a> |
-                    <a href="#">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.ContactInfoId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ContactInfoId">Delete</a>
                 </td>
             </tr>
         }
