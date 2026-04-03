@@ -21,6 +21,7 @@
             <th>City</th>
             <th>Country</th>
             <th>Postal Code</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -35,6 +36,50 @@
                 <td>@item.City</td>
                 <td>@item.Country</td>
                 <td>@item.PostalCode</td>
+                <td>
+                    <a href="#">Edit</a> |
+                    <a href="#">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+<br />
+
+<h2>Shipper Contact Infos Copy</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Shipper</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Postal Code</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Shipper.CompanyName</td>
+                <td>@item.Email</td>
+                <td>@item.Website</td>
+                <td>@item.Phone</td>
+                <td>@item.Address</td>
+                <td>@item.City</td>
+                <td>@item.Country</td>
+                <td>@item.PostalCode</td>
+                <td>
+                    <a href="#">Edit</a> |
+                    <a href="#">Delete</a>
+                </td>
             </tr>
         }
     </tbody>
