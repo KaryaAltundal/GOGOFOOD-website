@@ -1,16 +1,17 @@
 @model IEnumerable<Northwind.Mvc.Models.ShipperContactInfo>
+@using Northwind.Mvc.Models
 
 @{
     ViewData["Title"] = "Shipper Contact Infos";
+    var secondList = ViewBag.SecondList as List<ShipperContactInfo>;
 }
-
+<div class="container mt-4">
 <h2>Shipper Contact Infos</h2>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
+<a asp-action="Create" class="btn btn-purple mb-3">Create New</a>
 
-<table class="table table-bordered">
+
+<table class="table table-striped table-hover table-bordered shadow">
     <thead>
         <tr>
             <th>Shipper</th>
@@ -37,9 +38,9 @@
                 <td>@item.Country</td>
                 <td>@item.PostalCode</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ContactInfoId">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ContactInfoId">Delete</a>
-                </td>
+    <a asp-action="Edit" asp-route-id="@item.ContactInfoId" class="btn btn-sm btn-warning">Edit</a>
+    <a asp-action="Delete" asp-route-id="@item.ContactInfoId" class="btn btn-sm btn-danger">Delete</a>
+</td>
             </tr>
         }
     </tbody>
@@ -50,7 +51,7 @@
 
 <h2>Shipper Contact Infos Copy</h2>
 
-<table class="table table-bordered">
+<table class="table table-striped table-hover table-bordered shadow">
     <thead>
         <tr>
             <th>Shipper</th>
@@ -65,22 +66,43 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @if (secondList != null)
         {
-            <tr>
-                <td>@item.Shipper.CompanyName</td>
-                <td>@item.Email</td>
-                <td>@item.Website</td>
-                <td>@item.Phone</td>
-                <td>@item.Address</td>
-                <td>@item.City</td>
-                <td>@item.Country</td>
-                <td>@item.PostalCode</td>
-                <td>
-                    <a href="#">Edit</a> |
-                    <a href="#">Delete</a>
-                </td>
-            </tr>
+            @foreach (var item in secondList)
+            {
+                <tr>
+                    <td>@item.Shipper.CompanyName</td>
+                    <td>@item.Email</td>
+                    <td>@item.Website</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Address</td>
+                    <td>@item.City</td>
+                    <td>@item.Country</td>
+                    <td>@item.PostalCode</td>
+                    <td>
+    <a asp-action="Edit" asp-route-id="@item.ContactInfoId" class="btn btn-sm btn-warning">Edit</a>
+
+    <form asp-action="SoftDelete" method="post" style="display:inline;">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@item.ContactInfoId" />
+        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+    </form>
+</td>
+                </tr>
+            }
         }
     </tbody>
 </table>
+<style>
+    .btn-purple {
+        background-color: #6f42c1;
+        color: white;
+        border: none;
+    }
+
+    .btn-purple:hover {
+        background-color: #5a32a3;
+        color: white;
+    }
+</style>
+</div>

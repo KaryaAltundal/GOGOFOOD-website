@@ -552,6 +552,9 @@ public partial class NorthwindContext : DbContext
             entity.Property(e => e.City).HasMaxLength(100);
             entity.Property(e => e.Country).HasMaxLength(100);
             entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true, "DF_ShipperContactInfos_isActive")
+                .HasColumnName("isActive");
             entity.Property(e => e.Phone).HasMaxLength(30);
             entity.Property(e => e.PostalCode).HasMaxLength(20);
             entity.Property(e => e.ShipperId).HasColumnName("ShipperID");

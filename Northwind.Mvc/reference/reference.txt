@@ -16,3 +16,10 @@ Accessed: April 3, 2026.
 [3] OpenAI, "added features for edit and delete for the first table" ChatGPT shared conversation. [Online].
 Available: https://chatgpt.com/share/69cf8629-c7c0-8385-9c36-cc02b97bab75
 Accessed: April 3, 2026.
+
+
+
+
+[4] OpenAI, "added the delete future for the second table" ChatGPT shared conversation. [Online].
+Available:https://chatgpt.com/share/69cf8ddb-3924-8395-a4cc-ec2b6ec94864
+Accessed: April 3, 2026.

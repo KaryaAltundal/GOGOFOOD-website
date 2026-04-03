@@ -14,15 +14,21 @@ namespace Northwind.Mvc.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var list = await _context.ShipperContactInfos
-                .Include(x => x.Shipper)
-                .ToListAsync();
+       public async Task<IActionResult> Index()
+{
+    var firstList = await _context.ShipperContactInfos
+        .Include(x => x.Shipper)
+        .ToListAsync();
 
-            return View(list);
-        }
+    var secondList = await _context.ShipperContactInfos
+        .Include(x => x.Shipper)
+        .Where(x => x.IsActive == true)
+        .ToListAsync();
 
+    ViewBag.SecondList = secondList;
+
+    return View(firstList);
+}
         public IActionResult Create()
         {
             ViewBag.Shippers = new SelectList(_context.Shippers, "ShipperId", "CompanyName");
@@ -43,7 +49,7 @@ namespace Northwind.Mvc.Controllers
                 ViewBag.Shippers = new SelectList(_context.Shippers, "ShipperId", "CompanyName", shipperContactInfo.ShipperId);
                 return View(shipperContactInfo);
             }
-
+            shipperContactInfo.IsActive = true;
             _context.ShipperContactInfos.Add(shipperContactInfo);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -109,6 +115,20 @@ public async Task<IActionResult> Edit(int id, ShipperContactInfo shipperContactI
 
     _context.Update(shipperContactInfo);
     await _context.SaveChangesAsync();
+
+    return RedirectToAction(nameof(Index));
+}
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> SoftDelete(int id)
+{
+    var item = await _context.ShipperContactInfos.FindAsync(id);
+
+    if (item != null)
+    {
+        item.IsActive = false;
+        await _context.SaveChangesAsync();
+    }
 
     return RedirectToAction(nameof(Index));
 }
