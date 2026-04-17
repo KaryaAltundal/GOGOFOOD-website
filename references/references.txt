@@ -2,3 +2,11 @@
 [1] OpenAI, “week6 chat" ChatGPT shared conversation. [Online].
 Available:https://chatgpt.com/share/69d8ae47-fc64-838a-9d14-af3f2aa77d53
 Accessed: Apr 10, 2026.
+
+[2] OpenAI, “week7 chat" ChatGPT shared conversation. [Online].
+Available:https://chatgpt.com/share/69d8ae47-fc64-838a-9d14-af3f2aa77d53
+Accessed: Apr 17, 2026.
+
+[3] OpenAI, “week7 chat" ChatGPT shared conversation. [Online].
+Available:https://chatgpt.com/share/69e201e4-4d5c-8397-a288-c197a66e41f3
+Accessed: Apr 17, 2026.
