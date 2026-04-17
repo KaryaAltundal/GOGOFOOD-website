@@ -55,14 +55,10 @@ namespace GOGOFOOD.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuItemId"));
 
-                    b.Property<int>("CaretakerId")
+                    b.Property<int?>("CaretakerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -153,6 +149,10 @@ namespace GOGOFOOD.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
@@ -160,13 +160,9 @@ namespace GOGOFOOD.Migrations
 
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
-                    b.HasOne("GOGOFOOD.Models.Caretaker", "Caretaker")
+                    b.HasOne("GOGOFOOD.Models.Caretaker", null)
                         .WithMany("MenuItems")
-                        .HasForeignKey("CaretakerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Caretaker");
+                        .HasForeignKey("CaretakerId");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>
@@ -183,7 +179,7 @@ namespace GOGOFOOD.Migrations
             modelBuilder.Entity("GOGOFOOD.Models.OrderItem", b =>
                 {
                     b.HasOne("GOGOFOOD.Models.MenuItem", "MenuItem")
-                        .WithMany("OrderItems")
+                        .WithMany()
                         .HasForeignKey("MenuItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -202,11 +198,6 @@ namespace GOGOFOOD.Migrations
             modelBuilder.Entity("GOGOFOOD.Models.Caretaker", b =>
                 {
                     b.Navigation("MenuItems");
-                });
-
-            modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
-                {
-                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>

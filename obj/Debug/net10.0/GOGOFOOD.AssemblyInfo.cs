@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GOGOFOOD")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+83bc9c0de6e7f18abd7d708a284de00733bdbd43")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db68df0c61f2f0a3fe097183d02b9fc17676299b")]
 [assembly: System.Reflection.AssemblyProductAttribute("GOGOFOOD")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GOGOFOOD")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,16 @@
+@model List<GOGOFOOD.Models.MenuItem>
+
+@{
+    ViewData["Title"] = "Menu";
+}
+
+<h1>Our Menu</h1>
+
+@foreach (var item in Model)
+{
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <h3>@item.Name</h3>
+        <p>@item.Description</p>
+        <p>Price: @item.Price</p>
+    </div>
+}

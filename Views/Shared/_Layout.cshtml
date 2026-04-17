@@ -5,32 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GOGOFOOD</title>
     <script type="importmap"></script>
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-       <nav class="navbar-custom">
-    <div class="logo">
-        GOGO<span>FOOD</span>
-    </div>
+        <nav class="navbar-custom">
+            <div class="logo">
+                GOGO<span>FOOD</span>
+            </div>
 
-    <ul class="nav-links">
-        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-        <li><a href="#">Menu</a></li>
-        <li><a href="#">Login</a></li>
-    </ul>
+            <ul class="nav-links">
+                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li><a asp-controller="MenuItem" asp-action="Index">Menu</a></li>
+            </ul>
 
-    <div class="nav-right">
-        <a href="#" class="btn-login">Login</a>
-        <a href="#" class="btn-signup">Sign Up</a>
-    </div>
-</nav>
+            <div class="nav-right">
+                <a asp-controller="Account" asp-action="Login" class="btn-login">Login</a>
+                <a asp-controller="Account" asp-action="Register" class="btn-signup">Register</a>
+            </div>
+        </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -38,8 +39,9 @@
     </div>
 
     <footer class="footer">
-    <p>© 2026 GOGOFOOD - All Rights Reserved</p>
-</footer>
+        <p>© 2026 GOGOFOOD - All Rights Reserved</p>
+    </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
