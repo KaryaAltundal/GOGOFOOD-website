@@ -13,27 +13,52 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
         <nav class="navbar-custom">
-            <div class="logo">
+            <a asp-controller="Home" asp-action="Index" class="logo">
                 GOGO<span>FOOD</span>
-            </div>
+            </a>
 
             <ul class="nav-links">
-                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                <li><a asp-controller="MenuItem" asp-action="Index">Menu</a></li>
+                <li><a asp-controller="Home" asp-action="Index">🏠Home</a></li>
+                <li><a asp-controller="MenuItem" asp-action="Index">🍽Menu</a></li>
+
+                @if (!string.IsNullOrEmpty(Context.Session.GetString("UserEmail")) 
+                    && Context.Session.GetString("UserRole") != "Caretaker")
+                {
+                    <li><a asp-controller="Cart" asp-action="Index">🛒Cart</a></li>
+                    <li><a asp-controller="Order" asp-action="Index">📦Orders</a></li>
+                }
+
+                @if (Context.Session.GetString("UserRole") == "Caretaker")
+                {
+                    <li><a asp-controller="MenuItem" asp-action="Create">➕Add Menu</a></li>
+                    <li><a asp-controller="CustomizationOption" asp-action="Create">Customization</a></li>
+                }
             </ul>
 
             <div class="nav-right">
-                <a asp-controller="Account" asp-action="Login" class="btn-login">Login</a>
-                <a asp-controller="Account" asp-action="Register" class="btn-signup">Register</a>
+                @if (string.IsNullOrEmpty(Context.Session.GetString("UserEmail")))
+                {
+                    <a asp-controller="Account" asp-action="Login" class="btn-login">Login</a>
+                    <a asp-controller="Account" asp-action="Register" class="btn-signup">Register</a>
+                }
+                else
+                {
+                    <span class="welcome-user">
+                        Hello, @Context.Session.GetString("UserName")
+                    </span>
+
+                    <a asp-controller="Account" asp-action="Logout" class="btn-logout">Logout</a>
+                }
             </div>
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="page-wrapper">
+        <main class="main-content">
             @RenderBody()
         </main>
     </div>
@@ -45,6 +70,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

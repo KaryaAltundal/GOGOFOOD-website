@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Menu";
+    var role = Context.Session.GetString("UserRole");
 }
 
 <h1>Our Menu</h1>
@@ -12,5 +13,48 @@
         <h3>@item.Name</h3>
         <p>@item.Description</p>
         <p>Price: @item.Price</p>
+
+        @if (role == "Caretaker")
+        {
+            <a asp-controller="CustomizationOption"
+               asp-action="Create"
+               asp-route-menuItemId="@item.MenuItemId">
+                Add Custom Ingredient
+            </a>
+
+            <br />
+
+            <a asp-controller="CustomizationOption"
+               asp-action="Index"
+               asp-route-menuItemId="@item.MenuItemId">
+                Manage Custom Ingredients
+            </a>
+        }
+        else
+        {
+            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                <input type="hidden" name="id" value="@item.MenuItemId" />
+                <input type="hidden" name="name" value="@item.Name" />
+                <input type="hidden" name="price" value="@item.Price" />
+
+                <label>Customization</label>
+
+                <select name="customizationOptionId">
+                    <option value="0">No customization</option>
+
+                    @if (item.CustomizationOptions != null)
+                    {
+                        foreach (var option in item.CustomizationOptions)
+                        {
+                            <option value="@option.CustomizationOptionId">
+                                @option.Name (+@option.ExtraPrice)
+                            </option>
+                        }
+                    }
+                </select>
+
+                <button type="submit">Add to Cart</button>
+            </form>
+        }
     </div>
 }

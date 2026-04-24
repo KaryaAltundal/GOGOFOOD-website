@@ -1,0 +1,60 @@
+@model List<GOGOFOOD.Models.CustomizationOption>
+
+@{
+    ViewData["Title"] = "Manage Custom Ingredients";
+}
+
+<h2>Manage Custom Ingredients</h2>
+
+@if (Model.Count == 0)
+{
+    <p>No custom ingredients added for this menu item.</p>
+}
+else
+{
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Ingredient Name</th>
+            <th>Extra Price</th>
+            <th>Action</th>
+        </tr>
+
+        @foreach (var option in Model)
+        {
+            <tr>
+                <td>@option.Name</td>
+                <td>@option.ExtraPrice</td>
+                <td>
+    <a asp-controller="CustomizationOption"
+       asp-action="Edit"
+       asp-route-id="@option.CustomizationOptionId">
+        Edit
+    </a>
+
+    |
+
+    <a asp-controller="CustomizationOption"
+       asp-action="Delete"
+       asp-route-id="@option.CustomizationOptionId">
+        Delete
+    </a>
+</td>
+            </tr>
+        }
+    </table>
+}
+
+<br />
+
+<a asp-controller="CustomizationOption"
+   asp-action="Create"
+   asp-route-menuItemId="@ViewBag.MenuItemId">
+    Add New Custom Ingredient
+</a>
+
+<br />
+<br />
+
+<a asp-controller="MenuItem" asp-action="Index">
+    Back to Menu
+</a>

@@ -1,0 +1,34 @@
+@model GOGOFOOD.Models.CustomizationOption
+
+@{
+    ViewData["Title"] = "Edit Custom Ingredient";
+}
+
+<h2>Edit Custom Ingredient</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="CustomizationOptionId" />
+    <input type="hidden" asp-for="MenuItemId" />
+
+    <div>
+        <label>Ingredient Name</label>
+        <input asp-for="Name" />
+    </div>
+
+    <div>
+        <label>Extra Price</label>
+        <input asp-for="ExtraPrice" />
+    </div>
+
+    <button type="submit">Update</button>
+
+</form>
+
+<br />
+
+<a asp-controller="CustomizationOption"
+   asp-action="Index"
+   asp-route-menuItemId="@Model.MenuItemId">
+    Back
+</a>

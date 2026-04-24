@@ -1,7 +1,7 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace GOGOFOOD.Controllers
@@ -18,7 +18,10 @@ namespace GOGOFOOD.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var menuItems = _context.MenuItems.ToList();
+            var menuItems = _context.MenuItems
+                .Include(m => m.CustomizationOptions)
+                .ToList();
+
             return View(menuItems);
         }
 
@@ -55,15 +58,10 @@ namespace GOGOFOOD.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (ModelState.IsValid)
-            {
-                _context.MenuItems.Add(item);
-                _context.SaveChanges();
+            _context.MenuItems.Add(item);
+            _context.SaveChanges();
 
-                return RedirectToAction("Index", "MenuItem");
-            }
-
-            return View(item);
+            return RedirectToAction("Index", "MenuItem");
         }
     }
 }

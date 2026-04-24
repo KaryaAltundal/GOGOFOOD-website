@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GOGOFOOD.Migrations
 {
     [DbContext(typeof(GogoFoodContext))]
-    [Migration("20260410072957_InitialCreate")]
+    [Migration("20260424125344_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -50,6 +50,31 @@ namespace GOGOFOOD.Migrations
                     b.ToTable("Caretakers");
                 });
 
+            modelBuilder.Entity("GOGOFOOD.Models.CustomizationOption", b =>
+                {
+                    b.Property<int>("CustomizationOptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomizationOptionId"));
+
+                    b.Property<decimal>("ExtraPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MenuItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CustomizationOptionId");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.ToTable("CustomizationOptions");
+                });
+
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
                     b.Property<int>("MenuItemId")
@@ -58,14 +83,10 @@ namespace GOGOFOOD.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuItemId"));
 
-                    b.Property<int>("CaretakerId")
+                    b.Property<int?>("CaretakerId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -156,20 +177,31 @@ namespace GOGOFOOD.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
+            modelBuilder.Entity("GOGOFOOD.Models.CustomizationOption", b =>
                 {
-                    b.HasOne("GOGOFOOD.Models.Caretaker", "Caretaker")
-                        .WithMany("MenuItems")
-                        .HasForeignKey("CaretakerId")
+                    b.HasOne("GOGOFOOD.Models.MenuItem", "MenuItem")
+                        .WithMany("CustomizationOptions")
+                        .HasForeignKey("MenuItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Caretaker");
+                    b.Navigation("MenuItem");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
+                {
+                    b.HasOne("GOGOFOOD.Models.Caretaker", null)
+                        .WithMany("MenuItems")
+                        .HasForeignKey("CaretakerId");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>
@@ -186,7 +218,7 @@ namespace GOGOFOOD.Migrations
             modelBuilder.Entity("GOGOFOOD.Models.OrderItem", b =>
                 {
                     b.HasOne("GOGOFOOD.Models.MenuItem", "MenuItem")
-                        .WithMany("OrderItems")
+                        .WithMany()
                         .HasForeignKey("MenuItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -209,7 +241,7 @@ namespace GOGOFOOD.Migrations
 
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
-                    b.Navigation("OrderItems");
+                    b.Navigation("CustomizationOptions");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>

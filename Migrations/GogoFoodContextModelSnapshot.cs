@@ -47,6 +47,31 @@ namespace GOGOFOOD.Migrations
                     b.ToTable("Caretakers");
                 });
 
+            modelBuilder.Entity("GOGOFOOD.Models.CustomizationOption", b =>
+                {
+                    b.Property<int>("CustomizationOptionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomizationOptionId"));
+
+                    b.Property<decimal>("ExtraPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MenuItemId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CustomizationOptionId");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.ToTable("CustomizationOptions");
+                });
+
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
                     b.Property<int>("MenuItemId")
@@ -87,6 +112,10 @@ namespace GOGOFOOD.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -107,6 +136,13 @@ namespace GOGOFOOD.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemId"));
+
+                    b.Property<string>("CustomizationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("CustomizationPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MenuItemId")
                         .HasColumnType("int");
@@ -158,6 +194,17 @@ namespace GOGOFOOD.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("GOGOFOOD.Models.CustomizationOption", b =>
+                {
+                    b.HasOne("GOGOFOOD.Models.MenuItem", "MenuItem")
+                        .WithMany("CustomizationOptions")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MenuItem");
+                });
+
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
                     b.HasOne("GOGOFOOD.Models.Caretaker", null)
@@ -198,6 +245,11 @@ namespace GOGOFOOD.Migrations
             modelBuilder.Entity("GOGOFOOD.Models.Caretaker", b =>
                 {
                     b.Navigation("MenuItems");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
+                {
+                    b.Navigation("CustomizationOptions");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>

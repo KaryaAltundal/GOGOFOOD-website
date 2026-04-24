@@ -9,11 +9,11 @@ namespace GOGOFOOD.Data
             : base(options)
         {
         }
-
-        public DbSet<User> Users { get; set; }
-        public DbSet<Caretaker> Caretakers { get; set; }
-        public DbSet<MenuItem> MenuItems { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderItem> OrderItems { get; set; }
+public DbSet<User> Users { get; set; }
+public DbSet<Caretaker> Caretakers { get; set; }
+public DbSet<MenuItem> MenuItems { get; set; }
+public DbSet<CustomizationOption> CustomizationOptions { get; set; }
+public DbSet<Order> Orders { get; set; }
+public DbSet<OrderItem> OrderItems { get; set; }
     }
 }

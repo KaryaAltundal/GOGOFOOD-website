@@ -1,0 +1,56 @@
+@model List<GOGOFOOD.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<h2>Payment Simulation</h2>
+
+<h3>Order Summary</h3>
+
+<table border="1" cellpadding="10">
+    <tr>
+        <th>Item</th>
+        <th>Customization</th>
+        <th>Quantity</th>
+        <th>Total</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Customization</td>
+            <td>@item.Quantity</td>
+            <td>@item.TotalPrice</td>
+        </tr>
+    }
+</table>
+
+<h3>Total Price: @Model.Sum(x => x.TotalPrice)</h3>
+
+<h3>Card Information</h3>
+
+<form asp-controller="Payment" asp-action="CompletePayment" method="post">
+    <div>
+        <label>Card Holder Name</label>
+        <input type="text" name="cardHolder" required />
+    </div>
+
+    <div>
+        <label>Card Number</label>
+        <input type="text" name="cardNumber" required minlength="16" maxlength="16" />
+    </div>
+
+    <div>
+        <label>Expiration Date</label>
+        <input type="text" name="expirationDate" placeholder="MM/YY" required />
+    </div>
+
+    <div>
+        <label>CVV</label>
+        <input type="text" name="cvv" required minlength="3" maxlength="3" />
+    </div>
+
+    <button type="submit">Pay Now</button>
+</form>

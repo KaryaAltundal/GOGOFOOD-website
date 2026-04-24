@@ -34,7 +34,8 @@ namespace GOGOFOOD.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,8 +51,7 @@ namespace GOGOFOOD.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CaretakerId = table.Column<int>(type: "int", nullable: false)
+                    CaretakerId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -60,8 +60,7 @@ namespace GOGOFOOD.Migrations
                         name: "FK_MenuItems_Caretakers_CaretakerId",
                         column: x => x.CaretakerId,
                         principalTable: "Caretakers",
-                        principalColumn: "CaretakerId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CaretakerId");
                 });
 
             migrationBuilder.CreateTable(
@@ -82,6 +81,27 @@ namespace GOGOFOOD.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomizationOptions",
+                columns: table => new
+                {
+                    CustomizationOptionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExtraPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MenuItemId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomizationOptions", x => x.CustomizationOptionId);
+                    table.ForeignKey(
+                        name: "FK_CustomizationOptions_MenuItems_MenuItemId",
+                        column: x => x.MenuItemId,
+                        principalTable: "MenuItems",
+                        principalColumn: "MenuItemId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -114,6 +134,11 @@ namespace GOGOFOOD.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_CustomizationOptions_MenuItemId",
+                table: "CustomizationOptions",
+                column: "MenuItemId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MenuItems_CaretakerId",
                 table: "MenuItems",
                 column: "CaretakerId");
@@ -137,6 +162,9 @@ namespace GOGOFOOD.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "CustomizationOptions");
+
             migrationBuilder.DropTable(
                 name: "OrderItems");
 
