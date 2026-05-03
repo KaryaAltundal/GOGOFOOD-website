@@ -34,6 +34,12 @@ namespace GOGOFOOD.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -42,9 +48,54 @@ namespace GOGOFOOD.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("CaretakerId");
 
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
                     b.ToTable("Caretakers");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.CaretakerRating", b =>
+                {
+                    b.Property<int>("CaretakerRatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CaretakerRatingId"));
+
+                    b.Property<int>("CaretakerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RatingValue")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CaretakerRatingId");
+
+                    b.HasIndex("CaretakerId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CaretakerRatings");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.CustomizationOption", b =>
@@ -56,6 +107,7 @@ namespace GOGOFOOD.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomizationOptionId"));
 
                     b.Property<decimal>("ExtraPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MenuItemId")
@@ -92,6 +144,7 @@ namespace GOGOFOOD.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("MenuItemId");
@@ -99,6 +152,44 @@ namespace GOGOFOOD.Migrations
                     b.HasIndex("CaretakerId");
 
                     b.ToTable("MenuItems");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.MenuItemRating", b =>
+                {
+                    b.Property<int>("MenuItemRatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MenuItemRatingId"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MenuItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RatingValue")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("MenuItemRatingId");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MenuItemRatings");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>
@@ -117,6 +208,7 @@ namespace GOGOFOOD.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UserId")
@@ -142,6 +234,7 @@ namespace GOGOFOOD.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("CustomizationPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("MenuItemId")
@@ -154,6 +247,7 @@ namespace GOGOFOOD.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("OrderItemId");
@@ -163,6 +257,36 @@ namespace GOGOFOOD.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.SystemLog", b =>
+                {
+                    b.Property<int>("SystemLogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SystemLogId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserRole")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SystemLogId");
+
+                    b.ToTable("SystemLogs");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.User", b =>
@@ -176,6 +300,12 @@ namespace GOGOFOOD.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -194,6 +324,43 @@ namespace GOGOFOOD.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("GOGOFOOD.Models.Caretaker", b =>
+                {
+                    b.HasOne("GOGOFOOD.Models.User", "User")
+                        .WithOne("Caretaker")
+                        .HasForeignKey("GOGOFOOD.Models.Caretaker", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.CaretakerRating", b =>
+                {
+                    b.HasOne("GOGOFOOD.Models.Caretaker", "Caretaker")
+                        .WithMany("CaretakerRatings")
+                        .HasForeignKey("CaretakerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GOGOFOOD.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GOGOFOOD.Models.User", "User")
+                        .WithMany("CaretakerRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Caretaker");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GOGOFOOD.Models.CustomizationOption", b =>
                 {
                     b.HasOne("GOGOFOOD.Models.MenuItem", "MenuItem")
@@ -207,9 +374,39 @@ namespace GOGOFOOD.Migrations
 
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
-                    b.HasOne("GOGOFOOD.Models.Caretaker", null)
+                    b.HasOne("GOGOFOOD.Models.Caretaker", "Caretaker")
                         .WithMany("MenuItems")
-                        .HasForeignKey("CaretakerId");
+                        .HasForeignKey("CaretakerId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Caretaker");
+                });
+
+            modelBuilder.Entity("GOGOFOOD.Models.MenuItemRating", b =>
+                {
+                    b.HasOne("GOGOFOOD.Models.MenuItem", "MenuItem")
+                        .WithMany("MenuItemRatings")
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GOGOFOOD.Models.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GOGOFOOD.Models.User", "User")
+                        .WithMany("MenuItemRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("MenuItem");
+
+                    b.Navigation("Order");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>
@@ -244,12 +441,16 @@ namespace GOGOFOOD.Migrations
 
             modelBuilder.Entity("GOGOFOOD.Models.Caretaker", b =>
                 {
+                    b.Navigation("CaretakerRatings");
+
                     b.Navigation("MenuItems");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.MenuItem", b =>
                 {
                     b.Navigation("CustomizationOptions");
+
+                    b.Navigation("MenuItemRatings");
                 });
 
             modelBuilder.Entity("GOGOFOOD.Models.Order", b =>
@@ -259,6 +460,12 @@ namespace GOGOFOOD.Migrations
 
             modelBuilder.Entity("GOGOFOOD.Models.User", b =>
                 {
+                    b.Navigation("Caretaker");
+
+                    b.Navigation("CaretakerRatings");
+
+                    b.Navigation("MenuItemRatings");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618

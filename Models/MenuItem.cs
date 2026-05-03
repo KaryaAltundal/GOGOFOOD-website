@@ -10,6 +10,12 @@ namespace GOGOFOOD.Models
 
         public string Description { get; set; } = string.Empty;
 
+        public int? CaretakerId { get; set; }
+
+        public Caretaker? Caretaker { get; set; }
+
         public List<CustomizationOption>? CustomizationOptions { get; set; }
+
+        public List<MenuItemRating>? MenuItemRatings { get; set; }
     }
 }

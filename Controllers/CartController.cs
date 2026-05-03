@@ -24,7 +24,9 @@ namespace GOGOFOOD.Controllers
                 return new List<CartItem>();
             }
 
-            return JsonSerializer.Deserialize<List<CartItem>>(cartJson);
+            var cart = JsonSerializer.Deserialize<List<CartItem>>(cartJson);
+
+            return cart ?? new List<CartItem>();
         }
 
         private void SaveCart(List<CartItem> cart)
@@ -71,6 +73,7 @@ namespace GOGOFOOD.Controllers
             {
                 cart.Add(new CartItem
                 {
+                    CartItemKey = Guid.NewGuid().ToString(),
                     MenuItemId = id,
                     Name = name,
                     Price = price,
@@ -85,11 +88,11 @@ namespace GOGOFOOD.Controllers
             return RedirectToAction("Index", "Cart");
         }
 
-        public IActionResult IncreaseQuantity(int id)
+        public IActionResult IncreaseQuantity(string cartItemKey)
         {
             var cart = GetCart();
 
-            var item = cart.FirstOrDefault(x => x.MenuItemId == id);
+            var item = cart.FirstOrDefault(x => x.CartItemKey == cartItemKey);
 
             if (item != null)
             {
@@ -101,11 +104,11 @@ namespace GOGOFOOD.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult DecreaseQuantity(int id)
+        public IActionResult DecreaseQuantity(string cartItemKey)
         {
             var cart = GetCart();
 
-            var item = cart.FirstOrDefault(x => x.MenuItemId == id);
+            var item = cart.FirstOrDefault(x => x.CartItemKey == cartItemKey);
 
             if (item != null)
             {
@@ -122,11 +125,11 @@ namespace GOGOFOOD.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult RemoveItem(int id)
+        public IActionResult RemoveItem(string cartItemKey)
         {
             var cart = GetCart();
 
-            var item = cart.FirstOrDefault(x => x.MenuItemId == id);
+            var item = cart.FirstOrDefault(x => x.CartItemKey == cartItemKey);
 
             if (item != null)
             {

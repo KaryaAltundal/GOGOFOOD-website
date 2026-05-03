@@ -34,13 +34,13 @@ else
                 <td>
                     <a asp-controller="Cart"
                        asp-action="DecreaseQuantity"
-                       asp-route-id="@item.MenuItemId">-</a>
+                       asp-route-cartItemKey="@item.CartItemKey">-</a>
 
                     @item.Quantity
 
                     <a asp-controller="Cart"
                        asp-action="IncreaseQuantity"
-                       asp-route-id="@item.MenuItemId">+</a>
+                       asp-route-cartItemKey="@item.CartItemKey">+</a>
                 </td>
 
                 <td>@item.TotalPrice</td>
@@ -48,7 +48,7 @@ else
                 <td>
                     <a asp-controller="Cart"
                        asp-action="RemoveItem"
-                       asp-route-id="@item.MenuItemId">
+                       asp-route-cartItemKey="@item.CartItemKey">
                         Remove
                     </a>
                 </td>

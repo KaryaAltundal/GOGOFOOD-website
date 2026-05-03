@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Rate Caretaker";
+}
+
+<h1>Rate Caretaker ⭐</h1>
+
+@if (ViewBag.RestaurantName != null)
+{
+    <h3>@ViewBag.RestaurantName</h3>
+}
+
+@if (ViewBag.CaretakerName != null)
+{
+    <p><strong>Caretaker:</strong> @ViewBag.CaretakerName</p>
+}
+
+@if (ViewBag.Error != null)
+{
+    <p style="color:red;">@ViewBag.Error</p>
+}
+
+<form asp-controller="Rating" asp-action="AddCaretakerRating" method="post">
+    <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+    <input type="hidden" name="caretakerId" value="@ViewBag.CaretakerId" />
+
+    <label>Rating</label>
+    <select name="ratingValue" required>
+        <option value="">Select rating</option>
+        <option value="1">1 - Very Bad</option>
+        <option value="2">2 - Bad</option>
+        <option value="3">3 - Average</option>
+        <option value="4">4 - Good</option>
+        <option value="5">5 - Excellent</option>
+    </select>
+
+    <label>Comment</label>
+    <input type="text" name="comment" placeholder="Write your comment..." />
+
+    <button type="submit">Submit Caretaker Rating</button>
+</form>
+
+<br />
+
+<a asp-controller="Order" asp-action="Index">Back to Orders</a>

@@ -1,28 +1,109 @@
 @model List<GOGOFOOD.Models.Order>
 
-<h2>Your Orders</h2>
+@{
+    ViewData["Title"] = "Orders";
+    var role = Context.Session.GetString("UserRole");
+}
 
-@foreach (var order in Model)
+<h1>Orders 📦</h1>
+
+@if (TempData["RatingMessage"] != null)
 {
-    <div style="border:1px solid #ccc; margin:10px; padding:10px;">
-        <p><b>Date:</b> @order.OrderDate</p>
-        <p><b>Total:</b> @order.TotalPrice</p>
+    <p style="color:green; font-weight:bold;">@TempData["RatingMessage"]</p>
+}
 
-        <table border="1" cellpadding="5">
-            <tr>
-                <th>Item</th>
-                <th>Customization</th>
-                <th>Qty</th>
-            </tr>
+@if (Model.Count == 0)
+{
+    <p>No orders found.</p>
+}
+else
+{
+    @foreach (var order in Model)
+    {
+        <div class="card" style="margin-bottom:20px;">
+            <h3>Order #@order.OrderId</h3>
 
-            @foreach (var item in order.OrderItems)
+            <p><strong>Date:</strong> @order.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+            <p><strong>Status:</strong> @order.Status</p>
+            <p><strong>Total:</strong> @order.TotalPrice</p>
+
+            @if (order.User != null)
             {
-                <tr>
-                    <td>@item.MenuItem.Name</td>
-                    <td>@item.CustomizationName</td>
-                    <td>@item.Quantity</td>
-                </tr>
+                <p><strong>User:</strong> @order.User.Name (@order.User.Email)</p>
             }
-        </table>
-    </div>
+
+            <table>
+                <tr>
+                    <th>Menu Item</th>
+                    <th>Caretaker / Restaurant</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Customization</th>
+                    <th>Customization Price</th>
+                    <th>Menu Rating</th>
+                    <th>Caretaker Rating</th>
+                </tr>
+
+                @if (order.OrderItems != null)
+                {
+                    foreach (var item in order.OrderItems)
+                    {
+                        <tr>
+                            <td>@item.MenuItem?.Name</td>
+
+                            <td>
+                                @if (item.MenuItem?.Caretaker != null)
+                                {
+                                    <span>@item.MenuItem.Caretaker.RestaurantName</span>
+                                }
+                                else
+                                {
+                                    <span>No caretaker assigned</span>
+                                }
+                            </td>
+
+                            <td>@item.Quantity</td>
+                            <td>@item.UnitPrice</td>
+                            <td>@item.CustomizationName</td>
+                            <td>@item.CustomizationPrice</td>
+
+                            <td>
+                                @if (role == "User" && order.Status == "Completed")
+                                {
+                                    <a asp-controller="Rating"
+                                       asp-action="AddMenuItemRating"
+                                       asp-route-orderId="@order.OrderId"
+                                       asp-route-menuItemId="@item.MenuItemId">
+                                        Rate Menu Item
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (role == "User" &&
+                                     order.Status == "Completed" &&
+                                     item.MenuItem?.CaretakerId != null)
+                                {
+                                    <a asp-controller="Rating"
+                                       asp-action="AddCaretakerRating"
+                                       asp-route-orderId="@order.OrderId"
+                                       asp-route-caretakerId="@item.MenuItem.CaretakerId">
+                                        Rate Caretaker
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+    }
 }

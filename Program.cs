@@ -1,4 +1,5 @@
 using GOGOFOOD.Data;
+using GOGOFOOD.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddDbContext<GogoFoodContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSession();
+
+builder.Services.AddScoped<LogService>();
 
 var app = builder.Build();
 

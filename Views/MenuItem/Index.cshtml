@@ -9,10 +9,47 @@
 
 @foreach (var item in Model)
 {
-    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+    <div class="card" style="margin-bottom:20px;">
         <h3>@item.Name</h3>
         <p>@item.Description</p>
-        <p>Price: @item.Price</p>
+        <p><strong>Price:</strong> @item.Price</p>
+
+        @if (item.MenuItemRatings != null && item.MenuItemRatings.Count > 0)
+        {
+            <p>
+                <strong>Menu Item Rating:</strong>
+                ⭐ @item.MenuItemRatings.Average(x => x.RatingValue).ToString("0.0") / 5
+                (@item.MenuItemRatings.Count reviews)
+            </p>
+        }
+        else
+        {
+            <p><strong>Menu Item Rating:</strong> No ratings yet</p>
+        }
+
+        @if (item.Caretaker != null)
+        {
+            <p>
+                <strong>Restaurant:</strong> @item.Caretaker.RestaurantName
+            </p>
+
+            @if (item.Caretaker.CaretakerRatings != null && item.Caretaker.CaretakerRatings.Count > 0)
+            {
+                <p>
+                    <strong>Caretaker Rating:</strong>
+                    ⭐ @item.Caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") / 5
+                    (@item.Caretaker.CaretakerRatings.Count reviews)
+                </p>
+            }
+            else
+            {
+                <p><strong>Caretaker Rating:</strong> No ratings yet</p>
+            }
+        }
+        else
+        {
+            <p><strong>Restaurant:</strong> No caretaker assigned</p>
+        }
 
         @if (role == "Caretaker")
         {

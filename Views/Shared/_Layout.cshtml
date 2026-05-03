@@ -35,7 +35,10 @@
                 @if (Context.Session.GetString("UserRole") == "Caretaker")
                 {
                     <li><a asp-controller="MenuItem" asp-action="Create">➕Add Menu</a></li>
-                    <li><a asp-controller="CustomizationOption" asp-action="Create">Customization</a></li>
+                }
+                @if (Context.Session.GetString("UserRole") == "Admin")
+                {
+                    <li><a asp-controller="Admin" asp-action="Logs">📋Logs</a></li>
                 }
             </ul>
 

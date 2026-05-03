@@ -1,5 +1,6 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
+using GOGOFOOD.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -8,10 +9,12 @@ namespace GOGOFOOD.Controllers
     public class PaymentController : Controller
     {
         private readonly GogoFoodContext _context;
+        private readonly LogService _logService;
 
-        public PaymentController(GogoFoodContext context)
+        public PaymentController(GogoFoodContext context, LogService logService)
         {
             _context = context;
+            _logService = logService;
         }
 
         private List<CartItem> GetCart()
@@ -23,7 +26,9 @@ namespace GOGOFOOD.Controllers
                 return new List<CartItem>();
             }
 
-            return JsonSerializer.Deserialize<List<CartItem>>(cartJson);
+            var cart = JsonSerializer.Deserialize<List<CartItem>>(cartJson);
+
+            return cart ?? new List<CartItem>();
         }
 
         private void ClearCart()
@@ -33,6 +38,13 @@ namespace GOGOFOOD.Controllers
 
         public IActionResult Checkout()
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var cart = GetCart();
 
             if (cart.Count == 0)
@@ -46,29 +58,56 @@ namespace GOGOFOOD.Controllers
         [HttpPost]
         public IActionResult CompletePayment(string cardHolder, string cardNumber, string expirationDate, string cvv)
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var userEmail = HttpContext.Session.GetString("UserEmail");
+            var userRole = HttpContext.Session.GetString("UserRole");
+
+            if (userId == null)
+            {
+                _logService.AddLog(
+                    "Payment Failed",
+                    "Payment attempt failed because user was not logged in.",
+                    userEmail,
+                    userRole
+                );
+
+                return RedirectToAction("Login", "Account");
+            }
+
             var cart = GetCart();
 
             if (cart.Count == 0)
             {
+                _logService.AddLog(
+                    "Payment Failed",
+                    "Payment attempt failed because cart was empty.",
+                    userEmail,
+                    userRole
+                );
+
                 return RedirectToAction("Index", "Cart");
             }
 
-            // toplam fiyat
             decimal total = cart.Sum(x => x.TotalPrice);
 
-            // order oluştur
             var order = new Order
             {
                 OrderDate = DateTime.Now,
                 TotalPrice = total,
                 Status = "Completed",
-                UserId = 1 // şimdilik sabit (login sistemi sonra bağlanır)
+                UserId = userId.Value
             };
 
             _context.Orders.Add(order);
             _context.SaveChanges();
 
-            // order items ekle
+            _logService.AddLog(
+                "Order Created",
+                "Order created with Order ID: " + order.OrderId + " Total: " + total,
+                userEmail,
+                userRole
+            );
+
             foreach (var item in cart)
             {
                 var orderItem = new OrderItem
@@ -86,7 +125,13 @@ namespace GOGOFOOD.Controllers
 
             _context.SaveChanges();
 
-            // cart temizle
+            _logService.AddLog(
+                "Payment Completed",
+                "Payment completed successfully for Order ID: " + order.OrderId,
+                userEmail,
+                userRole
+            );
+
             ClearCart();
 
             return RedirectToAction("Success");
