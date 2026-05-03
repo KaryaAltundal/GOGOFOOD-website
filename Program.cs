@@ -1,4 +1,5 @@
 using GOGOFOOD.Data;
+using GOGOFOOD.Models;
 using GOGOFOOD.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<GogoFoodContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddSession();
 
 builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 

@@ -1,6 +1,7 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace GOGOFOOD.Controllers
@@ -14,17 +15,25 @@ namespace GOGOFOOD.Controllers
             _context = context;
         }
 
+        private bool IsCaretakerOwnerOfMenuItem(int menuItemId)
+        {
+            var role = HttpContext.Session.GetString("UserRole");
+            var caretakerId = HttpContext.Session.GetInt32("CaretakerId");
+
+            if (role != "Caretaker" || caretakerId == null)
+            {
+                return false;
+            }
+
+            return _context.MenuItems.Any(x =>
+                x.MenuItemId == menuItemId &&
+                x.CaretakerId == caretakerId.Value);
+        }
+
         [HttpGet]
         public IActionResult Create(int menuItemId)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-
-            if (role != "Caretaker")
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            if (menuItemId == 0)
+            if (!IsCaretakerOwnerOfMenuItem(menuItemId))
             {
                 return RedirectToAction("Index", "MenuItem");
             }
@@ -37,14 +46,7 @@ namespace GOGOFOOD.Controllers
         [HttpPost]
         public IActionResult Create(CustomizationOption option)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-
-            if (role != "Caretaker")
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            if (option.MenuItemId == 0)
+            if (!IsCaretakerOwnerOfMenuItem(option.MenuItemId))
             {
                 return RedirectToAction("Index", "MenuItem");
             }
@@ -57,11 +59,9 @@ namespace GOGOFOOD.Controllers
 
         public IActionResult Index(int menuItemId)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-
-            if (role != "Caretaker")
+            if (!IsCaretakerOwnerOfMenuItem(menuItemId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Index", "MenuItem");
             }
 
             var options = _context.CustomizationOptions
@@ -76,17 +76,16 @@ namespace GOGOFOOD.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-
-            if (role != "Caretaker")
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
             var option = _context.CustomizationOptions
+                .Include(x => x.MenuItem)
                 .FirstOrDefault(x => x.CustomizationOptionId == id);
 
             if (option == null)
+            {
+                return RedirectToAction("Index", "MenuItem");
+            }
+
+            if (!IsCaretakerOwnerOfMenuItem(option.MenuItemId))
             {
                 return RedirectToAction("Index", "MenuItem");
             }
@@ -97,11 +96,9 @@ namespace GOGOFOOD.Controllers
         [HttpPost]
         public IActionResult Edit(CustomizationOption option)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-
-            if (role != "Caretaker")
+            if (!IsCaretakerOwnerOfMenuItem(option.MenuItemId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Index", "MenuItem");
             }
 
             _context.CustomizationOptions.Update(option);
@@ -112,27 +109,25 @@ namespace GOGOFOOD.Controllers
 
         public IActionResult Delete(int id)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-
-            if (role != "Caretaker")
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
             var option = _context.CustomizationOptions
                 .FirstOrDefault(x => x.CustomizationOptionId == id);
 
-            if (option != null)
+            if (option == null)
             {
-                int menuItemId = option.MenuItemId;
-
-                _context.CustomizationOptions.Remove(option);
-                _context.SaveChanges();
-
-                return RedirectToAction("Index", "CustomizationOption", new { menuItemId = menuItemId });
+                return RedirectToAction("Index", "MenuItem");
             }
 
-            return RedirectToAction("Index", "MenuItem");
+            if (!IsCaretakerOwnerOfMenuItem(option.MenuItemId))
+            {
+                return RedirectToAction("Index", "MenuItem");
+            }
+
+            int menuItemId = option.MenuItemId;
+
+            _context.CustomizationOptions.Remove(option);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "CustomizationOption", new { menuItemId = menuItemId });
         }
     }
 }

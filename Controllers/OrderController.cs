@@ -18,6 +18,7 @@ namespace GOGOFOOD.Controllers
         {
             var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
+            var caretakerId = HttpContext.Session.GetInt32("CaretakerId");
 
             if (string.IsNullOrEmpty(role))
             {
@@ -35,6 +36,15 @@ namespace GOGOFOOD.Controllers
             if (role == "User" && userId != null)
             {
                 ordersQuery = ordersQuery.Where(o => o.UserId == userId.Value);
+            }
+
+            if (role == "Caretaker" && caretakerId != null)
+            {
+                ordersQuery = ordersQuery.Where(o =>
+                    o.OrderItems != null &&
+                    o.OrderItems.Any(oi =>
+                        oi.MenuItem != null &&
+                        oi.MenuItem.CaretakerId == caretakerId.Value));
             }
 
             var orders = ordersQuery.ToList();

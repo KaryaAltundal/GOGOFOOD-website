@@ -18,12 +18,27 @@ namespace GOGOFOOD.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var menuItems = _context.MenuItems
+            var role = HttpContext.Session.GetString("UserRole");
+            var caretakerId = HttpContext.Session.GetInt32("CaretakerId");
+
+            var menuItemsQuery = _context.MenuItems
                 .Include(m => m.CustomizationOptions)
                 .Include(m => m.MenuItemRatings)
                 .Include(m => m.Caretaker)
                 .ThenInclude(c => c.CaretakerRatings)
-                .ToList();
+                .AsQueryable();
+
+            if (role == "Caretaker")
+            {
+                if (caretakerId == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                menuItemsQuery = menuItemsQuery.Where(m => m.CaretakerId == caretakerId.Value);
+            }
+
+            var menuItems = menuItemsQuery.ToList();
 
             return View(menuItems);
         }
