@@ -38,8 +38,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/Account/VerifyTwoFactor.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxWZXJpZnlUd29GYWN0b3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/Admin/Logs.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9ncy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/Caretaker/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FyZXRha2VyXFByb2ZpbGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/Cart/Index.cshtml]
@@ -68,6 +76,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/MenuItem/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudUl0ZW1cQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/MenuItem/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVudUl0ZW1cRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/MenuItem/Index.cshtml]
@@ -100,6 +112,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/User/Location.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMb2NhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/karya/OneDrive/Masaüstü/GOGOFOOD/Views/_ViewImports.cshtml]

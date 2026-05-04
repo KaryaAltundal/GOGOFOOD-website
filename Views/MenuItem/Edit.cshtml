@@ -1,0 +1,60 @@
+@model GOGOFOOD.Models.MenuItem
+
+@{
+    ViewData["Title"] = "Edit Menu Item";
+}
+
+<div class="page-title">
+    <h1>Edit Menu Item ✏️</h1>
+    <p>Update the food information and photo.</p>
+</div>
+
+<div class="modern-form-card">
+    @if (ViewBag.ImageError != null)
+    {
+        <div class="alert-modern alert-danger-modern">
+            @ViewBag.ImageError
+        </div>
+    }
+
+    <form asp-controller="MenuItem" asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="MenuItemId" />
+
+        <div class="form-group-modern">
+            <label>Food Name</label>
+            <input asp-for="Name" placeholder="Example: California Roll" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Description</label>
+            <input asp-for="Description" placeholder="Example: Fresh sushi roll with avocado" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Price</label>
+            <input asp-for="Price" type="number" step="0.01" placeholder="Example: 250" required />
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="current-image-box">
+                <label>Current Photo</label>
+                <img src="@Model.ImageUrl" alt="@Model.Name" />
+            </div>
+        }
+
+        <div class="form-group-modern">
+            <label>Change Food Photo</label>
+            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,image/*" />
+            <small>If you do not choose a new photo, the current photo will stay.</small>
+        </div>
+
+        <button type="submit" class="btn-pink">
+            Save Changes
+        </button>
+
+        <a asp-controller="MenuItem" asp-action="Index" class="btn-outline-pink">
+            Cancel
+        </a>
+    </form>
+</div>

@@ -1,0 +1,78 @@
+@model GOGOFOOD.Models.Caretaker
+
+@{
+    ViewData["Title"] = "Restaurant Profile";
+}
+
+<div class="page-title">
+    <h1>Restaurant Profile 🏪</h1>
+    <p>Update your restaurant information and delivery location.</p>
+</div>
+
+@if (TempData["ProfileMessage"] != null)
+{
+    <div class="alert-modern alert-success-modern">
+        @TempData["ProfileMessage"]
+    </div>
+}
+
+@if (TempData["ProfileError"] != null)
+{
+    <div class="alert-modern alert-danger-modern">
+        @TempData["ProfileError"]
+    </div>
+}
+
+<div class="modern-form-card location-form-card">
+    <form asp-controller="Caretaker" asp-action="Profile" method="post" class="vertical-form">
+        <input type="hidden" asp-for="CaretakerId" />
+
+        <div class="form-group-modern">
+            <label>Caretaker Name</label>
+            <input asp-for="Name" placeholder="Example: GOGO BUBBLE TEA" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Restaurant Name</label>
+            <input asp-for="RestaurantName" placeholder="Example: GOGO BUBBLE TEA" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>City</label>
+            <input asp-for="City" placeholder="Example: Ankara" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>District</label>
+            <input asp-for="District" placeholder="Example: Yenimahalle" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Neighborhood</label>
+            <input asp-for="Neighborhood" placeholder="Example: Batıkent" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Street</label>
+            <input asp-for="Street" placeholder="Example: Atatürk Boulevard" />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Address Detail</label>
+            <input asp-for="AddressDetail" placeholder="Apartment, building, door number..." />
+        </div>
+
+        <button type="submit" class="btn-pink">
+            Save Profile
+        </button>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Address))
+{
+    <div class="saved-address-card">
+        <h3>Saved Restaurant Address ✅</h3>
+        <p>@Model.Address</p>
+        <small>This address was checked and saved using Google Maps.</small>
+    </div>
+}

@@ -222,7 +222,7 @@ C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\runtimes\win-x64\n
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\obj\Debug\net10.0\GOGOFOOD.csproj.AssemblyReference.cache
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\obj\Debug\net10.0\GOGOFOOD.csproj.Up2Date
-C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\obj\Debug\net10.0\compressed\l3cowobhrr-{0}-p8sa1z9xz6-p8sa1z9xz6.gz
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\BouncyCastle.Cryptography.dll
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\MailKit.dll
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\MimeKit.dll
+C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\obj\Debug\net10.0\compressed\l3cowobhrr-{0}-l4t3lal9ti-l4t3lal9ti.gz

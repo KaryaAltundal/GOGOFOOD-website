@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Verify Login";
+}
+
+<div class="auth-page-wrapper">
+    <div class="two-factor-card">
+        <div class="two-factor-icon">📩</div>
+
+        <h1>Email Verification</h1>
+
+        <p>
+            We sent a 6-digit verification code to:
+        </p>
+
+        <div class="two-factor-email">
+            @ViewBag.Email
+        </div>
+
+        @if (TempData["TwoFactorMessage"] != null)
+        {
+            <div class="alert-modern alert-success-modern">
+                @TempData["TwoFactorMessage"]
+            </div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert-modern alert-danger-modern">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form asp-controller="Account" asp-action="VerifyTwoFactor" method="post" class="two-factor-form">
+            <label>Verification Code</label>
+
+            <input type="text"
+                   name="code"
+                   maxlength="6"
+                   placeholder="Enter 6-digit code"
+                   required />
+
+            <button type="submit" class="btn-pink two-factor-submit">
+                Verify and Login
+            </button>
+        </form>
+
+        <form asp-controller="Account" asp-action="ResendTwoFactorCode" method="post">
+            <button type="submit" class="btn-outline-pink two-factor-resend">
+                Resend Code
+            </button>
+        </form>
+
+        <a asp-controller="Account" asp-action="Login" class="back-link-modern">
+            ← Back to Login
+        </a>
+    </div>
+</div>

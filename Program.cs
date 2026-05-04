@@ -19,6 +19,8 @@ builder.Services.AddSession();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<EmailService>();
 
+builder.Services.AddHttpClient<GoogleMapsService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

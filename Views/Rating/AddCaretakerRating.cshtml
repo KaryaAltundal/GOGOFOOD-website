@@ -1,44 +1,89 @@
+@using GOGOFOOD.Models
+
 @{
-    ViewData["Title"] = "Rate Caretaker";
+    ViewData["Title"] = "Rate Restaurant";
+    var caretakerItems = ViewBag.CaretakerItems as List<OrderItem>;
 }
 
-<h1>Rate Caretaker ⭐</h1>
+<div class="page-title">
+    <h1>Rate Restaurant ⭐</h1>
+    <p>Share your experience about this restaurant.</p>
+</div>
 
-@if (ViewBag.RestaurantName != null)
+@if (TempData["RatingMessage"] != null)
 {
-    <h3>@ViewBag.RestaurantName</h3>
+    <div class="alert-modern alert-danger-modern">
+        @TempData["RatingMessage"]
+    </div>
 }
 
-@if (ViewBag.CaretakerName != null)
-{
-    <p><strong>Caretaker:</strong> @ViewBag.CaretakerName</p>
-}
+<div class="rating-page-layout">
+    <div class="rating-food-card">
+        <div class="rating-restaurant-header">
+            <div class="restaurant-avatar-modern">🏪</div>
 
-@if (ViewBag.Error != null)
-{
-    <p style="color:red;">@ViewBag.Error</p>
-}
+            <div>
+                <h2>@ViewBag.RestaurantName</h2>
 
-<form asp-controller="Rating" asp-action="AddCaretakerRating" method="post">
-    <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
-    <input type="hidden" name="caretakerId" value="@ViewBag.CaretakerId" />
+                @if (ViewBag.CaretakerName != null)
+                {
+                    <p class="rating-restaurant">Caretaker: @ViewBag.CaretakerName</p>
+                }
 
-    <label>Rating</label>
-    <select name="ratingValue" required>
-        <option value="">Select rating</option>
-        <option value="1">1 - Very Bad</option>
-        <option value="2">2 - Bad</option>
-        <option value="3">3 - Average</option>
-        <option value="4">4 - Good</option>
-        <option value="5">5 - Excellent</option>
-    </select>
+                @if (ViewBag.RestaurantAddress != null)
+                {
+                    <p class="rating-description">@ViewBag.RestaurantAddress</p>
+                }
+            </div>
+        </div>
 
-    <label>Comment</label>
-    <input type="text" name="comment" placeholder="Write your comment..." />
+        @if (caretakerItems != null && caretakerItems.Count > 0)
+        {
+            <div class="rating-order-items">
+                <h3>Items from this restaurant</h3>
 
-    <button type="submit">Submit Caretaker Rating</button>
-</form>
+                @foreach (var item in caretakerItems)
+                {
+                    <div class="rating-order-item-row">
+                        <div>
+                            <strong>@item.MenuItem?.Name</strong>
+                            <span>@item.CustomizationName</span>
+                        </div>
 
-<br />
+                        <p>Qty: @item.Quantity</p>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 
-<a asp-controller="Order" asp-action="Index">Back to Orders</a>
+    <div class="rating-form-card">
+        <h2>Your Rating</h2>
+
+        <form asp-controller="Rating" asp-action="AddCaretakerRating" method="post">
+            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+            <input type="hidden" name="caretakerId" value="@ViewBag.CaretakerId" />
+
+            <label>Rating</label>
+            <select name="ratingValue" required>
+                <option value="">Select rating</option>
+                <option value="1">★ 1 - Very Bad</option>
+                <option value="2">★★ 2 - Bad</option>
+                <option value="3">★★★ 3 - Average</option>
+                <option value="4">★★★★ 4 - Good</option>
+                <option value="5">★★★★★ 5 - Excellent</option>
+            </select>
+
+            <label>Comment</label>
+            <textarea name="comment" placeholder="Write your comment..." rows="5"></textarea>
+
+            <button type="submit" class="btn-pink rating-submit-btn">
+                Submit Restaurant Rating
+            </button>
+        </form>
+
+        <a asp-controller="Order" asp-action="Index" class="back-link-modern">
+            ← Back to Orders
+        </a>
+    </div>
+</div>

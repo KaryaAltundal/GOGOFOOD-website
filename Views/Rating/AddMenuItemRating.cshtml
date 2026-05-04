@@ -2,38 +2,95 @@
     ViewData["Title"] = "Rate Menu Item";
 }
 
-<h1>Rate Menu Item ⭐</h1>
+<div class="page-title">
+    <h1>Rate Menu Item ⭐</h1>
+    <p>Share your experience about this meal.</p>
+</div>
 
-@if (ViewBag.MenuItemName != null)
+@if (TempData["RatingMessage"] != null)
 {
-    <h3>@ViewBag.MenuItemName</h3>
+    <div class="alert-modern alert-danger-modern">
+        @TempData["RatingMessage"]
+    </div>
 }
 
-@if (ViewBag.Error != null)
-{
-    <p style="color:red;">@ViewBag.Error</p>
-}
+<div class="rating-page-layout">
+    <div class="rating-food-card">
+        <div class="rating-food-image-box">
+            @if (!string.IsNullOrEmpty(ViewBag.MenuItemImage))
+            {
+                <img src="@ViewBag.MenuItemImage" alt="@ViewBag.MenuItemName" class="rating-food-image" />
+            }
+            else
+            {
+                <div class="rating-image-placeholder">🍽️</div>
+            }
+        </div>
 
-<form asp-controller="Rating" asp-action="AddMenuItemRating" method="post">
-    <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
-    <input type="hidden" name="menuItemId" value="@ViewBag.MenuItemId" />
+        <div class="rating-food-info">
+            <h2>@ViewBag.MenuItemName</h2>
 
-    <label>Rating</label>
-    <select name="ratingValue" required>
-        <option value="">Select rating</option>
-        <option value="1">1 - Very Bad</option>
-        <option value="2">2 - Bad</option>
-        <option value="3">3 - Average</option>
-        <option value="4">4 - Good</option>
-        <option value="5">5 - Excellent</option>
-    </select>
+            @if (ViewBag.RestaurantName != null)
+            {
+                <p class="rating-restaurant">🏪 @ViewBag.RestaurantName</p>
+            }
 
-    <label>Comment</label>
-    <input type="text" name="comment" placeholder="Write your comment..." />
+            @if (ViewBag.MenuItemDescription != null)
+            {
+                <p class="rating-description">@ViewBag.MenuItemDescription</p>
+            }
 
-    <button type="submit">Submit Rating</button>
-</form>
+            <div class="rating-detail-list">
+                <div>
+                    <span>Quantity</span>
+                    <strong>@ViewBag.Quantity</strong>
+                </div>
 
-<br />
+                <div>
+                    <span>Base Price</span>
+                    <strong>₺@ViewBag.UnitPrice</strong>
+                </div>
 
-<a asp-controller="Order" asp-action="Index">Back to Orders</a>
+                <div>
+                    <span>Custom Ingredients</span>
+                    <strong>@ViewBag.CustomizationName</strong>
+                </div>
+
+                <div>
+                    <span>Customization Price</span>
+                    <strong>₺@ViewBag.CustomizationPrice</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="rating-form-card">
+        <h2>Your Rating</h2>
+
+        <form asp-controller="Rating" asp-action="AddMenuItemRating" method="post">
+            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+            <input type="hidden" name="menuItemId" value="@ViewBag.MenuItemId" />
+
+            <label>Rating</label>
+            <select name="ratingValue" required>
+                <option value="">Select rating</option>
+                <option value="1">★ 1 - Very Bad</option>
+                <option value="2">★★ 2 - Bad</option>
+                <option value="3">★★★ 3 - Average</option>
+                <option value="4">★★★★ 4 - Good</option>
+                <option value="5">★★★★★ 5 - Excellent</option>
+            </select>
+
+            <label>Comment</label>
+            <textarea name="comment" placeholder="Write your comment..." rows="5"></textarea>
+
+            <button type="submit" class="btn-pink rating-submit-btn">
+                Submit Rating
+            </button>
+        </form>
+
+        <a asp-controller="Order" asp-action="Index" class="back-link-modern">
+            ← Back to Orders
+        </a>
+    </div>
+</div>

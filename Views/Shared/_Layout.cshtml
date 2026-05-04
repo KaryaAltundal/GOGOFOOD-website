@@ -25,17 +25,24 @@
                 <li><a asp-controller="Home" asp-action="Index">🏠Home</a></li>
                 <li><a asp-controller="MenuItem" asp-action="Index">🍽Menu</a></li>
 
-                @if (!string.IsNullOrEmpty(Context.Session.GetString("UserEmail")) 
+                @if (!string.IsNullOrEmpty(Context.Session.GetString("UserEmail"))
                     && Context.Session.GetString("UserRole") != "Caretaker")
                 {
                     <li><a asp-controller="Cart" asp-action="Index">🛒Cart</a></li>
                     <li><a asp-controller="Order" asp-action="Index">📦Orders</a></li>
+
+                    @if (Context.Session.GetString("UserRole") == "User")
+                    {
+                        <li><a asp-controller="User" asp-action="Location">📍Location</a></li>
+                    }
                 }
 
                 @if (Context.Session.GetString("UserRole") == "Caretaker")
                 {
                     <li><a asp-controller="MenuItem" asp-action="Create">➕Add Menu</a></li>
+                    <li><a asp-controller="Caretaker" asp-action="Profile">🏪Restaurant Profile</a></li>
                 }
+
                 @if (Context.Session.GetString("UserRole") == "Admin")
                 {
                     <li><a asp-controller="Admin" asp-action="Logs">📋Logs</a></li>

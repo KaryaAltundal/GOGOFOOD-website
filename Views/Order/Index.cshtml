@@ -5,105 +5,146 @@
     var role = Context.Session.GetString("UserRole");
 }
 
-<h1>Orders 📦</h1>
+<div class="page-title">
+    <h1>Orders 📦</h1>
+    <p>Review completed orders and leave ratings for meals or restaurants.</p>
+</div>
 
 @if (TempData["RatingMessage"] != null)
 {
-    <p style="color:green; font-weight:bold;">@TempData["RatingMessage"]</p>
+    <div class="alert-modern alert-success-modern">
+        @TempData["RatingMessage"]
+    </div>
 }
 
 @if (Model.Count == 0)
 {
-    <p>No orders found.</p>
+    <div class="empty-state">
+        <h3>No orders found</h3>
+        <p>Your completed orders will appear here.</p>
+    </div>
 }
 else
 {
-    @foreach (var order in Model)
-    {
-        <div class="card" style="margin-bottom:20px;">
-            <h3>Order #@order.OrderId</h3>
+    <div class="orders-list-modern">
+        @foreach (var order in Model)
+        {
+            <div class="order-card-modern">
+                <div class="order-card-header">
+                    <div>
+                        <h2>Completed Order</h2>
+                        <p>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+                    </div>
 
-            <p><strong>Date:</strong> @order.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
-            <p><strong>Status:</strong> @order.Status</p>
-            <p><strong>Total:</strong> @order.TotalPrice</p>
+                    <div class="order-status-pill">
+                        @order.Status
+                    </div>
+                </div>
 
-            @if (order.User != null)
-            {
-                <p><strong>User:</strong> @order.User.Name (@order.User.Email)</p>
-            }
+                <div class="order-info-row">
+                    <div class="order-info-box">
+                        <span>Total</span>
+                        <strong>₺@order.TotalPrice</strong>
+                    </div>
 
-            <table>
-                <tr>
-                    <th>Menu Item</th>
-                    <th>Caretaker / Restaurant</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Customization</th>
-                    <th>Customization Price</th>
-                    <th>Menu Rating</th>
-                    <th>Caretaker Rating</th>
-                </tr>
+                    @if (order.User != null)
+                    {
+                        <div class="order-info-box">
+                            <span>Customer</span>
+                            <strong>@order.User.Name</strong>
+                            <small>@order.User.Email</small>
+                        </div>
+                    }
+
+                    <div class="order-info-box">
+                        <span>Items</span>
+                        <strong>@(order.OrderItems != null ? order.OrderItems.Sum(x => x.Quantity) : 0)</strong>
+                    </div>
+                </div>
 
                 @if (order.OrderItems != null)
                 {
-                    foreach (var item in order.OrderItems)
-                    {
-                        <tr>
-                            <td>@item.MenuItem?.Name</td>
+                    <div class="order-items-modern">
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <div class="order-item-modern">
+                                <div class="order-item-image-box">
+                                    @if (!string.IsNullOrEmpty(item.MenuItem?.ImageUrl))
+                                    {
+                                        <img src="@item.MenuItem.ImageUrl" alt="@item.MenuItem.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="order-image-placeholder">🍽️</div>
+                                    }
+                                </div>
 
-                            <td>
-                                @if (item.MenuItem?.Caretaker != null)
-                                {
-                                    <span>@item.MenuItem.Caretaker.RestaurantName</span>
-                                }
-                                else
-                                {
-                                    <span>No caretaker assigned</span>
-                                }
-                            </td>
+                                <div class="order-item-main">
+                                    <h3>@item.MenuItem?.Name</h3>
 
-                            <td>@item.Quantity</td>
-                            <td>@item.UnitPrice</td>
-                            <td>@item.CustomizationName</td>
-                            <td>@item.CustomizationPrice</td>
+                                    @if (item.MenuItem?.Caretaker != null)
+                                    {
+                                        <p class="order-restaurant-name">🏪 @item.MenuItem.Caretaker.RestaurantName</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="order-restaurant-name">No restaurant assigned</p>
+                                    }
 
-                            <td>
-                                @if (role == "User" && order.Status == "Completed")
-                                {
-                                    <a asp-controller="Rating"
-                                       asp-action="AddMenuItemRating"
-                                       asp-route-orderId="@order.OrderId"
-                                       asp-route-menuItemId="@item.MenuItemId">
-                                        Rate Menu Item
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>-</span>
-                                }
-                            </td>
+                                    <p class="order-customization">
+                                        <strong>Custom:</strong> @item.CustomizationName
+                                    </p>
+                                </div>
 
-                            <td>
-                                @if (role == "User" &&
-                                     order.Status == "Completed" &&
-                                     item.MenuItem?.CaretakerId != null)
-                                {
-                                    <a asp-controller="Rating"
-                                       asp-action="AddCaretakerRating"
-                                       asp-route-orderId="@order.OrderId"
-                                       asp-route-caretakerId="@item.MenuItem.CaretakerId">
-                                        Rate Caretaker
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>-</span>
-                                }
-                            </td>
-                        </tr>
-                    }
+                                <div class="order-item-prices">
+                                    <div>
+                                        <span>Quantity</span>
+                                        <strong>@item.Quantity</strong>
+                                    </div>
+
+                                    <div>
+                                        <span>Unit Price</span>
+                                        <strong>₺@item.UnitPrice</strong>
+                                    </div>
+
+                                    <div>
+                                        <span>Custom Price</span>
+                                        <strong>₺@item.CustomizationPrice</strong>
+                                    </div>
+                                </div>
+
+                                <div class="order-rating-actions">
+                                    @if (role == "User" && order.Status == "Completed")
+                                    {
+                                        <a asp-controller="Rating"
+                                           asp-action="AddMenuItemRating"
+                                           asp-route-orderId="@order.OrderId"
+                                           asp-route-menuItemId="@item.MenuItemId"
+                                           class="btn-outline-pink">
+                                            Rate Meal
+                                        </a>
+
+                                        @if (item.MenuItem?.CaretakerId != null)
+                                        {
+                                            <a asp-controller="Rating"
+                                               asp-action="AddCaretakerRating"
+                                               asp-route-orderId="@order.OrderId"
+                                               asp-route-caretakerId="@item.MenuItem.CaretakerId"
+                                               class="btn-soft-rating">
+                                                Rate Restaurant
+                                            </a>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="order-no-action">No action</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
                 }
-            </table>
-        </div>
-    }
+            </div>
+        }
+    </div>
 }

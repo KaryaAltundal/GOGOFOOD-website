@@ -1,0 +1,84 @@
+@model GOGOFOOD.Models.User
+
+@{
+    ViewData["Title"] = "My Location";
+}
+
+<div class="page-title">
+    <h1>My Location 📍</h1>
+    <p>Enter your address so nearby restaurants can be filtered correctly.</p>
+</div>
+
+@if (TempData["LocationMessage"] != null)
+{
+    <div class="alert-modern alert-success-modern">
+        @TempData["LocationMessage"]
+    </div>
+}
+
+@if (TempData["LocationError"] != null)
+{
+    <div class="alert-modern alert-danger-modern">
+        @TempData["LocationError"]
+    </div>
+}
+
+<div class="modern-form-card location-form-card">
+    <form asp-controller="User" asp-action="Location" method="post" class="vertical-form">
+        <div class="form-group-modern">
+            <label>City</label>
+            <input type="text" name="city" value="@Model.City" placeholder="Example: Ankara" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>District</label>
+            <input type="text" name="district" value="@Model.District" placeholder="Example: Çankaya" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Neighborhood</label>
+            <input type="text" name="neighborhood" value="@Model.Neighborhood" placeholder="Example: Kızılay" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Street</label>
+            <input type="text" name="street" value="@Model.Street" placeholder="Example: Atatürk Boulevard" />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Address Detail</label>
+            <input type="text" name="addressDetail" value="@Model.AddressDetail" placeholder="Apartment, building, door number..." />
+        </div>
+
+        <button type="submit" class="btn-pink">
+            Save Location
+        </button>
+    </form>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.City) || !string.IsNullOrEmpty(Model.District) || !string.IsNullOrEmpty(Model.Neighborhood))
+{
+    <div class="saved-address-card">
+        <h3>Saved Address ✅</h3>
+        <p>
+            @Model.AddressDetail
+            @if (!string.IsNullOrEmpty(Model.Street))
+            {
+                <span>@Model.Street,</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Neighborhood))
+            {
+                <span>@Model.Neighborhood,</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.District))
+            {
+                <span>@Model.District,</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.City))
+            {
+                <span>@Model.City</span>
+            }
+        </p>
+        <small>This address was checked and saved using Google Maps.</small>
+    </div>
+}

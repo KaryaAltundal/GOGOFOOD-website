@@ -269,3 +269,76 @@
   position: absolute; 
   bottom: 50px;
 }
+.current-image-box {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 22px;
+}
+
+.current-image-box label {
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 10px;
+    font-size: 17px;
+}
+
+.current-image-box img {
+    width: 260px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 22px;
+    border: 1px solid #f1f1f1;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.customization-checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px 0 18px;
+}
+
+.custom-checkbox-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff7fb;
+    border: 1px solid #ffd1e1;
+    border-radius: 18px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.custom-checkbox-card:hover {
+    background: #fff0f6;
+    transform: translateY(-1px);
+}
+
+.custom-checkbox-card input {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    accent-color: #FF0569;
+}
+
+.custom-checkbox-card span {
+    font-weight: 700;
+    color: #111827;
+}
+
+.custom-checkbox-card strong {
+    color: #FF0569;
+    margin-left: 6px;
+}
+
+.no-custom-text {
+    color: #6b7280;
+    font-size: 15px;
+    margin: 8px 0 18px;
+}
+
+.add-cart-full {
+    width: 100%;
+    margin-top: 4px;
+}

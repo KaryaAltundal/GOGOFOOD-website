@@ -10,6 +10,10 @@ namespace GOGOFOOD.Models
 
         public string Description { get; set; } = string.Empty;
 
+        public string ImageUrl { get; set; } = string.Empty;
+
+        public bool IsDeleted { get; set; } = false;
+
         public int? CaretakerId { get; set; }
 
         public Caretaker? Caretaker { get; set; }

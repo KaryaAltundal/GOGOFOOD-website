@@ -3,95 +3,244 @@
 @{
     ViewData["Title"] = "Menu";
     var role = Context.Session.GetString("UserRole");
+    var distances = ViewBag.Distances as Dictionary<int, double>;
 }
 
-<h1>Our Menu</h1>
+<div class="page-title">
+    <h1>Our Menu 🍽️</h1>
+    <p>Discover delicious meals from nearby restaurants.</p>
+</div>
 
-@foreach (var item in Model)
+@if (TempData["MenuMessage"] != null)
 {
-    <div class="card" style="margin-bottom:20px;">
-        <h3>@item.Name</h3>
-        <p>@item.Description</p>
-        <p><strong>Price:</strong> @item.Price</p>
+    <div class="alert-modern alert-success-modern">
+        @TempData["MenuMessage"]
+    </div>
+}
 
-        @if (item.MenuItemRatings != null && item.MenuItemRatings.Count > 0)
-        {
-            <p>
-                <strong>Menu Item Rating:</strong>
-                ⭐ @item.MenuItemRatings.Average(x => x.RatingValue).ToString("0.0") / 5
-                (@item.MenuItemRatings.Count reviews)
-            </p>
-        }
-        else
-        {
-            <p><strong>Menu Item Rating:</strong> No ratings yet</p>
-        }
+@if (TempData["LocationWarning"] != null)
+{
+    <div class="alert-modern alert-danger-modern">
+        @TempData["LocationWarning"]
+    </div>
+}
 
-        @if (item.Caretaker != null)
-        {
-            <p>
-                <strong>Restaurant:</strong> @item.Caretaker.RestaurantName
-            </p>
+@if (role == "User")
+{
+    <div class="filter-card">
+        <form asp-controller="MenuItem" asp-action="Index" method="get" class="filter-form">
+            <div class="filter-input-group">
+                <label>Maximum distance</label>
+                <input type="number"
+                       step="any"
+                       name="maxDistanceKm"
+                       value="@ViewBag.MaxDistanceKm"
+                       placeholder="Example: 10 km" />
+            </div>
 
-            @if (item.Caretaker.CaretakerRatings != null && item.Caretaker.CaretakerRatings.Count > 0)
-            {
-                <p>
-                    <strong>Caretaker Rating:</strong>
-                    ⭐ @item.Caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") / 5
-                    (@item.Caretaker.CaretakerRatings.Count reviews)
-                </p>
-            }
-            else
-            {
-                <p><strong>Caretaker Rating:</strong> No ratings yet</p>
-            }
-        }
-        else
-        {
-            <p><strong>Restaurant:</strong> No caretaker assigned</p>
-        }
+            <button type="submit" class="btn-pink">
+                Filter Nearby Restaurants
+            </button>
 
-        @if (role == "Caretaker")
-        {
-            <a asp-controller="CustomizationOption"
-               asp-action="Create"
-               asp-route-menuItemId="@item.MenuItemId">
-                Add Custom Ingredient
+            <a asp-controller="User" asp-action="Location" class="btn-outline-pink">
+                📍 Update My Address
             </a>
+        </form>
+    </div>
+}
 
-            <br />
-
-            <a asp-controller="CustomizationOption"
-               asp-action="Index"
-               asp-route-menuItemId="@item.MenuItemId">
-                Manage Custom Ingredients
-            </a>
-        }
-        else
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <h3>No menu items found</h3>
+        <p>Try increasing the distance filter or update your address.</p>
+    </div>
+}
+else
+{
+    <div class="menu-grid">
+        @foreach (var item in Model)
         {
-            <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                <input type="hidden" name="id" value="@item.MenuItemId" />
-                <input type="hidden" name="name" value="@item.Name" />
-                <input type="hidden" name="price" value="@item.Price" />
-
-                <label>Customization</label>
-
-                <select name="customizationOptionId">
-                    <option value="0">No customization</option>
-
-                    @if (item.CustomizationOptions != null)
+            <div class="menu-card-modern">
+                <div class="menu-image-wrapper">
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
                     {
-                        foreach (var option in item.CustomizationOptions)
-                        {
-                            <option value="@option.CustomizationOptionId">
-                                @option.Name (+@option.ExtraPrice)
-                            </option>
-                        }
+                        <img src="@item.ImageUrl" alt="@item.Name" class="menu-image" />
                     }
-                </select>
+                    else
+                    {
+                        <div class="menu-image-placeholder">
+                            🍽️
+                        </div>
+                    }
 
-                <button type="submit">Add to Cart</button>
-            </form>
+                    @if (distances != null && distances.ContainsKey(item.MenuItemId))
+                    {
+                        <span class="distance-badge">
+                            📍 @distances[item.MenuItemId].ToString("0.0") km
+                        </span>
+                    }
+                </div>
+
+                <div class="menu-card-body">
+                    <div class="menu-card-top">
+                        <div>
+                            <h3>@item.Name</h3>
+                            <p class="menu-description">@item.Description</p>
+                        </div>
+
+                        <div class="price-pill">
+                            ₺@item.Price
+                        </div>
+                    </div>
+
+                    <div class="restaurant-box">
+                        @if (item.Caretaker != null)
+                        {
+                            <p class="restaurant-name">🏪 @item.Caretaker.RestaurantName</p>
+
+                            @if (!string.IsNullOrEmpty(item.Caretaker.Address))
+                            {
+                                <p class="restaurant-address">@item.Caretaker.Address</p>
+                            }
+                        }
+                        else
+                        {
+                            <p class="restaurant-name">🏪 No caretaker assigned</p>
+                        }
+                    </div>
+
+                    <div class="rating-row">
+                        <div class="rating-chip">
+                            <span class="rating-stars">★</span>
+
+                            @if (item.MenuItemRatings != null && item.MenuItemRatings.Count > 0)
+                            {
+                                <span>
+                                    Menu @item.MenuItemRatings.Average(x => x.RatingValue).ToString("0.0") / 5
+                                    (@item.MenuItemRatings.Count reviews)
+                                </span>
+                            }
+                            else
+                            {
+                                <span>Menu: No ratings yet</span>
+                            }
+                        </div>
+
+                        <div class="rating-chip">
+                            <span class="rating-stars">★</span>
+
+                            @if (item.Caretaker != null &&
+                                                    item.Caretaker.CaretakerRatings != null &&
+                                                    item.Caretaker.CaretakerRatings.Count > 0)
+                            {
+                                <span>
+                                    Restaurant @item.Caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") / 5
+                                    (@item.Caretaker.CaretakerRatings.Count reviews)
+                                </span>
+                            }
+                            else
+                            {
+                                <span>Restaurant: No ratings yet</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (role == "Caretaker")
+                    {
+                        <div class="caretaker-actions">
+                            <a asp-controller="MenuItem"
+                               asp-action="Edit"
+                               asp-route-id="@item.MenuItemId"
+                               class="btn-outline-pink">
+                                Edit
+                            </a>
+
+                            <a asp-controller="CustomizationOption"
+                               asp-action="Create"
+                               asp-route-menuItemId="@item.MenuItemId"
+                               class="btn-outline-pink">
+                                Add Custom Ingredient
+                            </a>
+
+                            <a asp-controller="CustomizationOption"
+                               asp-action="Index"
+                               asp-route-menuItemId="@item.MenuItemId"
+                               class="btn-pink-small">
+                                Manage Ingredients
+                            </a>
+
+                            <form asp-controller="MenuItem"
+                                  asp-action="Delete"
+                                  asp-route-id="@item.MenuItemId"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this menu item?');">
+                                <button type="submit" class="btn-soft-delete">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (role == "Admin")
+                    {
+                        <div class="caretaker-actions">
+                            <a asp-controller="MenuItem"
+                               asp-action="Edit"
+                               asp-route-id="@item.MenuItemId"
+                               class="btn-outline-pink">
+                                Edit Menu Item
+                            </a>
+
+                            <form asp-controller="MenuItem"
+                                  asp-action="Delete"
+                                  asp-route-id="@item.MenuItemId"
+                                  method="post"
+                                  onsubmit="return confirm('Admin action: Are you sure you want to delete this menu item?');">
+                                <button type="submit" class="btn-soft-delete">
+                                    Delete Menu Item
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <form asp-controller="Cart" asp-action="AddToCart" method="post" class="add-cart-form">
+                            <input type="hidden" name="id" value="@item.MenuItemId" />
+                            <input type="hidden" name="name" value="@item.Name" />
+                            <input type="hidden" name="price" value="@item.Price" />
+                            <input type="hidden" name="imageUrl" value="@item.ImageUrl" />
+                            <label>Custom Ingredients</label>
+
+                            @if (item.CustomizationOptions != null && item.CustomizationOptions.Count > 0)
+                            {
+                                <div class="customization-checkbox-list">
+                                    @foreach (var option in item.CustomizationOptions)
+                                    {
+                                        <label class="custom-checkbox-card">
+                                            <input type="checkbox"
+                                                   name="customizationOptionIds"
+                                                   value="@option.CustomizationOptionId" />
+
+                                            <span>
+                                                @option.Name
+                                                <strong>+₺@option.ExtraPrice</strong>
+                                            </span>
+                                        </label>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="no-custom-text">No custom ingredients available.</p>
+                            }
+
+                            <button type="submit" class="btn-pink add-cart-full">
+                                Add to Cart
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
         }
     </div>
 }

@@ -42,22 +42,31 @@ namespace GOGOFOOD.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddToCart(int id, string name, decimal price, int customizationOptionId)
+        public IActionResult AddToCart(
+            int id,
+            string name,
+            decimal price,
+            string imageUrl,
+            int[]? customizationOptionIds)
         {
             var cart = GetCart();
 
             string customizationName = "No customization";
             decimal customizationPrice = 0;
 
-            if (customizationOptionId != 0)
+            if (customizationOptionIds != null && customizationOptionIds.Length > 0)
             {
-                var option = _context.CustomizationOptions
-                    .FirstOrDefault(x => x.CustomizationOptionId == customizationOptionId);
+                var selectedOptions = _context.CustomizationOptions
+                    .Where(x =>
+                        customizationOptionIds.Contains(x.CustomizationOptionId) &&
+                        x.MenuItemId == id)
+                    .OrderBy(x => x.CustomizationOptionId)
+                    .ToList();
 
-                if (option != null)
+                if (selectedOptions.Count > 0)
                 {
-                    customizationName = option.Name;
-                    customizationPrice = option.ExtraPrice;
+                    customizationName = string.Join(", ", selectedOptions.Select(x => x.Name));
+                    customizationPrice = selectedOptions.Sum(x => x.ExtraPrice);
                 }
             }
 
@@ -76,6 +85,7 @@ namespace GOGOFOOD.Controllers
                     CartItemKey = Guid.NewGuid().ToString(),
                     MenuItemId = id,
                     Name = name,
+                    ImageUrl = imageUrl ?? string.Empty,
                     Price = price,
                     Quantity = 1,
                     Customization = customizationName,

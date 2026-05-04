@@ -30,14 +30,10 @@ namespace GOGOFOOD.Controllers
             var order = _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.MenuItem)
+                .ThenInclude(m => m.Caretaker)
                 .FirstOrDefault(o => o.OrderId == orderId && o.UserId == userId.Value);
 
-            if (order == null)
-            {
-                return RedirectToAction("Index", "Order");
-            }
-
-            if (order.Status != "Completed")
+            if (order == null || order.Status != "Completed")
             {
                 return RedirectToAction("Index", "Order");
             }
@@ -45,7 +41,7 @@ namespace GOGOFOOD.Controllers
             var orderItem = order.OrderItems?
                 .FirstOrDefault(x => x.MenuItemId == menuItemId);
 
-            if (orderItem == null)
+            if (orderItem == null || orderItem.MenuItem == null)
             {
                 return RedirectToAction("Index", "Order");
             }
@@ -63,7 +59,14 @@ namespace GOGOFOOD.Controllers
 
             ViewBag.OrderId = orderId;
             ViewBag.MenuItemId = menuItemId;
-            ViewBag.MenuItemName = orderItem.MenuItem?.Name;
+            ViewBag.MenuItemName = orderItem.MenuItem.Name;
+            ViewBag.MenuItemDescription = orderItem.MenuItem.Description;
+            ViewBag.MenuItemImage = orderItem.MenuItem.ImageUrl;
+            ViewBag.RestaurantName = orderItem.MenuItem.Caretaker?.RestaurantName;
+            ViewBag.CustomizationName = orderItem.CustomizationName;
+            ViewBag.Quantity = orderItem.Quantity;
+            ViewBag.UnitPrice = orderItem.UnitPrice;
+            ViewBag.CustomizationPrice = orderItem.CustomizationPrice;
 
             return View();
         }
@@ -82,10 +85,8 @@ namespace GOGOFOOD.Controllers
 
             if (ratingValue < 1 || ratingValue > 5)
             {
-                ViewBag.Error = "Rating must be between 1 and 5.";
-                ViewBag.OrderId = orderId;
-                ViewBag.MenuItemId = menuItemId;
-                return View();
+                TempData["RatingMessage"] = "Rating must be between 1 and 5.";
+                return RedirectToAction("AddMenuItemRating", new { orderId = orderId, menuItemId = menuItemId });
             }
 
             var order = _context.Orders
@@ -157,12 +158,7 @@ namespace GOGOFOOD.Controllers
                 .ThenInclude(m => m.Caretaker)
                 .FirstOrDefault(o => o.OrderId == orderId && o.UserId == userId.Value);
 
-            if (order == null)
-            {
-                return RedirectToAction("Index", "Order");
-            }
-
-            if (order.Status != "Completed")
+            if (order == null || order.Status != "Completed")
             {
                 return RedirectToAction("Index", "Order");
             }
@@ -184,16 +180,22 @@ namespace GOGOFOOD.Controllers
 
             if (existingRating != null)
             {
-                TempData["RatingMessage"] = "You already rated this caretaker.";
+                TempData["RatingMessage"] = "You already rated this restaurant.";
                 return RedirectToAction("Index", "Order");
             }
 
             var caretaker = _context.Caretakers.FirstOrDefault(x => x.CaretakerId == caretakerId);
 
+            var caretakerItems = order.OrderItems?
+                .Where(x => x.MenuItem != null && x.MenuItem.CaretakerId == caretakerId)
+                .ToList();
+
             ViewBag.OrderId = orderId;
             ViewBag.CaretakerId = caretakerId;
             ViewBag.CaretakerName = caretaker?.Name;
             ViewBag.RestaurantName = caretaker?.RestaurantName;
+            ViewBag.RestaurantAddress = caretaker?.Address;
+            ViewBag.CaretakerItems = caretakerItems;
 
             return View();
         }
@@ -212,10 +214,8 @@ namespace GOGOFOOD.Controllers
 
             if (ratingValue < 1 || ratingValue > 5)
             {
-                ViewBag.Error = "Rating must be between 1 and 5.";
-                ViewBag.OrderId = orderId;
-                ViewBag.CaretakerId = caretakerId;
-                return View();
+                TempData["RatingMessage"] = "Rating must be between 1 and 5.";
+                return RedirectToAction("AddCaretakerRating", new { orderId = orderId, caretakerId = caretakerId });
             }
 
             var order = _context.Orders
@@ -245,7 +245,7 @@ namespace GOGOFOOD.Controllers
 
             if (existingRating != null)
             {
-                TempData["RatingMessage"] = "You already rated this caretaker.";
+                TempData["RatingMessage"] = "You already rated this restaurant.";
                 return RedirectToAction("Index", "Order");
             }
 
@@ -269,7 +269,7 @@ namespace GOGOFOOD.Controllers
                 userRole
             );
 
-            TempData["RatingMessage"] = "Thank you! Your caretaker rating was submitted.";
+            TempData["RatingMessage"] = "Thank you! Your restaurant rating was submitted.";
 
             return RedirectToAction("Index", "Order");
         }
