@@ -17,6 +17,22 @@
     </div>
 }
 
+<div class="filter-card">
+    <form asp-controller="Order" asp-action="Index" method="get" class="filter-form">
+        <div class="filter-input-group">
+            <label>Search orders</label>
+            <input type="text"
+                   name="searchText"
+                   value="@ViewBag.SearchText"
+                   placeholder="Search customer, meal or status" />
+        </div>
+
+        <button type="submit" class="btn-pink">
+            Filter Orders
+        </button>
+    </form>
+</div>
+
 @if (Model.Count == 0)
 {
     <div class="empty-state">
@@ -145,6 +161,22 @@ else
                     </div>
                 }
             </div>
+        }
+    </div>
+}
+
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+{
+    <div class="pagination-modern">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <a asp-controller="Order"
+               asp-action="Index"
+               asp-route-page="@i"
+               asp-route-searchText="@ViewBag.SearchText"
+               class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
+                @i
+            </a>
         }
     </div>
 }

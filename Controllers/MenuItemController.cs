@@ -27,7 +27,7 @@ namespace GOGOFOOD.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(double? maxDistanceKm)
+        public async Task<IActionResult> Index(double? maxDistanceKm, string? searchText, int page = 1)
         {
             var role = HttpContext.Session.GetString("UserRole");
             var caretakerId = HttpContext.Session.GetInt32("CaretakerId");
@@ -97,10 +97,32 @@ namespace GOGOFOOD.Controllers
                 menuItems = filteredItems;
             }
 
-            ViewBag.MaxDistanceKm = maxDistanceKm;
-            ViewBag.Distances = distances;
+           if (!string.IsNullOrWhiteSpace(searchText))
+{
+    menuItems = menuItems
+        .Where(m =>
+            m.Name.ToLower().Contains(searchText.ToLower()) ||
+            m.Description.ToLower().Contains(searchText.ToLower()) ||
+            (m.Caretaker != null && m.Caretaker.RestaurantName.ToLower().Contains(searchText.ToLower())))
+        .ToList();
+}
 
-            return View(menuItems);
+int pageSize = 6;
+int totalItems = menuItems.Count;
+int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+menuItems = menuItems
+    .Skip((page - 1) * pageSize)
+    .Take(pageSize)
+    .ToList();
+
+ViewBag.MaxDistanceKm = maxDistanceKm;
+ViewBag.Distances = distances;
+ViewBag.SearchText = searchText;
+ViewBag.CurrentPage = page;
+ViewBag.TotalPages = totalPages;
+
+return View(menuItems);
         }
 
         [HttpGet]

@@ -25,10 +25,18 @@
     </div>
 }
 
-@if (role == "User")
-{
-    <div class="filter-card">
-        <form asp-controller="MenuItem" asp-action="Index" method="get" class="filter-form">
+<div class="filter-card">
+    <form asp-controller="MenuItem" asp-action="Index" method="get" class="filter-form">
+        <div class="filter-input-group">
+            <label>Search</label>
+            <input type="text"
+                   name="searchText"
+                   value="@ViewBag.SearchText"
+                   placeholder="Search meal or restaurant" />
+        </div>
+
+        @if (role == "User")
+        {
             <div class="filter-input-group">
                 <label>Maximum distance</label>
                 <input type="number"
@@ -37,23 +45,26 @@
                        value="@ViewBag.MaxDistanceKm"
                        placeholder="Example: 10 km" />
             </div>
+        }
 
-            <button type="submit" class="btn-pink">
-                Filter Nearby Restaurants
-            </button>
+        <button type="submit" class="btn-pink">
+            Filter Menu
+        </button>
 
+        @if (role == "User")
+        {
             <a asp-controller="User" asp-action="Location" class="btn-outline-pink">
                 📍 Update My Address
             </a>
-        </form>
-    </div>
-}
+        }
+    </form>
+</div>
 
 @if (Model.Count == 0)
 {
     <div class="empty-state">
         <h3>No menu items found</h3>
-        <p>Try increasing the distance filter or update your address.</p>
+        <p>Try changing your search or distance filter.</p>
     </div>
 }
 else
@@ -131,8 +142,8 @@ else
                             <span class="rating-stars">★</span>
 
                             @if (item.Caretaker != null &&
-                                                    item.Caretaker.CaretakerRatings != null &&
-                                                    item.Caretaker.CaretakerRatings.Count > 0)
+                                item.Caretaker.CaretakerRatings != null &&
+                                item.Caretaker.CaretakerRatings.Count > 0)
                             {
                                 <span>
                                     Restaurant @item.Caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") / 5
@@ -209,6 +220,7 @@ else
                             <input type="hidden" name="name" value="@item.Name" />
                             <input type="hidden" name="price" value="@item.Price" />
                             <input type="hidden" name="imageUrl" value="@item.ImageUrl" />
+
                             <label>Custom Ingredients</label>
 
                             @if (item.CustomizationOptions != null && item.CustomizationOptions.Count > 0)
@@ -241,6 +253,23 @@ else
                     }
                 </div>
             </div>
+        }
+    </div>
+}
+
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+{
+    <div class="pagination-modern">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <a asp-controller="MenuItem"
+               asp-action="Index"
+               asp-route-page="@i"
+               asp-route-searchText="@ViewBag.SearchText"
+               asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
+               class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
+                @i
+            </a>
         }
     </div>
 }

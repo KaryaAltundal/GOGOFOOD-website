@@ -2,55 +2,101 @@
 
 @{
     ViewData["Title"] = "Payment";
+    var totalPrice = Model.Sum(x => x.TotalPrice);
 }
 
-<h2>Payment Simulation</h2>
+<div class="payment-page">
+    <div class="payment-left-card">
+        <div class="payment-heading">
+            <span class="payment-badge">Secure Checkout</span>
+            <h1>Payment Simulation</h1>
+            <p>Review your order and complete the simulated payment.</p>
+        </div>
 
-<h3>Order Summary</h3>
+        <h2>Order Summary</h2>
 
-<table border="1" cellpadding="10">
-    <tr>
-        <th>Item</th>
-        <th>Customization</th>
-        <th>Quantity</th>
-        <th>Total</th>
-    </tr>
+        <div class="payment-table-wrapper">
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Customization</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.Name</td>
-            <td>@item.Customization</td>
-            <td>@item.Quantity</td>
-            <td>@item.TotalPrice</td>
-        </tr>
-    }
-</table>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="payment-item-info">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="payment-item-placeholder">🍽️</div>
+                                    }
 
-<h3>Total Price: @Model.Sum(x => x.TotalPrice)</h3>
+                                    <strong>@item.Name</strong>
+                                </div>
+                            </td>
 
-<h3>Card Information</h3>
+                            <td>@item.Customization</td>
+                            <td>@item.Quantity</td>
+                            <td class="payment-price">₺@item.TotalPrice</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-<form asp-controller="Payment" asp-action="CompletePayment" method="post">
-    <div>
-        <label>Card Holder Name</label>
-        <input type="text" name="cardHolder" required />
+        <div class="payment-total-box">
+            <span>Total Price</span>
+            <strong>₺@totalPrice</strong>
+        </div>
+
+        <div class="payment-note">
+            🔒 This is a payment simulation. No real transaction will be processed.
+        </div>
     </div>
 
-    <div>
-        <label>Card Number</label>
-        <input type="text" name="cardNumber" required minlength="16" maxlength="16" />
-    </div>
+    <div class="payment-right-card">
+        <h2>Card Information</h2>
 
-    <div>
-        <label>Expiration Date</label>
-        <input type="text" name="expirationDate" placeholder="MM/YY" required />
-    </div>
+        <form asp-controller="Payment" asp-action="CompletePayment" method="post" class="payment-form">
+            <div class="payment-form-group">
+                <label>Card Holder Name</label>
+                <input type="text" name="cardHolder" placeholder="Name Surname" required />
+            </div>
 
-    <div>
-        <label>CVV</label>
-        <input type="text" name="cvv" required minlength="3" maxlength="3" />
-    </div>
+            <div class="payment-form-group">
+                <label>Card Number</label>
+                <input type="text" name="cardNumber" placeholder="1234567890123456" required minlength="16" maxlength="16" />
+            </div>
 
-    <button type="submit">Pay Now</button>
-</form>
+            <div class="payment-row">
+                <div class="payment-form-group">
+                    <label>Expiration Date</label>
+                    <input type="text" name="expirationDate" placeholder="MM/YY" required />
+                </div>
+
+                <div class="payment-form-group">
+                    <label>CVV</label>
+                    <input type="text" name="cvv" placeholder="123" required minlength="3" maxlength="3" />
+                </div>
+            </div>
+
+            <button type="submit" class="payment-button">
+                Pay Now ₺@totalPrice
+            </button>
+
+            <p class="payment-secure-text">
+                ✅ 256-bit SSL secure payment simulation
+            </p>
+        </form>
+    </div>
+</div>

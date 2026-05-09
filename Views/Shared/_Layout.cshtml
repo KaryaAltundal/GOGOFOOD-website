@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -17,35 +17,35 @@
 <body>
     <header>
         <nav class="navbar-custom">
-            <a asp-controller="Home" asp-action="Index" class="logo">
-                GOGO<span>FOOD</span>
+            <a asp-controller="Home" asp-action="Index" class="logo brand-logo">
+                <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
             </a>
 
             <ul class="nav-links">
-                <li><a asp-controller="Home" asp-action="Index">🏠Home</a></li>
-                <li><a asp-controller="MenuItem" asp-action="Index">🍽Menu</a></li>
+                <li><a asp-controller="Home" asp-action="Index">🏠 Home</a></li>
+                <li><a asp-controller="MenuItem" asp-action="Index">🍽 Menu</a></li>
 
                 @if (!string.IsNullOrEmpty(Context.Session.GetString("UserEmail"))
                     && Context.Session.GetString("UserRole") != "Caretaker")
                 {
-                    <li><a asp-controller="Cart" asp-action="Index">🛒Cart</a></li>
-                    <li><a asp-controller="Order" asp-action="Index">📦Orders</a></li>
+                    <li><a asp-controller="Cart" asp-action="Index">🛒 Cart</a></li>
+                    <li><a asp-controller="Order" asp-action="Index">📦 Orders</a></li>
 
                     @if (Context.Session.GetString("UserRole") == "User")
                     {
-                        <li><a asp-controller="User" asp-action="Location">📍Location</a></li>
+                        <li><a asp-controller="User" asp-action="Location">📍 Location</a></li>
                     }
                 }
 
                 @if (Context.Session.GetString("UserRole") == "Caretaker")
                 {
-                    <li><a asp-controller="MenuItem" asp-action="Create">➕Add Menu</a></li>
-                    <li><a asp-controller="Caretaker" asp-action="Profile">🏪Restaurant Profile</a></li>
+                    <li><a asp-controller="MenuItem" asp-action="Create">➕ Add Menu</a></li>
+                    <li><a asp-controller="Caretaker" asp-action="Profile">🏪 Profile</a></li>
                 }
 
                 @if (Context.Session.GetString("UserRole") == "Admin")
                 {
-                    <li><a asp-controller="Admin" asp-action="Logs">📋Logs</a></li>
+                    <li><a asp-controller="Admin" asp-action="Logs">📋 Logs</a></li>
                 }
             </ul>
 
@@ -58,7 +58,7 @@
                 else
                 {
                     <span class="welcome-user">
-                        Hello, @Context.Session.GetString("UserName")
+                        👋 @Context.Session.GetString("UserName")
                     </span>
 
                     <a asp-controller="Account" asp-action="Logout" class="btn-logout">Logout</a>
@@ -73,8 +73,64 @@
         </main>
     </div>
 
-    <footer class="footer">
-        <p>© 2026 GOGOFOOD - All Rights Reserved</p>
+    <footer class="footer-modern">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h2 class="brand-logo footer-logo">
+                    <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
+                </h2>
+
+                <p>
+                    <span class="brand-logo inline-brand">
+                        <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
+                    </span>
+                    is a fast, modern and reliable food ordering platform.
+                    Discover delicious meals, customize your order and enjoy a smooth
+                    catering experience.
+                </p>
+
+                <div class="footer-contact">
+                    <p>📧 info@gogofood.com</p>
+                    <p>📞 +90 555 123 45 67</p>
+                    <p>📍 Istanbul, Turkey</p>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <a asp-controller="Home" asp-action="Index">Home</a>
+                <a asp-controller="MenuItem" asp-action="Index">Menu</a>
+                <a asp-controller="Cart" asp-action="Index">Cart</a>
+                <a asp-controller="Order" asp-action="Index">Orders</a>
+            </div>
+
+            <div class="footer-column">
+                <h3>About Us</h3>
+                <p>
+                    Our mission is to bring quality meals to users quickly and easily.
+                    We focus on simple ordering, clear tracking and user satisfaction.
+                </p>
+            </div>
+
+            <div class="footer-column">
+                <h3>Follow Us</h3>
+                <p>Stay updated on social media.</p>
+
+                <div class="social-links">
+                    <a href="#">📸 Instagram</a>
+                    <a href="#">🐦 Twitter</a>
+                    <a href="#">📘 Facebook</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026
+            <span class="brand-logo footer-bottom-logo">
+                <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
+            </span>
+            . All rights reserved.
+        </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

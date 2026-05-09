@@ -4,32 +4,76 @@
     ViewData["Title"] = "System Logs";
 }
 
-<h1>System Logs</h1>
+<div class="page-title">
+    <h1>System Logs 🧾</h1>
+    <p>Track system activities, user actions, and important events.</p>
+</div>
+
+<div class="filter-card">
+    <form asp-controller="Admin" asp-action="Logs" method="get" class="filter-form">
+        <div class="filter-input-group">
+            <label>Search logs</label>
+            <input type="text"
+                   name="searchText"
+                   value="@ViewBag.SearchText"
+                   placeholder="Search event, message, email or role" />
+        </div>
+
+        <button type="submit" class="btn-pink">
+            Filter Logs
+        </button>
+    </form>
+</div>
 
 @if (Model.Count == 0)
 {
-    <p>No logs found.</p>
+    <div class="empty-state">
+        <h3>No logs found</h3>
+        <p>System activities will appear here.</p>
+    </div>
 }
 else
 {
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Event Type</th>
-            <th>Message</th>
-            <th>User Email</th>
-            <th>User Role</th>
-        </tr>
+    <div class="table-modern-wrapper">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Event Type</th>
+                    <th>Message</th>
+                    <th>User Email</th>
+                    <th>User Role</th>
+                </tr>
+            </thead>
 
-        @foreach (var log in Model)
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td>@log.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@log.EventType</td>
+                        <td>@log.Message</td>
+                        <td>@log.UserEmail</td>
+                        <td>@log.UserRole</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+{
+    <div class="pagination-modern">
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
         {
-            <tr>
-                <td>@log.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@log.EventType</td>
-                <td>@log.Message</td>
-                <td>@log.UserEmail</td>
-                <td>@log.UserRole</td>
-            </tr>
+            <a asp-controller="Admin"
+               asp-action="Logs"
+               asp-route-page="@i"
+               asp-route-searchText="@ViewBag.SearchText"
+               class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
+                @i
+            </a>
         }
-    </table>
+    </div>
 }

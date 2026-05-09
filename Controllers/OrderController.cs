@@ -14,7 +14,7 @@ namespace GOGOFOOD.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string? searchText, int page = 1)
         {
             var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -47,7 +47,37 @@ namespace GOGOFOOD.Controllers
                         oi.MenuItem.CaretakerId == caretakerId.Value));
             }
 
-            var orders = ordersQuery.ToList();
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                ordersQuery = ordersQuery.Where(o =>
+                    o.Status.Contains(searchText) ||
+                    o.User.Name.Contains(searchText) ||
+                    o.User.Email.Contains(searchText) ||
+                    o.OrderItems.Any(oi => oi.MenuItem.Name.Contains(searchText)));
+            }
+
+            int pageSize = 5;
+            int totalOrders = ordersQuery.Count();
+            int totalPages = (int)Math.Ceiling(totalOrders / (double)pageSize);
+
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            if (totalPages > 0 && page > totalPages)
+            {
+                page = totalPages;
+            }
+
+            var orders = ordersQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.SearchText = searchText;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(orders);
         }

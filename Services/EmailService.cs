@@ -1,4 +1,3 @@
-using GOGOFOOD.Services;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -17,6 +16,15 @@ namespace GOGOFOOD.Services
         }
 
         public void SendEmail(string toEmail, string subject, string body)
+        {
+            SendEmail(toEmail, subject, body, null);
+        }
+
+        public void SendEmail(
+            string toEmail,
+            string subject,
+            string body,
+            List<(string FileName, byte[] Content, string ContentType)>? attachments)
         {
             try
             {
@@ -59,19 +67,33 @@ namespace GOGOFOOD.Services
                 email.To.Add(MailboxAddress.Parse(toEmail));
                 email.Subject = subject;
 
-                email.Body = new TextPart("html")
+                var bodyBuilder = new BodyBuilder
                 {
-                    Text = body
+                    HtmlBody = body
                 };
+
+                if (attachments != null)
+                {
+                    foreach (var attachment in attachments)
+                    {
+                        if (attachment.Content != null && attachment.Content.Length > 0)
+                        {
+                            bodyBuilder.Attachments.Add(
+                                attachment.FileName,
+                                attachment.Content,
+                                ContentType.Parse(attachment.ContentType)
+                            );
+                        }
+                    }
+                }
+
+                email.Body = bodyBuilder.ToMessageBody();
 
                 using var smtp = new SmtpClient();
 
                 smtp.Connect(smtpServer, port, SecureSocketOptions.StartTls);
-
                 smtp.Authenticate(username, password);
-
                 smtp.Send(email);
-
                 smtp.Disconnect(true);
 
                 _logService.AddLog(

@@ -1,7 +1,9 @@
+using QuestPDF.Infrastructure;
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
 using GOGOFOOD.Services;
 using Microsoft.EntityFrameworkCore;
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
