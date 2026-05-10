@@ -1,7 +1,6 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Text.Json;
 
 namespace GOGOFOOD.Controllers
@@ -42,13 +41,17 @@ namespace GOGOFOOD.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddToCart(
-            int id,
-            string name,
-            decimal price,
-            string imageUrl,
-            int[]? customizationOptionIds)
+        [ValidateAntiForgeryToken]
+        public IActionResult AddToCart(int id, int[]? customizationOptionIds)
         {
+            var menuItem = _context.MenuItems
+                .FirstOrDefault(x => x.MenuItemId == id);
+
+            if (menuItem == null)
+            {
+                return RedirectToAction("Index", "MenuItem");
+            }
+
             var cart = GetCart();
 
             string customizationName = "No customization";
@@ -83,10 +86,10 @@ namespace GOGOFOOD.Controllers
                 cart.Add(new CartItem
                 {
                     CartItemKey = Guid.NewGuid().ToString(),
-                    MenuItemId = id,
-                    Name = name,
-                    ImageUrl = imageUrl ?? string.Empty,
-                    Price = price,
+                    MenuItemId = menuItem.MenuItemId,
+                    Name = menuItem.Name,
+                    ImageUrl = menuItem.ImageUrl ?? string.Empty,
+                    Price = menuItem.Price,
                     Quantity = 1,
                     Customization = customizationName,
                     CustomizationPrice = customizationPrice

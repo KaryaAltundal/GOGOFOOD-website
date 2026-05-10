@@ -18,6 +18,8 @@
     }
 
     <form asp-controller="MenuItem" asp-action="Edit" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
         <input type="hidden" asp-for="MenuItemId" />
 
         <div class="form-group-modern">
@@ -32,7 +34,7 @@
 
         <div class="form-group-modern">
             <label>Price</label>
-            <input asp-for="Price" type="number" step="0.01" placeholder="Example: 250" required />
+            <input asp-for="Price" type="number" step="0.01" min="0.01" placeholder="Example: 250" required />
         </div>
 
         @if (!string.IsNullOrEmpty(Model.ImageUrl))
@@ -45,8 +47,8 @@
 
         <div class="form-group-modern">
             <label>Change Food Photo</label>
-            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,image/*" />
-            <small>If you do not choose a new photo, the current photo will stay.</small>
+            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            <small>If you do not choose a new photo, the current photo will stay. Maximum size: 2 MB.</small>
         </div>
 
         <button type="submit" class="btn-pink">

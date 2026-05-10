@@ -1,0 +1,45 @@
+GOGOFOOD Security Concerns
+
+Before the final submission I did a security review of the GOGOFOOD project for any possible security issues.
+The project is being used as a course project but some parts need to be improved to make it safer.
+The first problem is hardcoded sensitive data.
+Some credentials like email settings, SMTP password or API keys should not be written directly inside configuration files.
+If these values are pushed to GitHub they may be accessible to other people. Move these values to environment variables or .NET User Secrets. 
+If any password or key has been shared before it should be changed.
+
+Password storage is another big issue. 
+If the user passwords are stored in plain text it’s a serious security risk.
+Passwords should be stored as hashed values instead of real passwords. You can use ASP.NET Core Identity or PasswordHasher for this.
+
+Some POST actions may also require anti-forgery protection. If there are no anti-forgery tokens the project may be vulnerable to CSRF attacks. 
+For example another page could try to trick a logged-in user into submitting an unwanted form. 
+The solution to this is to add [ValidateAntiForgeryToken] to POST actions and add anti forgery tokens to forms .
+
+The project uses session values such as UserRole to restrict access.
+This is good for a simple project but it's not the most secure way.
+Always protect important actions on the server side. The role system will be safer if you use ASP.NET Core Identity and [Authorize] attributes.
+
+
+There is also the risk of price manipulation on the cart.
+When the client provides the item price or the price of customization the user can change the values before submitting the request. 
+The server should only be receiving item IDs and customization IDs. Always recalculate prices and order totals from the database.
+
+File upload validation should be improved as well. Since the caretakers can upload images of the menu itemsthe system should check the file extension  the file type and the file size. 
+Uploaded files should also be stored with random file names. Only accept image files that are safe formats such as jpg, jpeg, png or webp.
+
+
+The page for payment asks for your card number, card expiry date and CVV.
+Even if payment is only simulated, this information is sensitive. 
+The project must not store or log card data. It would be better to show a note that no real payment is processed as well.
+
+Logs may contain user email or action information. 
+This can be useful for admin tracking but logs shouldn’t give away too much personal information. 
+Only admin users should be able to access logs and sensitive values should not be logged.
+
+
+Also session and cookie settings can be improved.
+Set HttpOnly, SameSite and Secure options for cookies.
+You can also add some security headers like X-Frame-Options and X-Content-Type-Options.
+
+The most important fixes are removing hard coded secrets, hashing passwords, calculating cart prices on the server side, adding anti-forgery protection, improving file upload checks and avoiding storing payment information.
+Overall the project is functional but these security improvements should be taken into consideration before final delivery.

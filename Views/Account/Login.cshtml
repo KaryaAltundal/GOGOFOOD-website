@@ -1,6 +1,8 @@
 <h2>Login</h2>
 
 <form asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
+
     <div>
         <label>Email</label>
         <input type="email" name="email" />

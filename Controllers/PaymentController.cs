@@ -66,6 +66,7 @@ namespace GOGOFOOD.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CompletePayment(string cardHolder, string cardNumber, string expirationDate, string cvv)
         {
             var userId = HttpContext.Session.GetInt32("UserId");

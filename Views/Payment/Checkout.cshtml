@@ -61,32 +61,62 @@
 
         <div class="payment-note">
             🔒 This is a payment simulation. No real transaction will be processed.
+            Card information is only used for this demo form and must not be stored or logged.
         </div>
     </div>
 
     <div class="payment-right-card">
         <h2>Card Information</h2>
 
-        <form asp-controller="Payment" asp-action="CompletePayment" method="post" class="payment-form">
+        <form asp-controller="Payment" asp-action="CompletePayment" method="post" class="payment-form" autocomplete="off">
+            @Html.AntiForgeryToken()
+
             <div class="payment-form-group">
                 <label>Card Holder Name</label>
-                <input type="text" name="cardHolder" placeholder="Name Surname" required />
+                <input type="text"
+                       name="cardHolder"
+                       placeholder="Name Surname"
+                       autocomplete="off"
+                       required />
             </div>
 
             <div class="payment-form-group">
                 <label>Card Number</label>
-                <input type="text" name="cardNumber" placeholder="1234567890123456" required minlength="16" maxlength="16" />
+                <input type="text"
+                       id="cardNumber"
+                       name="cardNumber"
+                       placeholder="1234567890123456"
+                       inputmode="numeric"
+                       autocomplete="off"
+                       required
+                       minlength="16"
+                       maxlength="16" />
             </div>
 
             <div class="payment-row">
                 <div class="payment-form-group">
                     <label>Expiration Date</label>
-                    <input type="text" name="expirationDate" placeholder="MM/YY" required />
+                    <input type="text"
+                           id="expirationDate"
+                           name="expirationDate"
+                           placeholder="MM/YY"
+                           inputmode="numeric"
+                           autocomplete="off"
+                           required
+                           maxlength="5" />
                 </div>
 
                 <div class="payment-form-group">
                     <label>CVV</label>
-                    <input type="text" name="cvv" placeholder="123" required minlength="3" maxlength="3" />
+                    <input type="password"
+                           id="cvv"
+                           name="cvv"
+                           placeholder="123"
+                           inputmode="numeric"
+                           autocomplete="off"
+                           required
+                           minlength="3"
+                           maxlength="3" />
                 </div>
             </div>
 
@@ -95,8 +125,40 @@
             </button>
 
             <p class="payment-secure-text">
-                ✅ 256-bit SSL secure payment simulation
+                ✅ Demo only — no real card payment is processed.
             </p>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        const cardNumberInput = document.getElementById("cardNumber");
+        const expirationDateInput = document.getElementById("expirationDate");
+        const cvvInput = document.getElementById("cvv");
+
+        cardNumberInput.addEventListener("input", function () {
+            this.value = this.value
+                .replace(/\D/g, "")
+                .slice(0, 16);
+        });
+
+        expirationDateInput.addEventListener("input", function () {
+            let value = this.value
+                .replace(/\D/g, "")
+                .slice(0, 4);
+
+            if (value.length >= 3) {
+                value = value.slice(0, 2) + "/" + value.slice(2);
+            }
+
+            this.value = value;
+        });
+
+        cvvInput.addEventListener("input", function () {
+            this.value = this.value
+                .replace(/\D/g, "")
+                .slice(0, 3);
+        });
+    </script>
+}

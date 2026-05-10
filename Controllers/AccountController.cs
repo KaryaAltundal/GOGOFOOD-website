@@ -1,6 +1,7 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
 using GOGOFOOD.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GOGOFOOD.Controllers
@@ -10,6 +11,7 @@ namespace GOGOFOOD.Controllers
         private readonly GogoFoodContext _context;
         private readonly LogService _logService;
         private readonly EmailService _emailService;
+        private readonly PasswordHasher<User> _passwordHasher;
 
         public AccountController(
             GogoFoodContext context,
@@ -19,6 +21,7 @@ namespace GOGOFOOD.Controllers
             _context = context;
             _logService = logService;
             _emailService = emailService;
+            _passwordHasher = new PasswordHasher<User>();
         }
 
         [HttpGet]
@@ -32,6 +35,26 @@ namespace GOGOFOOD.Controllers
         {
             if (ModelState.IsValid)
             {
+                var existingUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
+
+                if (existingUser != null)
+                {
+                    ViewBag.Error = "This email is already registered.";
+
+                    _logService.AddLog(
+                        "Register Failed",
+                        "Registration failed because email already exists.",
+                        user.Email,
+                        user.Role
+                    );
+
+                    return View(user);
+                }
+
+                // Hash password before saving.
+                // The real password will not be stored in the database.
+                user.Password = _passwordHasher.HashPassword(user, user.Password);
+
                 _context.Users.Add(user);
                 _context.SaveChanges();
 
@@ -78,36 +101,42 @@ namespace GOGOFOOD.Controllers
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == email && x.Password == password);
+            var user = _context.Users.FirstOrDefault(x => x.Email == email);
 
             if (user != null)
             {
-                var random = new Random();
-                var verificationCode = random.Next(100000, 999999).ToString();
+                var passwordResult = _passwordHasher.VerifyHashedPassword(user, user.Password, password);
 
-                HttpContext.Session.SetInt32("PendingUserId", user.UserId);
-                HttpContext.Session.SetString("PendingUserEmail", user.Email);
-                HttpContext.Session.SetString("PendingUserRole", user.Role);
-                HttpContext.Session.SetString("PendingUserName", user.Name);
-                HttpContext.Session.SetString("TwoFactorCode", verificationCode);
-                HttpContext.Session.SetString("TwoFactorExpireTime", DateTime.Now.AddMinutes(5).ToString());
+                if (passwordResult == PasswordVerificationResult.Success ||
+                    passwordResult == PasswordVerificationResult.SuccessRehashNeeded)
+                {
+                    var random = new Random();
+                    var verificationCode = random.Next(100000, 999999).ToString();
 
-                string emailBody = BuildTwoFactorEmailBody(user.Name, verificationCode);
+                    HttpContext.Session.SetInt32("PendingUserId", user.UserId);
+                    HttpContext.Session.SetString("PendingUserEmail", user.Email);
+                    HttpContext.Session.SetString("PendingUserRole", user.Role);
+                    HttpContext.Session.SetString("PendingUserName", user.Name);
+                    HttpContext.Session.SetString("TwoFactorCode", verificationCode);
+                    HttpContext.Session.SetString("TwoFactorExpireTime", DateTime.Now.AddMinutes(5).ToString());
 
-                _emailService.SendEmail(
-                    user.Email,
-                    "GOGOFOOD Login Verification Code",
-                    emailBody
-                );
+                    string emailBody = BuildTwoFactorEmailBody(user.Name, verificationCode);
 
-                _logService.AddLog(
-                    "Two Factor Code Sent",
-                    "Two-factor authentication code sent to: " + user.Email,
-                    user.Email,
-                    user.Role
-                );
+                    _emailService.SendEmail(
+                        user.Email,
+                        "GOGOFOOD Login Verification Code",
+                        emailBody
+                    );
 
-                return RedirectToAction("VerifyTwoFactor");
+                    _logService.AddLog(
+                        "Two Factor Code Sent",
+                        "Two-factor authentication code sent to: " + user.Email,
+                        user.Email,
+                        user.Role
+                    );
+
+                    return RedirectToAction("VerifyTwoFactor");
+                }
             }
 
             _logService.AddLog(

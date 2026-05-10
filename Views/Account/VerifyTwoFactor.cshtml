@@ -31,6 +31,8 @@
         }
 
         <form asp-controller="Account" asp-action="VerifyTwoFactor" method="post" class="two-factor-form">
+            @Html.AntiForgeryToken()
+
             <label>Verification Code</label>
 
             <input type="text"
@@ -45,6 +47,8 @@
         </form>
 
         <form asp-controller="Account" asp-action="ResendTwoFactorCode" method="post">
+            @Html.AntiForgeryToken()
+
             <button type="submit" class="btn-outline-pink two-factor-resend">
                 Resend Code
             </button>

@@ -3,7 +3,6 @@ using GOGOFOOD.Models;
 using GOGOFOOD.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace GOGOFOOD.Controllers
 {
@@ -13,6 +12,18 @@ namespace GOGOFOOD.Controllers
         private readonly GoogleMapsService _googleMapsService;
         private readonly LogService _logService;
         private readonly IWebHostEnvironment _environment;
+
+        private const long MaxImageSize = 2 * 1024 * 1024; // 2 MB
+
+        private readonly string[] _allowedExtensions =
+        {
+            ".jpg", ".jpeg", ".png", ".webp"
+        };
+
+        private readonly string[] _allowedContentTypes =
+        {
+            "image/jpeg", "image/png", "image/webp"
+        };
 
         public MenuItemController(
             GogoFoodContext context,
@@ -97,32 +108,35 @@ namespace GOGOFOOD.Controllers
                 menuItems = filteredItems;
             }
 
-           if (!string.IsNullOrWhiteSpace(searchText))
-{
-    menuItems = menuItems
-        .Where(m =>
-            m.Name.ToLower().Contains(searchText.ToLower()) ||
-            m.Description.ToLower().Contains(searchText.ToLower()) ||
-            (m.Caretaker != null && m.Caretaker.RestaurantName.ToLower().Contains(searchText.ToLower())))
-        .ToList();
-}
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                var search = searchText.ToLower();
 
-int pageSize = 6;
-int totalItems = menuItems.Count;
-int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+                menuItems = menuItems
+                    .Where(m =>
+                        m.Name.ToLower().Contains(search) ||
+                        m.Description.ToLower().Contains(search) ||
+                        (m.Caretaker != null &&
+                         m.Caretaker.RestaurantName.ToLower().Contains(search)))
+                    .ToList();
+            }
 
-menuItems = menuItems
-    .Skip((page - 1) * pageSize)
-    .Take(pageSize)
-    .ToList();
+            int pageSize = 6;
+            int totalItems = menuItems.Count;
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-ViewBag.MaxDistanceKm = maxDistanceKm;
-ViewBag.Distances = distances;
-ViewBag.SearchText = searchText;
-ViewBag.CurrentPage = page;
-ViewBag.TotalPages = totalPages;
+            menuItems = menuItems
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-return View(menuItems);
+            ViewBag.MaxDistanceKm = maxDistanceKm;
+            ViewBag.Distances = distances;
+            ViewBag.SearchText = searchText;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(menuItems);
         }
 
         [HttpGet]
@@ -144,6 +158,7 @@ return View(menuItems);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(MenuItem item, IFormFile? imageFile)
         {
             var role = HttpContext.Session.GetString("UserRole");
@@ -164,17 +179,23 @@ return View(menuItems);
                 return RedirectToAction("Login", "Account");
             }
 
+            if (item.Price <= 0)
+            {
+                ViewBag.ImageError = "Price must be greater than 0.";
+                return View(item);
+            }
+
             if (imageFile != null && imageFile.Length > 0)
             {
-                var uploadedImagePath = await SaveImage(imageFile);
+                var uploadResult = await SaveImage(imageFile);
 
-                if (uploadedImagePath == null)
+                if (!uploadResult.Success)
                 {
-                    ViewBag.ImageError = "Only JPG, JPEG, PNG, and WEBP images are allowed.";
+                    ViewBag.ImageError = uploadResult.ErrorMessage;
                     return View(item);
                 }
 
-                item.ImageUrl = uploadedImagePath;
+                item.ImageUrl = uploadResult.ImageUrl ?? string.Empty;
             }
             else
             {
@@ -238,6 +259,7 @@ return View(menuItems);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(MenuItem item, IFormFile? imageFile)
         {
             var role = HttpContext.Session.GetString("UserRole");
@@ -275,21 +297,27 @@ return View(menuItems);
                 return RedirectToAction("Index", "MenuItem");
             }
 
+            if (item.Price <= 0)
+            {
+                ViewBag.ImageError = "Price must be greater than 0.";
+                return View(existingItem);
+            }
+
             existingItem.Name = item.Name;
             existingItem.Description = item.Description;
             existingItem.Price = item.Price;
 
             if (imageFile != null && imageFile.Length > 0)
             {
-                var uploadedImagePath = await SaveImage(imageFile);
+                var uploadResult = await SaveImage(imageFile);
 
-                if (uploadedImagePath == null)
+                if (!uploadResult.Success)
                 {
-                    ViewBag.ImageError = "Only JPG, JPEG, PNG, and WEBP images are allowed.";
+                    ViewBag.ImageError = uploadResult.ErrorMessage;
                     return View(existingItem);
                 }
 
-                existingItem.ImageUrl = uploadedImagePath;
+                existingItem.ImageUrl = uploadResult.ImageUrl ?? existingItem.ImageUrl;
             }
 
             _context.MenuItems.Update(existingItem);
@@ -308,6 +336,7 @@ return View(menuItems);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var role = HttpContext.Session.GetString("UserRole");
@@ -364,14 +393,28 @@ return View(menuItems);
             return RedirectToAction("Index", "MenuItem");
         }
 
-        private async Task<string?> SaveImage(IFormFile imageFile)
+        private async Task<(bool Success, string? ImageUrl, string ErrorMessage)> SaveImage(IFormFile imageFile)
         {
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-            var extension = Path.GetExtension(imageFile.FileName).ToLower();
-
-            if (!allowedExtensions.Contains(extension))
+            if (imageFile == null || imageFile.Length == 0)
             {
-                return null;
+                return (false, null, "Please select an image file.");
+            }
+
+            if (imageFile.Length > MaxImageSize)
+            {
+                return (false, null, "Image size must be smaller than 2 MB.");
+            }
+
+            var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+
+            if (string.IsNullOrWhiteSpace(extension) || !_allowedExtensions.Contains(extension))
+            {
+                return (false, null, "Only JPG, JPEG, PNG and WEBP image files are allowed.");
+            }
+
+            if (!_allowedContentTypes.Contains(imageFile.ContentType.ToLowerInvariant()))
+            {
+                return (false, null, "Invalid image type. Please upload JPG, PNG or WEBP.");
             }
 
             var uploadsFolder = Path.Combine(_environment.WebRootPath, "images", "menu");
@@ -381,7 +424,7 @@ return View(menuItems);
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            var uniqueFileName = Guid.NewGuid().ToString() + extension;
+            var uniqueFileName = Guid.NewGuid().ToString("N") + extension;
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -389,7 +432,7 @@ return View(menuItems);
                 await imageFile.CopyToAsync(fileStream);
             }
 
-            return "/images/menu/" + uniqueFileName;
+            return (true, "/images/menu/" + uniqueFileName, string.Empty);
         }
     }
 }

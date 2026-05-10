@@ -18,6 +18,8 @@
     }
 
     <form asp-controller="MenuItem" asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
         <div class="form-group-modern">
             <label>Food Name</label>
             <input asp-for="Name" placeholder="Example: California Roll" required />
@@ -30,13 +32,13 @@
 
         <div class="form-group-modern">
             <label>Price</label>
-            <input asp-for="Price" type="number" step="0.01" placeholder="Example: 250" required />
+            <input asp-for="Price" type="number" step="0.01" min="0.01" placeholder="Example: 250" required />
         </div>
 
         <div class="form-group-modern">
             <label>Food Photo</label>
-            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,image/*" />
-            <small>Choose a food image from your computer. JPG, PNG, JPEG, and WEBP are supported.</small>
+            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            <small>Choose a food image from your computer. JPG, JPEG, PNG and WEBP are supported. Maximum size: 2 MB.</small>
         </div>
 
         <button type="submit" class="btn-pink">

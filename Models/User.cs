@@ -8,6 +8,9 @@ namespace GOGOFOOD.Models
 
         public string Email { get; set; } = string.Empty;
 
+        // Security note:
+        // This property stores the hashed password, not the plain text password.
+        // It is kept as "Password" to avoid changing the existing database column.
         public string Password { get; set; } = string.Empty;
 
         public string Role { get; set; } = string.Empty;

@@ -142,8 +142,8 @@ else
                             <span class="rating-stars">★</span>
 
                             @if (item.Caretaker != null &&
-                                item.Caretaker.CaretakerRatings != null &&
-                                item.Caretaker.CaretakerRatings.Count > 0)
+                                 item.Caretaker.CaretakerRatings != null &&
+                                 item.Caretaker.CaretakerRatings.Count > 0)
                             {
                                 <span>
                                     Restaurant @item.Caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") / 5
@@ -186,6 +186,8 @@ else
                                   asp-route-id="@item.MenuItemId"
                                   method="post"
                                   onsubmit="return confirm('Are you sure you want to delete this menu item?');">
+                                @Html.AntiForgeryToken()
+
                                 <button type="submit" class="btn-soft-delete">
                                     Delete
                                 </button>
@@ -207,6 +209,8 @@ else
                                   asp-route-id="@item.MenuItemId"
                                   method="post"
                                   onsubmit="return confirm('Admin action: Are you sure you want to delete this menu item?');">
+                                @Html.AntiForgeryToken()
+
                                 <button type="submit" class="btn-soft-delete">
                                     Delete Menu Item
                                 </button>
@@ -216,10 +220,9 @@ else
                     else
                     {
                         <form asp-controller="Cart" asp-action="AddToCart" method="post" class="add-cart-form">
+                            @Html.AntiForgeryToken()
+
                             <input type="hidden" name="id" value="@item.MenuItemId" />
-                            <input type="hidden" name="name" value="@item.Name" />
-                            <input type="hidden" name="price" value="@item.Price" />
-                            <input type="hidden" name="imageUrl" value="@item.ImageUrl" />
 
                             <label>Custom Ingredients</label>
 
