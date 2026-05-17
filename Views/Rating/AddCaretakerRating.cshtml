@@ -1,89 +1,113 @@
-@using GOGOFOOD.Models
+@model GOGOFOOD.Models.CaretakerRating
 
 @{
-    ViewData["Title"] = "Rate Restaurant";
-    var caretakerItems = ViewBag.CaretakerItems as List<OrderItem>;
+    ViewData["Title"] = "Rate Caterer";
+
+    var orderId = ViewBag.OrderId;
+    var caretakerId = ViewBag.CaretakerId;
+    var caretaker = ViewBag.Caretaker as GOGOFOOD.Models.Caretaker;
+
+    var selectedRating = Model != null && Model.RatingValue > 0 ? Model.RatingValue : 5;
+
+    var ratingCount = ViewBag.RatingCount != null ? (int)ViewBag.RatingCount : 0;
+    var ratingAverage = ViewBag.RatingAverage != null ? Convert.ToDouble(ViewBag.RatingAverage) : 0;
 }
 
 <div class="page-title">
-    <h1>Rate Restaurant ⭐</h1>
-    <p>Share your experience about this restaurant.</p>
+    <h1>Rate Caterer ⭐</h1>
+    <p>Select a star rating and write your experience about this caterer.</p>
 </div>
 
 @if (TempData["RatingMessage"] != null)
 {
-    <div class="alert-modern alert-danger-modern">
+    <div class="alert-modern alert-success-modern">
         @TempData["RatingMessage"]
     </div>
 }
 
-<div class="rating-page-layout">
-    <div class="rating-food-card">
-        <div class="rating-restaurant-header">
-            <div class="restaurant-avatar-modern">🏪</div>
-
-            <div>
-                <h2>@ViewBag.RestaurantName</h2>
-
-                @if (ViewBag.CaretakerName != null)
-                {
-                    <p class="rating-restaurant">Caretaker: @ViewBag.CaretakerName</p>
-                }
-
-                @if (ViewBag.RestaurantAddress != null)
-                {
-                    <p class="rating-description">@ViewBag.RestaurantAddress</p>
-                }
-            </div>
-        </div>
-
-        @if (caretakerItems != null && caretakerItems.Count > 0)
+<div class="rating-page-layout rating-page-single">
+    <div class="rating-form-card">
+        @if (caretaker != null)
         {
-            <div class="rating-order-items">
-                <h3>Items from this restaurant</h3>
+            <div class="rating-menu-preview">
+                <div class="rating-menu-image">
+                    <span>🏪</span>
+                </div>
 
-                @foreach (var item in caretakerItems)
-                {
-                    <div class="rating-order-item-row">
-                        <div>
-                            <strong>@item.MenuItem?.Name</strong>
-                            <span>@item.CustomizationName</span>
-                        </div>
+                <div>
+                    <span class="rating-category-label">Caterer</span>
+                    <h2>@caretaker.RestaurantName</h2>
+                    <p>@caretaker.Address</p>
 
-                        <p>Qty: @item.Quantity</p>
+                    <div class="rating-summary-box">
+                        @if (ratingCount > 0)
+                        {
+                            <strong>⭐ @ratingAverage.ToString("0.0") / 5</strong>
+                            <span>@ratingCount rating(s)</span>
+                        }
+                        else
+                        {
+                            <strong>⭐ No rating yet</strong>
+                            <span>Be the first to rate this caterer.</span>
+                        }
                     </div>
-                }
+                </div>
             </div>
         }
-    </div>
 
-    <div class="rating-form-card">
-        <h2>Your Rating</h2>
+        <form asp-controller="Rating"
+              asp-action="AddCaretakerRating"
+              method="post"
+              class="rating-form-modern">
 
-        <form asp-controller="Rating" asp-action="AddCaretakerRating" method="post">
-            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
-            <input type="hidden" name="caretakerId" value="@ViewBag.CaretakerId" />
+            @Html.AntiForgeryToken()
 
-            <label>Rating</label>
-            <select name="ratingValue" required>
-                <option value="">Select rating</option>
-                <option value="1">★ 1 - Very Bad</option>
-                <option value="2">★★ 2 - Bad</option>
-                <option value="3">★★★ 3 - Average</option>
-                <option value="4">★★★★ 4 - Good</option>
-                <option value="5">★★★★★ 5 - Excellent</option>
-            </select>
+            <input type="hidden" name="orderId" value="@orderId" />
+            <input type="hidden" name="caretakerId" value="@caretakerId" />
 
-            <label>Comment</label>
-            <textarea name="comment" placeholder="Write your comment..." rows="5"></textarea>
+            <div class="rating-field">
+                <label>Your Rating</label>
 
-            <button type="submit" class="btn-pink rating-submit-btn">
-                Submit Restaurant Rating
-            </button>
+                <select name="ratingValue" required>
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        if (selectedRating == i)
+                        {
+                            <option value="@i" selected>@i ⭐</option>
+                        }
+                        else
+                        {
+                            <option value="@i">@i ⭐</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="rating-field">
+                <label>Your Comment</label>
+                <textarea name="comment"
+                          rows="5"
+                          placeholder="Write your comment about this caterer...">@Model?.Comment</textarea>
+            </div>
+
+            <div class="rating-action-row">
+                <button type="submit" class="btn-pink">
+                    Save Rating
+                </button>
+
+                <a asp-controller="Rating"
+                   asp-action="Reviews"
+                   asp-route-caretakerId="@caretakerId"
+                   class="btn-outline-pink">
+                    View Reviews
+                </a>
+
+                <a asp-controller="Order"
+                   asp-action="Index"
+                   class="btn-outline-pink">
+                    Back to Orders
+                </a>
+            </div>
         </form>
-
-        <a asp-controller="Order" asp-action="Index" class="back-link-modern">
-            ← Back to Orders
-        </a>
     </div>
 </div>

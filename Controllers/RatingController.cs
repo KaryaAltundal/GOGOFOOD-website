@@ -1,6 +1,5 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
-using GOGOFOOD.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,269 +8,319 @@ namespace GOGOFOOD.Controllers
     public class RatingController : Controller
     {
         private readonly GogoFoodContext _context;
-        private readonly LogService _logService;
 
-        public RatingController(GogoFoodContext context, LogService logService)
+        public RatingController(GogoFoodContext context)
         {
             _context = context;
-            _logService = logService;
         }
 
         [HttpGet]
         public IActionResult AddMenuItemRating(int orderId, int menuItemId)
         {
+            var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
 
-            if (userId == null)
+            if (role != "User" || userId == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            var order = _context.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .ThenInclude(m => m.Caretaker)
-                .FirstOrDefault(o => o.OrderId == orderId && o.UserId == userId.Value);
+            var orderItem = _context.OrderItems
+                .Include(x => x.Order)
+                .Include(x => x.MenuItem)
+                    .ThenInclude(x => x!.Caretaker)
+                .FirstOrDefault(x =>
+                    x.OrderId == orderId &&
+                    x.MenuItemId == menuItemId &&
+                    x.Order != null &&
+                    x.Order.UserId == userId.Value);
 
-            if (order == null || order.Status != "Completed")
+            if (orderItem == null)
             {
+                TempData["RatingMessage"] = "You can only rate menu items from your own completed orders.";
                 return RedirectToAction("Index", "Order");
             }
 
-            var orderItem = order.OrderItems?
-                .FirstOrDefault(x => x.MenuItemId == menuItemId);
+            var existingRating = _context.MenuItemRatings
+                .FirstOrDefault(x =>
+                    x.OrderId == orderId &&
+                    x.MenuItemId == menuItemId &&
+                    x.UserId == userId.Value);
 
-            if (orderItem == null || orderItem.MenuItem == null)
-            {
-                return RedirectToAction("Index", "Order");
-            }
+            var ratingCount = _context.MenuItemRatings.Count(x => x.MenuItemId == menuItemId);
 
-            var existingRating = _context.MenuItemRatings.FirstOrDefault(x =>
-                x.UserId == userId.Value &&
-                x.OrderId == orderId &&
-                x.MenuItemId == menuItemId);
-
-            if (existingRating != null)
-            {
-                TempData["RatingMessage"] = "You already rated this menu item.";
-                return RedirectToAction("Index", "Order");
-            }
+            var ratingAverage = ratingCount > 0
+                ? _context.MenuItemRatings
+                    .Where(x => x.MenuItemId == menuItemId)
+                    .Average(x => x.RatingValue)
+                : 0;
 
             ViewBag.OrderId = orderId;
             ViewBag.MenuItemId = menuItemId;
-            ViewBag.MenuItemName = orderItem.MenuItem.Name;
-            ViewBag.MenuItemDescription = orderItem.MenuItem.Description;
-            ViewBag.MenuItemImage = orderItem.MenuItem.ImageUrl;
-            ViewBag.RestaurantName = orderItem.MenuItem.Caretaker?.RestaurantName;
-            ViewBag.CustomizationName = orderItem.CustomizationName;
-            ViewBag.Quantity = orderItem.Quantity;
-            ViewBag.UnitPrice = orderItem.UnitPrice;
-            ViewBag.CustomizationPrice = orderItem.CustomizationPrice;
+            ViewBag.MenuItem = orderItem.MenuItem;
+            ViewBag.ExistingRating = existingRating;
+            ViewBag.RatingCount = ratingCount;
+            ViewBag.RatingAverage = ratingAverage;
 
-            return View();
+            return View(existingRating ?? new MenuItemRating());
         }
 
         [HttpPost]
-        public IActionResult AddMenuItemRating(int orderId, int menuItemId, int ratingValue, string comment)
+        [ValidateAntiForgeryToken]
+        public IActionResult AddMenuItemRating(int orderId, int menuItemId, int ratingValue, string? comment)
         {
+            var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
-            var userEmail = HttpContext.Session.GetString("UserEmail");
-            var userRole = HttpContext.Session.GetString("UserRole");
 
-            if (userId == null)
+            if (role != "User" || userId == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
             if (ratingValue < 1 || ratingValue > 5)
             {
-                TempData["RatingMessage"] = "Rating must be between 1 and 5.";
-                return RedirectToAction("AddMenuItemRating", new { orderId = orderId, menuItemId = menuItemId });
+                TempData["RatingMessage"] = "Please select a rating between 1 and 5.";
+                return RedirectToAction("AddMenuItemRating", new { orderId, menuItemId });
             }
 
-            var order = _context.Orders
-                .Include(o => o.OrderItems)
-                .FirstOrDefault(o => o.OrderId == orderId && o.UserId == userId.Value);
+            var orderItem = _context.OrderItems
+                .Include(x => x.Order)
+                .FirstOrDefault(x =>
+                    x.OrderId == orderId &&
+                    x.MenuItemId == menuItemId &&
+                    x.Order != null &&
+                    x.Order.UserId == userId.Value);
 
-            if (order == null || order.Status != "Completed")
+            if (orderItem == null)
             {
+                TempData["RatingMessage"] = "You can only rate menu items from your own completed orders.";
                 return RedirectToAction("Index", "Order");
             }
 
-            var orderItemExists = order.OrderItems != null &&
-                                  order.OrderItems.Any(x => x.MenuItemId == menuItemId);
+            var existingRating = _context.MenuItemRatings
+                .FirstOrDefault(x =>
+                    x.OrderId == orderId &&
+                    x.MenuItemId == menuItemId &&
+                    x.UserId == userId.Value);
 
-            if (!orderItemExists)
+            if (existingRating == null)
             {
-                return RedirectToAction("Index", "Order");
+                var rating = new MenuItemRating
+                {
+                    OrderId = orderId,
+                    MenuItemId = menuItemId,
+                    UserId = userId.Value,
+                    RatingValue = ratingValue,
+                    Comment = comment ?? "",
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.MenuItemRatings.Add(rating);
+            }
+            else
+            {
+                existingRating.RatingValue = ratingValue;
+                existingRating.Comment = comment ?? "";
+                existingRating.CreatedAt = DateTime.Now;
+
+                _context.MenuItemRatings.Update(existingRating);
             }
 
-            var existingRating = _context.MenuItemRatings.FirstOrDefault(x =>
-                x.UserId == userId.Value &&
-                x.OrderId == orderId &&
-                x.MenuItemId == menuItemId);
-
-            if (existingRating != null)
-            {
-                TempData["RatingMessage"] = "You already rated this menu item.";
-                return RedirectToAction("Index", "Order");
-            }
-
-            var rating = new MenuItemRating
-            {
-                RatingValue = ratingValue,
-                Comment = comment ?? string.Empty,
-                CreatedAt = DateTime.Now,
-                UserId = userId.Value,
-                OrderId = orderId,
-                MenuItemId = menuItemId
-            };
-
-            _context.MenuItemRatings.Add(rating);
             _context.SaveChanges();
 
-            _logService.AddLog(
-                "Rating Submitted",
-                "Menu item rating submitted. MenuItemId: " + menuItemId + ", Rating: " + ratingValue,
-                userEmail,
-                userRole
-            );
-
-            TempData["RatingMessage"] = "Thank you! Your rating was submitted.";
-
-            return RedirectToAction("Index", "Order");
+            TempData["RatingMessage"] = "Menu rating saved successfully.";
+            return RedirectToAction("Reviews", new { menuItemId });
         }
 
         [HttpGet]
         public IActionResult AddCaretakerRating(int orderId, int caretakerId)
         {
+            var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
 
-            if (userId == null)
+            if (role != "User" || userId == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
-            var order = _context.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .ThenInclude(m => m.Caretaker)
-                .FirstOrDefault(o => o.OrderId == orderId && o.UserId == userId.Value);
+            var caretaker = _context.Caretakers
+                .FirstOrDefault(x => x.CaretakerId == caretakerId && !x.IsDeleted);
 
-            if (order == null || order.Status != "Completed")
+            if (caretaker == null)
             {
+                TempData["RatingMessage"] = "Caterer could not be found.";
                 return RedirectToAction("Index", "Order");
             }
 
-            bool caretakerExistsInOrder = order.OrderItems != null &&
-                order.OrderItems.Any(x =>
+            var orderHasThisCaretaker = _context.OrderItems
+                .Include(x => x.Order)
+                .Include(x => x.MenuItem)
+                .Any(x =>
+                    x.OrderId == orderId &&
+                    x.Order != null &&
+                    x.Order.UserId == userId.Value &&
                     x.MenuItem != null &&
                     x.MenuItem.CaretakerId == caretakerId);
 
-            if (!caretakerExistsInOrder)
+            if (!orderHasThisCaretaker)
             {
+                TempData["RatingMessage"] = "You can only rate caterers from your own completed orders.";
                 return RedirectToAction("Index", "Order");
             }
 
-            var existingRating = _context.CaretakerRatings.FirstOrDefault(x =>
-                x.UserId == userId.Value &&
-                x.OrderId == orderId &&
-                x.CaretakerId == caretakerId);
+            var existingRating = _context.CaretakerRatings
+                .FirstOrDefault(x =>
+                    x.OrderId == orderId &&
+                    x.CaretakerId == caretakerId &&
+                    x.UserId == userId.Value);
 
-            if (existingRating != null)
-            {
-                TempData["RatingMessage"] = "You already rated this restaurant.";
-                return RedirectToAction("Index", "Order");
-            }
+            var ratingCount = _context.CaretakerRatings.Count(x => x.CaretakerId == caretakerId);
 
-            var caretaker = _context.Caretakers.FirstOrDefault(x => x.CaretakerId == caretakerId);
-
-            var caretakerItems = order.OrderItems?
-                .Where(x => x.MenuItem != null && x.MenuItem.CaretakerId == caretakerId)
-                .ToList();
+            var ratingAverage = ratingCount > 0
+                ? _context.CaretakerRatings
+                    .Where(x => x.CaretakerId == caretakerId)
+                    .Average(x => x.RatingValue)
+                : 0;
 
             ViewBag.OrderId = orderId;
             ViewBag.CaretakerId = caretakerId;
-            ViewBag.CaretakerName = caretaker?.Name;
-            ViewBag.RestaurantName = caretaker?.RestaurantName;
-            ViewBag.RestaurantAddress = caretaker?.Address;
-            ViewBag.CaretakerItems = caretakerItems;
+            ViewBag.Caretaker = caretaker;
+            ViewBag.ExistingRating = existingRating;
+            ViewBag.RatingCount = ratingCount;
+            ViewBag.RatingAverage = ratingAverage;
 
-            return View();
+            return View(existingRating ?? new CaretakerRating());
         }
 
         [HttpPost]
-        public IActionResult AddCaretakerRating(int orderId, int caretakerId, int ratingValue, string comment)
+        [ValidateAntiForgeryToken]
+        public IActionResult AddCaretakerRating(int orderId, int caretakerId, int ratingValue, string? comment)
         {
+            var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
-            var userEmail = HttpContext.Session.GetString("UserEmail");
-            var userRole = HttpContext.Session.GetString("UserRole");
 
-            if (userId == null)
+            if (role != "User" || userId == null)
             {
                 return RedirectToAction("Login", "Account");
             }
 
             if (ratingValue < 1 || ratingValue > 5)
             {
-                TempData["RatingMessage"] = "Rating must be between 1 and 5.";
-                return RedirectToAction("AddCaretakerRating", new { orderId = orderId, caretakerId = caretakerId });
+                TempData["RatingMessage"] = "Please select a rating between 1 and 5.";
+                return RedirectToAction("AddCaretakerRating", new { orderId, caretakerId });
             }
 
-            var order = _context.Orders
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .FirstOrDefault(o => o.OrderId == orderId && o.UserId == userId.Value);
-
-            if (order == null || order.Status != "Completed")
-            {
-                return RedirectToAction("Index", "Order");
-            }
-
-            bool caretakerExistsInOrder = order.OrderItems != null &&
-                order.OrderItems.Any(x =>
+            var orderHasThisCaretaker = _context.OrderItems
+                .Include(x => x.Order)
+                .Include(x => x.MenuItem)
+                .Any(x =>
+                    x.OrderId == orderId &&
+                    x.Order != null &&
+                    x.Order.UserId == userId.Value &&
                     x.MenuItem != null &&
                     x.MenuItem.CaretakerId == caretakerId);
 
-            if (!caretakerExistsInOrder)
+            if (!orderHasThisCaretaker)
             {
+                TempData["RatingMessage"] = "You can only rate caterers from your own completed orders.";
                 return RedirectToAction("Index", "Order");
             }
 
-            var existingRating = _context.CaretakerRatings.FirstOrDefault(x =>
-                x.UserId == userId.Value &&
-                x.OrderId == orderId &&
-                x.CaretakerId == caretakerId);
+            var existingRating = _context.CaretakerRatings
+                .FirstOrDefault(x =>
+                    x.OrderId == orderId &&
+                    x.CaretakerId == caretakerId &&
+                    x.UserId == userId.Value);
 
-            if (existingRating != null)
+            if (existingRating == null)
             {
-                TempData["RatingMessage"] = "You already rated this restaurant.";
-                return RedirectToAction("Index", "Order");
+                var rating = new CaretakerRating
+                {
+                    OrderId = orderId,
+                    CaretakerId = caretakerId,
+                    UserId = userId.Value,
+                    RatingValue = ratingValue,
+                    Comment = comment ?? "",
+                    CreatedAt = DateTime.Now
+                };
+
+                _context.CaretakerRatings.Add(rating);
+            }
+            else
+            {
+                existingRating.RatingValue = ratingValue;
+                existingRating.Comment = comment ?? "";
+                existingRating.CreatedAt = DateTime.Now;
+
+                _context.CaretakerRatings.Update(existingRating);
             }
 
-            var rating = new CaretakerRating
-            {
-                RatingValue = ratingValue,
-                Comment = comment ?? string.Empty,
-                CreatedAt = DateTime.Now,
-                UserId = userId.Value,
-                OrderId = orderId,
-                CaretakerId = caretakerId
-            };
-
-            _context.CaretakerRatings.Add(rating);
             _context.SaveChanges();
 
-            _logService.AddLog(
-                "Rating Submitted",
-                "Caretaker rating submitted. CaretakerId: " + caretakerId + ", Rating: " + ratingValue,
-                userEmail,
-                userRole
-            );
+            TempData["RatingMessage"] = "Caterer rating saved successfully.";
+            return RedirectToAction("Reviews", new { caretakerId });
+        }
 
-            TempData["RatingMessage"] = "Thank you! Your restaurant rating was submitted.";
+        [HttpGet]
+        public IActionResult Reviews(int? menuItemId, int? caretakerId)
+        {
+            MenuItem? menuItem = null;
+            Caretaker? caretaker = null;
 
-            return RedirectToAction("Index", "Order");
+            if (menuItemId != null)
+            {
+                menuItem = _context.MenuItems
+                    .Include(x => x.Caretaker)
+                    .FirstOrDefault(x => x.MenuItemId == menuItemId.Value && !x.IsDeleted);
+
+                if (menuItem != null && menuItem.CaretakerId != null)
+                {
+                    caretakerId = menuItem.CaretakerId;
+                }
+            }
+
+            if (caretakerId != null)
+            {
+                caretaker = _context.Caretakers
+                    .FirstOrDefault(x => x.CaretakerId == caretakerId.Value && !x.IsDeleted);
+            }
+
+            if (menuItem == null && caretaker == null)
+            {
+                TempData["RatingMessage"] = "Review details could not be found.";
+                return RedirectToAction("Index", "MenuItem");
+            }
+
+            var menuRatings = new List<MenuItemRating>();
+
+            if (menuItem != null)
+            {
+                menuRatings = _context.MenuItemRatings
+                    .Include(x => x.User)
+                    .Where(x => x.MenuItemId == menuItem.MenuItemId)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .ToList();
+            }
+
+            var caretakerRatings = new List<CaretakerRating>();
+
+            if (caretaker != null)
+            {
+                caretakerRatings = _context.CaretakerRatings
+                    .Include(x => x.User)
+                    .Where(x => x.CaretakerId == caretaker.CaretakerId)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .ToList();
+            }
+
+            ViewBag.MenuItem = menuItem;
+            ViewBag.Caretaker = caretaker;
+            ViewBag.MenuRatings = menuRatings;
+            ViewBag.CaretakerRatings = caretakerRatings;
+            ViewBag.ShowMenuSection = menuItem != null;
+            ViewBag.ShowCaretakerSection = caretaker != null;
+
+            return View();
         }
     }
 }

@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "Live Call";
+
+    var order = ViewBag.Order as GOGOFOOD.Models.Order;
+    var roomName = ViewBag.RoomName as string ?? "GOGOFOOD-Live-Call";
+    var customerName = ViewBag.CustomerName as string ?? "Customer";
+    var catererNames = ViewBag.CatererNames as string ?? "Caterer";
+}
+
+<div class="page-title">
+    <h1>Live Call 📞</h1>
+    <p>Talk live with the other side after the completed catering purchase.</p>
+</div>
+
+<div class="live-call-page">
+    <div class="live-call-info-card">
+        <span class="live-call-badge">Completed Order Call</span>
+
+        <h2>Order #@order?.OrderId</h2>
+
+        <div class="live-call-meta-grid">
+            <div>
+                <span>Customer</span>
+                <strong>@customerName</strong>
+            </div>
+
+            <div>
+                <span>Caterer</span>
+                <strong>@catererNames</strong>
+            </div>
+
+            <div>
+                <span>Room</span>
+                <strong>@roomName</strong>
+            </div>
+        </div>
+
+        <p class="live-call-note">
+            Camera and microphone permission may be requested by your browser.
+            Both sides should open this same completed order call room.
+        </p>
+
+        <div class="live-call-actions">
+            <a asp-controller="Order"
+               asp-action="Index"
+               class="btn-outline-pink">
+                ← Back to Orders
+            </a>
+        </div>
+    </div>
+
+    <div class="live-call-frame-card">
+        <div id="liveCallContainer" class="live-call-frame"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://meet.jit.si/external_api.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const domain = "meet.jit.si";
+            const roomName = "@roomName";
+
+            const options = {
+                roomName: roomName,
+                parentNode: document.querySelector("#liveCallContainer"),
+                width: "100%",
+                height: 620,
+                userInfo: {
+                    displayName: "GOGOFOOD User"
+                },
+                configOverwrite: {
+                    prejoinPageEnabled: true
+                },
+                interfaceConfigOverwrite: {
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_BRAND_WATERMARK: false
+                }
+            };
+
+            new JitsiMeetExternalAPI(domain, options);
+        });
+    </script>
+}

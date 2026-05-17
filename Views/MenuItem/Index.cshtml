@@ -69,96 +69,159 @@
     </div>
 }
 
-<div class="filter-card catering-filter-card">
-    <form asp-controller="MenuItem" asp-action="Index" method="get" class="filter-form">
-        @if (selectedCatererId != null)
-        {
+@if (role == "User" && selectedCatererId != null)
+{
+    <div class="filter-card catering-filter-card menu-detail-filter-card">
+        <form asp-controller="MenuItem"
+              asp-action="Index"
+              method="get"
+              class="menu-detail-filter-form">
+
             <input type="hidden" name="selectedCatererId" value="@selectedCatererId" />
-        }
+            <input type="hidden" name="maxDistanceKm" value="@ViewBag.MaxDistanceKm" />
 
-        <div class="filter-input-group">
-            <label>Search</label>
-            <input type="text"
-                   name="searchText"
-                   value="@ViewBag.SearchText"
-                   placeholder="Search caterer, menu or category" />
-        </div>
+            <div class="menu-detail-filter-main">
+                <div class="filter-input-group menu-detail-search">
+                    <label>Search</label>
+                    <input type="text"
+                           name="searchText"
+                           value="@ViewBag.SearchText"
+                           placeholder="Search menu option" />
+                </div>
 
-        @if (selectedCatererId != null || role == "Caretaker" || role == "Admin")
-        {
-            <div class="filter-input-group">
-                <label>Category</label>
-                <select name="categoryFilter">
-                    @if (string.IsNullOrWhiteSpace(categoryFilter))
-                    {
-                        <option value="" selected>All Categories</option>
-                    }
-                    else
-                    {
-                        <option value="">All Categories</option>
-                    }
-
-                    @foreach (var category in categories)
-                    {
-                        if (categoryFilter == category)
+                <div class="filter-input-group menu-detail-category">
+                    <label>Category</label>
+                    <select name="categoryFilter">
+                        @if (string.IsNullOrWhiteSpace(categoryFilter))
                         {
-                            <option value="@category" selected>@category</option>
+                            <option value="" selected>All Categories</option>
                         }
                         else
                         {
-                            <option value="@category">@category</option>
+                            <option value="">All Categories</option>
                         }
-                    }
-                </select>
-            </div>
-        }
 
-        @if (role == "User")
-        {
+                        @foreach (var category in categories)
+                        {
+                            if (categoryFilter == category)
+                            {
+                                <option value="@category" selected>@category</option>
+                            }
+                            else
+                            {
+                                <option value="@category">@category</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-pink menu-detail-filter-button">
+                    Filter
+                </button>
+            </div>
+
+            <div class="menu-detail-filter-bottom">
+                <a asp-controller="MenuItem"
+                   asp-action="Index"
+                   asp-route-searchText="@ViewBag.SearchText"
+                   asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
+                   class="btn-outline-pink menu-detail-back-button">
+                    ← Back to Caterers
+                </a>
+
+                <a asp-controller="Cart"
+                   asp-action="Index"
+                   class="filter-cart-button menu-detail-cart-button"
+                   title="Go to Cart">
+                    <span>🛒</span>
+                    Cart
+                </a>
+            </div>
+        </form>
+    </div>
+}
+else
+{
+    <div class="filter-card catering-filter-card">
+        <form asp-controller="MenuItem" asp-action="Index" method="get" class="filter-form">
+            @if (selectedCatererId != null)
+            {
+                <input type="hidden" name="selectedCatererId" value="@selectedCatererId" />
+            }
+
             <div class="filter-input-group">
-                <label>Maximum distance</label>
-                <input type="number"
-                       step="any"
-                       name="maxDistanceKm"
-                       value="@ViewBag.MaxDistanceKm"
-                       placeholder="Example: 10 km" />
+                <label>Search</label>
+                <input type="text"
+                       name="searchText"
+                       value="@ViewBag.SearchText"
+                       placeholder="Search caterer, menu or category" />
             </div>
-        }
 
-        <button type="submit" class="btn-pink">
-            Filter
-        </button>
+            @if (selectedCatererId != null || role == "Caretaker" || role == "Admin")
+            {
+                <div class="filter-input-group">
+                    <label>Category</label>
+                    <select name="categoryFilter">
+                        @if (string.IsNullOrWhiteSpace(categoryFilter))
+                        {
+                            <option value="" selected>All Categories</option>
+                        }
+                        else
+                        {
+                            <option value="">All Categories</option>
+                        }
+
+                        @foreach (var category in categories)
+                        {
+                            if (categoryFilter == category)
+                            {
+                                <option value="@category" selected>@category</option>
+                            }
+                            else
+                            {
+                                <option value="@category">@category</option>
+                            }
+                        }
+                    </select>
+                </div>
+            }
+
+            @if (role == "User" && selectedCatererId == null)
+            {
+                <div class="filter-input-group">
+                    <label>Maximum distance</label>
+                    <input type="number"
+                           step="any"
+                           name="maxDistanceKm"
+                           value="@ViewBag.MaxDistanceKm"
+                           placeholder="Example: 10 km" />
+                </div>
+            }
+
+            <button type="submit" class="btn-pink">
+                Filter
+            </button>
+
+            @if (role == "User" && selectedCatererId == null)
+            {
+                <a asp-controller="User" asp-action="Location" class="btn-outline-pink">
+                    📍 Update My Address
+                </a>
+            }
+        </form>
 
         @if (role == "User")
         {
-            <a asp-controller="User" asp-action="Location" class="btn-outline-pink">
-                📍 Update My Address
-            </a>
-        }
-
-        @if (selectedCatererId != null && role == "User")
-        {
-            <a asp-controller="MenuItem"
+            <a asp-controller="Cart"
                asp-action="Index"
-               asp-route-searchText="@ViewBag.SearchText"
-               asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
-               class="btn-outline-pink">
-                ← Back to Caterers
+               class="filter-cart-button"
+               title="Go to Cart">
+                <span>🛒</span>
+                Cart
             </a>
         }
-    </form>
-
-    @if (role == "User")
-    {
-        <a asp-controller="Cart"
-           asp-action="Index"
-           class="filter-cart-button"
-           title="Go to Cart">
-            <span>🛒</span>
-            Cart
-        </a>
-    }
-</div>
+    </div>
+}
 
 @if (role == "User" && selectedCatererId == null)
 {
@@ -292,14 +355,21 @@ else if (role == "User" && selectedCatererId != null)
                 <p>@selectedCaterer.Address</p>
             </div>
 
-            <div class="selected-caterer-stats">
-                <div>
+            <div class="selected-caterer-stats clean-caterer-stats">
+                <div class="clean-caterer-stat-card">
                     <span>Rating</span>
                     <strong>⭐ @selectedRatingText</strong>
                     <small>@selectedRatingCount review(s)</small>
+
+                    <a asp-controller="Rating"
+                       asp-action="Reviews"
+                       asp-route-caretakerId="@selectedCaterer.CaretakerId"
+                       class="clean-review-button">
+                        View Reviews
+                    </a>
                 </div>
 
-                <div>
+                <div class="clean-caterer-stat-card">
                     <span>Build Menu</span>
                     <strong>4 Categories</strong>
                     <small>Starter • Main • Dessert • Drink</small>
@@ -410,16 +480,56 @@ else if (role == "User" && selectedCatererId != null)
                             <div class="catering-accordion-options">
                                 @foreach (var item in categoryItems)
                                 {
+                                    var menuRatingCount = item.MenuItemRatings != null ? item.MenuItemRatings.Count : 0;
+                                    var menuRatingAverage = menuRatingCount > 0
+                                        ? item.MenuItemRatings!.Average(x => x.RatingValue)
+                                        : 0;
+
                                     <div class="catering-option-card user-builder-option">
-                                        <div class="catering-option-image">
-                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                            {
-                                                <img src="@item.ImageUrl" alt="@item.Name" />
-                                            }
-                                            else
-                                            {
-                                                <span>🍽️</span>
-                                            }
+                                        <div class="catering-option-media">
+                                            <div class="catering-option-image">
+                                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                {
+                                                    <img src="@item.ImageUrl" alt="@item.Name" />
+                                                }
+                                                else
+                                                {
+                                                    <span>🍽️</span>
+                                                }
+                                            </div>
+
+                                            <a asp-controller="Rating"
+                                               asp-action="Reviews"
+                                               asp-route-menuItemId="@item.MenuItemId"
+                                               class="menu-rating-mini-box"
+                                               title="View menu and caterer reviews">
+                                                <div class="menu-rating-mini-content">
+                                                    @if (menuRatingCount > 0)
+                                                    {
+                                                        <span class="menu-rating-label">Rating</span>
+
+                                                        <strong class="menu-rating-score">
+                                                            ⭐ @menuRatingAverage.ToString("0.0") / 5
+                                                        </strong>
+
+                                                        <span class="menu-rating-count">
+                                                            @menuRatingCount review(s)
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="menu-rating-label">Rating</span>
+
+                                                        <strong class="menu-rating-score">
+                                                            ⭐ Not rated
+                                                        </strong>
+
+                                                        <span class="menu-rating-count">
+                                                            View<br />reviews
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </a>
                                         </div>
 
                                         <div class="catering-option-content">
@@ -467,6 +577,7 @@ else if (role == "User" && selectedCatererId != null)
                                                     <input type="number"
                                                            name="peopleCount"
                                                            min="100"
+                                                           max="20000"
                                                            step="100"
                                                            value="100"
                                                            required />

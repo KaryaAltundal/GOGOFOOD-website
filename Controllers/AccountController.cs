@@ -34,8 +34,23 @@ namespace GOGOFOOD.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(User user)
         {
+            if (!IsPasswordValid(user.Password))
+            {
+                ViewBag.Error = "Password must be at least 6 characters long and include at least one punctuation mark.";
+
+                _logService.AddLog(
+                    "Register Failed",
+                    "Registration failed because password did not meet security rules.",
+                    user.Email,
+                    user.Role
+                );
+
+                return View(user);
+            }
+
             if (ModelState.IsValid)
             {
                 var existingUser = _context.Users.FirstOrDefault(x => x.Email == user.Email);
@@ -437,9 +452,9 @@ namespace GOGOFOOD.Controllers
                 return View();
             }
 
-            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+            if (!IsPasswordValid(newPassword))
             {
-                ViewBag.Error = "New password must be at least 6 characters.";
+                ViewBag.Error = "New password must be at least 6 characters long and include at least one punctuation mark.";
                 return View();
             }
 
@@ -605,6 +620,21 @@ namespace GOGOFOOD.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        private bool IsPasswordValid(string? password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                return false;
+            }
+
+            if (password.Length < 6)
+            {
+                return false;
+            }
+
+            return password.Any(char.IsPunctuation);
         }
 
         private bool IsDemoAccount(User user)

@@ -1,0 +1,240 @@
+@{
+    ViewData["Title"] = "Reviews";
+
+    var menuItem = ViewBag.MenuItem as GOGOFOOD.Models.MenuItem;
+    var caretaker = ViewBag.Caretaker as GOGOFOOD.Models.Caretaker;
+
+    var menuRatings = ViewBag.MenuRatings as List<GOGOFOOD.Models.MenuItemRating> ?? new List<GOGOFOOD.Models.MenuItemRating>();
+    var caretakerRatings = ViewBag.CaretakerRatings as List<GOGOFOOD.Models.CaretakerRating> ?? new List<GOGOFOOD.Models.CaretakerRating>();
+
+    var showMenuSection = ViewBag.ShowMenuSection != null && (bool)ViewBag.ShowMenuSection;
+    var showCaretakerSection = ViewBag.ShowCaretakerSection != null && (bool)ViewBag.ShowCaretakerSection;
+
+    var menuAverage = menuRatings.Count > 0 ? menuRatings.Average(x => x.RatingValue) : 0;
+    var caretakerAverage = caretakerRatings.Count > 0 ? caretakerRatings.Average(x => x.RatingValue) : 0;
+}
+
+<div class="page-title">
+    <h1>Reviews ⭐</h1>
+
+    @if (menuItem != null && caretaker != null)
+    {
+        <p>View reviews for this menu option and its caterer.</p>
+    }
+    else if (caretaker != null)
+    {
+        <p>View reviews written for this caterer.</p>
+    }
+    else
+    {
+        <p>View customer reviews.</p>
+    }
+</div>
+
+@if (TempData["RatingMessage"] != null)
+{
+    <div class="alert-modern alert-success-modern">
+        @TempData["RatingMessage"]
+    </div>
+}
+
+<div class="review-page-layout @(menuItem == null || caretaker == null ? "review-page-single-card" : "")">
+    @if (menuItem != null)
+    {
+        <div class="review-summary-card">
+            <div class="review-summary-image">
+                @if (!string.IsNullOrWhiteSpace(menuItem.ImageUrl))
+                {
+                    <img src="@menuItem.ImageUrl" alt="@menuItem.Name" />
+                }
+                else
+                {
+                    <span>🍽️</span>
+                }
+            </div>
+
+            <div class="review-summary-content">
+                <span class="rating-category-label">@menuItem.Category</span>
+                <h2>@menuItem.Name</h2>
+
+                @if (menuItem.Caretaker != null)
+                {
+                    <p>🏪 @menuItem.Caretaker.RestaurantName</p>
+                }
+
+                <div class="review-score-row">
+                    @if (menuRatings.Count > 0)
+                    {
+                        <strong>⭐ @menuAverage.ToString("0.0") / 5</strong>
+                        <span>@menuRatings.Count menu review(s)</span>
+                    }
+                    else
+                    {
+                        <strong>⭐ No menu rating yet</strong>
+                        <span>This menu has not received a review yet.</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (caretaker != null)
+    {
+        <div class="review-summary-card">
+            <div class="review-summary-image">
+                <span>🏪</span>
+            </div>
+
+            <div class="review-summary-content">
+                <span class="rating-category-label">Caterer</span>
+                <h2>@caretaker.RestaurantName</h2>
+                <p>@caretaker.Address</p>
+
+                <div class="review-score-row">
+                    @if (caretakerRatings.Count > 0)
+                    {
+                        <strong>⭐ @caretakerAverage.ToString("0.0") / 5</strong>
+                        <span>@caretakerRatings.Count caterer review(s)</span>
+                    }
+                    else
+                    {
+                        <strong>⭐ No caterer rating yet</strong>
+                        <span>This caterer has not received a review yet.</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="review-sections-grid @(showMenuSection && showCaretakerSection ? "" : "review-sections-single")">
+    @if (showMenuSection && menuItem != null)
+    {
+        <div class="review-list-card">
+            <div class="review-list-header">
+                <h2>Menu Reviews 🍽️</h2>
+                <span>@menuRatings.Count review(s)</span>
+            </div>
+
+            @if (menuRatings.Count == 0)
+            {
+                <div class="empty-review-box">
+                    <strong>No menu comments yet</strong>
+                    <p>Users will see menu comments here after rating this menu option.</p>
+                </div>
+            }
+            else
+            {
+                <div class="review-list">
+                    @foreach (var rating in menuRatings)
+                    {
+                        <div class="review-comment-card">
+                            <div class="review-comment-top">
+                                <strong>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= rating.RatingValue)
+                                        {
+                                            <text>★</text>
+                                        }
+                                        else
+                                        {
+                                            <text>☆</text>
+                                        }
+                                    }
+                                </strong>
+
+                                <span>@rating.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            </div>
+
+                            <p>
+                                @if (!string.IsNullOrWhiteSpace(rating.Comment))
+                                {
+                                    @rating.Comment
+                                }
+                                else
+                                {
+                                    <text>No written comment.</text>
+                                }
+                            </p>
+
+                            <small>
+                                by @(rating.User != null ? rating.User.Name : "User")
+                            </small>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    @if (showCaretakerSection && caretaker != null)
+    {
+        <div class="review-list-card">
+            <div class="review-list-header">
+                <h2>Caterer Reviews 🏪</h2>
+                <span>@caretakerRatings.Count review(s)</span>
+            </div>
+
+            @if (caretakerRatings.Count == 0)
+            {
+                <div class="empty-review-box">
+                    <strong>No caterer comments yet</strong>
+                    <p>Only reviews written for this caterer will appear here.</p>
+                </div>
+            }
+            else
+            {
+                <div class="review-list">
+                    @foreach (var rating in caretakerRatings)
+                    {
+                        <div class="review-comment-card">
+                            <div class="review-comment-top">
+                                <strong>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= rating.RatingValue)
+                                        {
+                                            <text>★</text>
+                                        }
+                                        else
+                                        {
+                                            <text>☆</text>
+                                        }
+                                    }
+                                </strong>
+
+                                <span>@rating.CreatedAt.ToString("dd.MM.yyyy")</span>
+                            </div>
+
+                            <p>
+                                @if (!string.IsNullOrWhiteSpace(rating.Comment))
+                                {
+                                    @rating.Comment
+                                }
+                                else
+                                {
+                                    <text>No written comment.</text>
+                                }
+                            </p>
+
+                            <small>
+                                by @(rating.User != null ? rating.User.Name : "User")
+                            </small>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div class="review-back-row">
+    <a asp-controller="MenuItem" asp-action="Index" class="btn-outline-pink">
+        ← Back to Caterers
+    </a>
+
+    <a asp-controller="Order" asp-action="Index" class="btn-outline-pink">
+        My Orders
+    </a>
+</div>

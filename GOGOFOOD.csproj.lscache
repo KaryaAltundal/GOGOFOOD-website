@@ -517,13 +517,16 @@ Views/
   Create.cshtml
   Edit.cshtml
   Index.cshtml
- Order/Index.cshtml
+ Order/
+  Index.cshtml
+  LiveCall.cshtml
  Payment/
   Checkout.cshtml
   Success.cshtml
  Rating/
   AddCaretakerRating.cshtml
   AddMenuItemRating.cshtml
+  Reviews.cshtml
  Shared/
   Error.cshtml
   _Layout.cshtml
@@ -557,13 +560,16 @@ Views/
   Create.cshtml
   Edit.cshtml
   Index.cshtml
- Order/Index.cshtml
+ Order/
+  Index.cshtml
+  LiveCall.cshtml
  Payment/
   Checkout.cshtml
   Success.cshtml
  Rating/
   AddCaretakerRating.cshtml
   AddMenuItemRating.cshtml
+  Reviews.cshtml
  Shared/
   Error.cshtml
   _Layout.cshtml

@@ -1,96 +1,124 @@
+@model GOGOFOOD.Models.MenuItemRating
+
 @{
-    ViewData["Title"] = "Rate Menu Item";
+    ViewData["Title"] = "Rate Menu";
+
+    var orderId = ViewBag.OrderId;
+    var menuItemId = ViewBag.MenuItemId;
+    var menuItem = ViewBag.MenuItem as GOGOFOOD.Models.MenuItem;
+
+    var selectedRating = Model != null && Model.RatingValue > 0 ? Model.RatingValue : 5;
+
+    var ratingCount = ViewBag.RatingCount != null ? (int)ViewBag.RatingCount : 0;
+    var ratingAverage = ViewBag.RatingAverage != null ? Convert.ToDouble(ViewBag.RatingAverage) : 0;
 }
 
 <div class="page-title">
-    <h1>Rate Menu Item ⭐</h1>
-    <p>Share your experience about this meal.</p>
+    <h1>Rate Menu ⭐</h1>
+    <p>Select a star rating and write your experience about this catering menu option.</p>
 </div>
 
 @if (TempData["RatingMessage"] != null)
 {
-    <div class="alert-modern alert-danger-modern">
+    <div class="alert-modern alert-success-modern">
         @TempData["RatingMessage"]
     </div>
 }
 
-<div class="rating-page-layout">
-    <div class="rating-food-card">
-        <div class="rating-food-image-box">
-            @if (!string.IsNullOrEmpty(ViewBag.MenuItemImage))
-            {
-                <img src="@ViewBag.MenuItemImage" alt="@ViewBag.MenuItemName" class="rating-food-image" />
-            }
-            else
-            {
-                <div class="rating-image-placeholder">🍽️</div>
-            }
-        </div>
-
-        <div class="rating-food-info">
-            <h2>@ViewBag.MenuItemName</h2>
-
-            @if (ViewBag.RestaurantName != null)
-            {
-                <p class="rating-restaurant">🏪 @ViewBag.RestaurantName</p>
-            }
-
-            @if (ViewBag.MenuItemDescription != null)
-            {
-                <p class="rating-description">@ViewBag.MenuItemDescription</p>
-            }
-
-            <div class="rating-detail-list">
-                <div>
-                    <span>Quantity</span>
-                    <strong>@ViewBag.Quantity</strong>
+<div class="rating-page-layout rating-page-single">
+    <div class="rating-form-card">
+        @if (menuItem != null)
+        {
+            <div class="rating-menu-preview">
+                <div class="rating-menu-image">
+                    @if (!string.IsNullOrEmpty(menuItem.ImageUrl))
+                    {
+                        <img src="@menuItem.ImageUrl" alt="@menuItem.Name" />
+                    }
+                    else
+                    {
+                        <span>🍽️</span>
+                    }
                 </div>
 
                 <div>
-                    <span>Base Price</span>
-                    <strong>₺@ViewBag.UnitPrice</strong>
-                </div>
+                    <span class="rating-category-label">@menuItem.Category</span>
+                    <h2>@menuItem.Name</h2>
 
-                <div>
-                    <span>Custom Ingredients</span>
-                    <strong>@ViewBag.CustomizationName</strong>
-                </div>
+                    @if (menuItem.Caretaker != null)
+                    {
+                        <p>🏪 @menuItem.Caretaker.RestaurantName</p>
+                    }
 
-                <div>
-                    <span>Customization Price</span>
-                    <strong>₺@ViewBag.CustomizationPrice</strong>
+                    <div class="rating-summary-box">
+                        @if (ratingCount > 0)
+                        {
+                            <strong>⭐ @ratingAverage.ToString("0.0") / 5</strong>
+                            <span>@ratingCount rating(s)</span>
+                        }
+                        else
+                        {
+                            <strong>⭐ No rating yet</strong>
+                            <span>Be the first to rate this menu.</span>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+        }
 
-    <div class="rating-form-card">
-        <h2>Your Rating</h2>
+        <form asp-controller="Rating"
+              asp-action="AddMenuItemRating"
+              method="post"
+              class="rating-form-modern">
 
-        <form asp-controller="Rating" asp-action="AddMenuItemRating" method="post">
-            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
-            <input type="hidden" name="menuItemId" value="@ViewBag.MenuItemId" />
+            @Html.AntiForgeryToken()
 
-            <label>Rating</label>
-            <select name="ratingValue" required>
-                <option value="">Select rating</option>
-                <option value="1">★ 1 - Very Bad</option>
-                <option value="2">★★ 2 - Bad</option>
-                <option value="3">★★★ 3 - Average</option>
-                <option value="4">★★★★ 4 - Good</option>
-                <option value="5">★★★★★ 5 - Excellent</option>
-            </select>
+            <input type="hidden" name="orderId" value="@orderId" />
+            <input type="hidden" name="menuItemId" value="@menuItemId" />
 
-            <label>Comment</label>
-            <textarea name="comment" placeholder="Write your comment..." rows="5"></textarea>
+            <div class="rating-field">
+                <label>Your Rating</label>
 
-            <button type="submit" class="btn-pink rating-submit-btn">
-                Submit Rating
-            </button>
+                <select name="ratingValue" required>
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        if (selectedRating == i)
+                        {
+                            <option value="@i" selected>@i ⭐</option>
+                        }
+                        else
+                        {
+                            <option value="@i">@i ⭐</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="rating-field">
+                <label>Your Comment</label>
+                <textarea name="comment"
+                          rows="5"
+                          placeholder="Write your comment about this menu...">@Model?.Comment</textarea>
+            </div>
+
+            <div class="rating-action-row">
+                <button type="submit" class="btn-pink">
+                    Save Rating
+                </button>
+
+                <a asp-controller="Rating"
+                   asp-action="Reviews"
+                   asp-route-menuItemId="@menuItemId"
+                   class="btn-outline-pink">
+                    View Reviews
+                </a>
+
+                <a asp-controller="Order"
+                   asp-action="Index"
+                   class="btn-outline-pink">
+                    Back to Orders
+                </a>
+            </div>
         </form>
-
-        <a asp-controller="Order" asp-action="Index" class="back-link-modern">
-            ← Back to Orders
-        </a>
     </div>
 </div>

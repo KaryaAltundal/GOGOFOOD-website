@@ -267,4 +267,4 @@ C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\runtimes\win-x86\n
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\runtimes\win-x86\native\libwinpthread-1.dll
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\runtimes\win-x86\native\qpdf.dll
 C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\bin\Debug\net10.0\runtimes\win-x86\native\zlib1.dll
-C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\obj\Debug\net10.0\compressed\l3cowobhrr-{0}-5uf2tjpiex-5uf2tjpiex.gz
+C:\Users\karya\OneDrive\Masaüstü\GOGOFOOD\obj\Debug\net10.0\compressed\l3cowobhrr-{0}-qatv3zrunp-qatv3zrunp.gz

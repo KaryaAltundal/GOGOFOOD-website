@@ -16,6 +16,8 @@
         }
 
         <form asp-controller="Account" asp-action="Register" method="post" class="auth-form-clean">
+            @Html.AntiForgeryToken()
+
             <div class="auth-field-clean">
                 <label>Name</label>
                 <input asp-for="Name"
@@ -37,9 +39,16 @@
                 <label>Password</label>
                 <input asp-for="Password"
                        type="password"
-                       placeholder="Create a password"
-                       autocomplete="off"
+                       placeholder="At least 6 characters and one punctuation mark"
+                       autocomplete="new-password"
+                       minlength="6"
+                       pattern="^(?=.*[^\w\s]).{6,}$"
+                       title="Password must be at least 6 characters long and include at least one punctuation mark."
                        required />
+
+                <small class="password-rule-text">
+                    Password must be at least 6 characters long and include one punctuation mark, such as ! . ? * #
+                </small>
             </div>
 
             <div class="auth-field-clean">

@@ -7,19 +7,36 @@
 
     var role = Context.Session.GetString("UserRole");
     var isAdmin = role == "Admin";
+    var isCaretaker = role == "Caretaker";
 
     var searchText = ViewBag.SearchText as string ?? "";
     var statusFilter = ViewBag.StatusFilter as string ?? "";
     var startDate = ViewBag.StartDate as string ?? "";
     var endDate = ViewBag.EndDate as string ?? "";
 
-    string minTotalValue = ViewBag.MinTotal != null
-        ? Convert.ToDecimal(ViewBag.MinTotal).ToString("0.##", CultureInfo.InvariantCulture)
+    decimal? minTotalDecimal = ViewBag.MinTotal != null
+        ? Convert.ToDecimal(ViewBag.MinTotal)
+        : null;
+
+    decimal? maxTotalDecimal = ViewBag.MaxTotal != null
+        ? Convert.ToDecimal(ViewBag.MaxTotal)
+        : null;
+
+    string minTotalValue = minTotalDecimal != null
+        ? minTotalDecimal.Value.ToString("0.##", CultureInfo.InvariantCulture)
         : "";
 
-    string maxTotalValue = ViewBag.MaxTotal != null
-        ? Convert.ToDecimal(ViewBag.MaxTotal).ToString("0.##", CultureInfo.InvariantCulture)
+    string maxTotalValue = maxTotalDecimal != null
+        ? maxTotalDecimal.Value.ToString("0.##", CultureInfo.InvariantCulture)
         : "";
+
+    double? minTotalForPagination = minTotalDecimal != null
+        ? Convert.ToDouble(minTotalDecimal.Value)
+        : null;
+
+    double? maxTotalForPagination = maxTotalDecimal != null
+        ? Convert.ToDouble(maxTotalDecimal.Value)
+        : null;
 
     int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
     int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
@@ -31,10 +48,15 @@
         <h1>Admin Orders Panel 📦</h1>
         <p>Monitor completed orders, customers, caterers, locations and order totals.</p>
     }
+    else if (isCaretaker)
+    {
+        <h1>Caterer Orders 📦</h1>
+        <p>Review completed catering orders and join live calls after purchase.</p>
+    }
     else
     {
         <h1>Orders 📦</h1>
-        <p>Review completed catering orders and leave ratings for meals or caterers.</p>
+        <p>Review completed catering orders, rate meals or caterers, and start a live call after purchase.</p>
     }
 </div>
 
@@ -195,6 +217,10 @@
         @if (isAdmin)
         {
             <p>No order records match your current filter.</p>
+        }
+        else if (isCaretaker)
+        {
+            <p>No completed catering order has been assigned to your caterer account yet.</p>
         }
         else
         {
@@ -463,6 +489,23 @@ else
                     </div>
                 </div>
 
+                @if (order.Status == "Completed")
+                {
+                    <div class="order-call-row-fixed">
+                        <div class="order-call-text-fixed">
+                            <strong>Need to discuss this catering order?</strong>
+                            <span>Start a live call connected to this completed order.</span>
+                        </div>
+
+                        <a asp-controller="Order"
+                           asp-action="LiveCall"
+                           asp-route-orderId="@order.OrderId"
+                           class="order-call-button-fixed">
+                            📞 Live Call
+                        </a>
+                    </div>
+                }
+
                 @if (order.OrderItems != null)
                 {
                     <div class="order-items-modern">
@@ -566,8 +609,8 @@ else
     ActionName = "Index",
     SearchText = searchText,
     StatusFilter = statusFilter,
-    MinTotal = ViewBag.MinTotal,
-    MaxTotal = ViewBag.MaxTotal,
+    MinTotal = minTotalForPagination,
+    MaxTotal = maxTotalForPagination,
     StartDate = startDate,
     EndDate = endDate
 })
