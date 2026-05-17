@@ -2774,3 +2774,4665 @@ th {
         margin-left: auto !important;
     }
 }
+/* LOCATION MAP DESIGN - GOGOFOOD STYLE */
+.location-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 28px;
+    align-items: stretch;
+    margin-top: 25px;
+}
+
+/* Sol form kartı ve sağ harita kartı aynı aileden gözüksün */
+.location-form-card,
+.location-map-card {
+    background: linear-gradient(135deg, rgba(153, 255, 224, 0.18), rgba(255, 255, 255, 0.95), rgba(255, 5, 105, 0.07));
+    border: 1px solid rgba(255, 5, 105, 0.22);
+    border-radius: 26px;
+    padding: 28px;
+    box-shadow: 0 18px 45px rgba(255, 5, 105, 0.07);
+    transition: all 0.3s ease;
+}
+
+.location-form-card:hover,
+.location-map-card:hover {
+    background: linear-gradient(135deg, rgba(255, 5, 105, 0.18), rgba(255, 5, 105, 0.09), rgba(255, 255, 255, 0.96));
+    border-color: rgba(255, 5, 105, 0.42);
+    box-shadow: 0 22px 55px rgba(255, 5, 105, 0.16);
+    transform: translateY(-3px);
+}
+/* Sağ harita kutusunun başlığı */
+.location-map-heading h3 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #06142e;
+}
+
+.location-map-heading p {
+    margin: 0 0 18px;
+    color: #5f6c7b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Harita alanı */
+.location-map {
+    width: 100%;
+    height: 430px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 5, 105, 0.22);
+    overflow: hidden;
+    background: #f7f7f7;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+/* Show Address on Map butonu */
+.location-map-button {
+    width: 100%;
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 10px;
+}
+
+/* Harita altındaki küçük yazı */
+.map-help-text {
+    display: block;
+    margin-top: 12px;
+    color: #7a7f8c;
+    font-size: 13px;
+}
+
+/* Kaydedilen adres kartı */
+.saved-address-card {
+    margin-top: 28px;
+    padding: 24px 28px;
+    border-radius: 26px;
+    background: linear-gradient(135deg, rgba(153, 255, 224, 0.18), rgba(255, 255, 255, 0.95), rgba(255, 5, 105, 0.07));
+    border: 1px solid rgba(255, 5, 105, 0.22);
+    box-shadow: 0 18px 45px rgba(255, 5, 105, 0.07);
+    transition: all 0.3s ease;
+}
+
+.saved-address-card:hover {
+    background: linear-gradient(135deg, rgba(255, 5, 105, 0.18), rgba(255, 5, 105, 0.09), rgba(255, 255, 255, 0.96));
+    border-color: rgba(255, 5, 105, 0.42);
+    box-shadow: 0 22px 55px rgba(255, 5, 105, 0.16);
+    transform: translateY(-3px);
+}
+
+.saved-address-card h3 {
+    margin: 0 0 10px;
+    font-weight: 800;
+    color: #06142e;
+}
+
+.saved-address-card p {
+    margin: 0 0 8px;
+    color: #444;
+}
+
+.saved-address-card small {
+    color: #777;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .location-two-column {
+        grid-template-columns: 1fr;
+    }
+
+    .location-map {
+        height: 360px;
+    }
+}
+/* NEARBY RESTAURANTS MAP - MENU PAGE */
+.nearby-map-card {
+    margin-bottom: 34px;
+    padding: 24px;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.26), transparent 38%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.09), transparent 44%),
+        #ffffff;
+    border: 1px solid rgba(7, 20, 47, 0.16);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.nearby-map-card:hover {
+    background:
+        radial-gradient(circle at top left, rgba(255, 5, 105, 0.08), transparent 38%),
+        radial-gradient(circle at bottom right, rgba(255, 122, 174, 0.12), transparent 42%),
+        #ffffff;
+    border-color: rgba(255, 5, 105, 0.24);
+    box-shadow: 0 20px 46px rgba(255, 5, 105, 0.10);
+    transform: translateY(-3px);
+}
+
+.nearby-map-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.nearby-map-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: rgba(255, 5, 105, 0.08);
+    color: #FF0569;
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.nearby-map-info h2 {
+    margin: 0 0 6px;
+    color: #06142e;
+    font-size: 26px;
+    font-weight: 900;
+}
+
+.nearby-map-info p {
+    margin: 0;
+    color: #657284;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.nearby-restaurants-map {
+    width: 100%;
+    height: 330px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 5, 105, 0.20);
+    background: #f8fafc;
+}
+
+.map-popup {
+    max-width: 240px;
+    font-family: "Poppins", sans-serif;
+}
+
+.map-popup h3 {
+    margin: 0 0 8px;
+    color: #FF0569;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.map-popup p {
+    margin: 5px 0;
+    color: #374151;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .nearby-map-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nearby-map-info .btn-outline-pink {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nearby-restaurants-map {
+        height: 280px;
+    }
+}
+/* ADMIN ORDERS PANEL */
+.admin-orders-shell {
+    margin-top: 24px;
+}
+
+.admin-panel-note {
+    margin-top: 12px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    color: #475569;
+    font-size: 14px;
+}
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.admin-stat-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
+    transition: 0.25s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 5, 105, 0.24);
+    box-shadow: 0 18px 40px rgba(255, 5, 105, 0.08);
+}
+
+.admin-stat-card span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.admin-stat-card strong {
+    display: block;
+    color: #0f172a;
+    font-size: 25px;
+    font-weight: 900;
+}
+
+.admin-orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.admin-order-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+    transition: 0.25s ease;
+}
+
+.admin-order-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 5, 105, 0.22);
+    box-shadow: 0 18px 42px rgba(255, 5, 105, 0.08);
+}
+
+.admin-order-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: flex-start;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-order-top h2 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.admin-order-top p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.admin-order-status {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(153, 255, 224, 0.30);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.admin-order-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.admin-meta-box {
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+    padding: 14px;
+}
+
+.admin-meta-box span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-meta-box strong {
+    display: block;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.admin-meta-box small {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.admin-items-table-wrapper {
+    margin-top: 18px;
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    min-width: 900px;
+}
+
+.admin-items-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 13px 14px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-items-table td {
+    padding: 13px 14px;
+    color: #0f172a;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+    vertical-align: top;
+}
+
+.admin-items-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-location-text {
+    color: #475569;
+    line-height: 1.45;
+}
+
+.admin-coordinate {
+    display: inline-block;
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.admin-money {
+    font-weight: 900;
+    color: #FF0569;
+}
+
+@media (max-width: 992px) {
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-order-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-order-top {
+        flex-direction: column;
+    }
+}
+/* ADMIN ORDERS PANEL - FINAL POLISH */
+.admin-page-title h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.admin-page-title p {
+    font-size: 18px;
+    color: #5f6c7b;
+}
+
+.admin-stat-card strong {
+    font-size: 24px;
+    line-height: 1.2;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: nowrap;
+}
+
+.admin-stat-card {
+    overflow: hidden;
+}
+
+.admin-stat-card span {
+    font-size: 13px;
+}
+
+@media (max-width: 1200px) {
+    .admin-stat-card strong {
+        font-size: 21px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-page-title h1 {
+        font-size: 34px;
+    }
+
+    .admin-page-title p {
+        font-size: 15px;
+    }
+
+    .admin-stat-card strong {
+        font-size: 20px;
+        white-space: normal;
+    }
+}
+/* GLOBAL PAGE TITLE POLISH */
+.page-title h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.15;
+}
+
+.page-title p {
+    font-size: 18px;
+    color: #5f6c7b;
+    line-height: 1.5;
+}
+
+/* Admin başlığı da artık genel page-title ile aynı ailede */
+.admin-page-title h1 {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.15;
+}
+
+.admin-page-title p {
+    font-size: 18px;
+    color: #5f6c7b;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .page-title h1,
+    .admin-page-title h1 {
+        font-size: 34px;
+    }
+
+    .page-title p,
+    .admin-page-title p {
+        font-size: 15px;
+    }
+}
+/* =========================
+   FINAL GLOBAL TITLE STYLE
+   All main page titles same clean weight
+   ========================= */
+
+.page-title h1,
+.admin-page-title h1,
+.payment-heading h1,
+.home-hero-content h1,
+.hero h1 {
+    font-size: 42px !important;
+    font-weight: 800 !important;
+    letter-spacing: -1px !important;
+    line-height: 1.15 !important;
+    color: #07142f !important;
+}
+
+.page-title p,
+.admin-page-title p,
+.payment-heading p,
+.home-hero-content p,
+.hero p {
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    color: #5f6c7b !important;
+    line-height: 1.5 !important;
+}
+
+/* Kart içi başlıklar çok kalın durmasın */
+.menu-card-top h3,
+.cart-item-info h3,
+.order-card-header h2,
+.order-item-main h3,
+.rating-food-info h2,
+.rating-form-card h2,
+.saved-address-card h3,
+.empty-state h3,
+.home-hero-card h3,
+.home-section-title h2 {
+    font-weight: 800 !important;
+    letter-spacing: -0.4px !important;
+    color: #07142f !important;
+}
+
+/* Admin panel özel başlıkları da sadeleştir */
+.admin-order-top h2,
+.admin-stat-card strong,
+.admin-meta-box strong {
+    font-weight: 800 !important;
+    letter-spacing: -0.3px !important;
+}
+
+/* Navbar ve logo etkilenmesin */
+.logo,
+.brand-logo,
+.brand-gogo,
+.brand-food {
+    font-weight: 900 !important;
+}
+
+@media (max-width: 768px) {
+    .page-title h1,
+    .admin-page-title h1,
+    .payment-heading h1,
+    .home-hero-content h1,
+    .hero h1 {
+        font-size: 34px !important;
+    }
+
+    .page-title p,
+    .admin-page-title p,
+    .payment-heading p,
+    .home-hero-content p,
+    .hero p {
+        font-size: 15px !important;
+    }
+}
+/* =========================
+   FINAL MODERN PAGINATION
+   Used in Logs, Orders, Menu, Admin pages
+   ========================= */
+
+.pagination-modern {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 34px 0 10px !important;
+    flex-wrap: wrap !important;
+}
+
+/* Pagination number buttons */
+.pagination-modern a,
+.pagination-modern button,
+.pagination-modern .page-link {
+    min-width: 38px !important;
+    height: 38px !important;
+    padding: 0 13px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 12px !important;
+    border: 1px solid rgba(15, 23, 42, 0.16) !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+
+    box-shadow: none !important;
+    transition: 0.22s ease !important;
+}
+
+/* Hover */
+.pagination-modern a:hover,
+.pagination-modern button:hover,
+.pagination-modern .page-link:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14) !important;
+}
+
+/* Active page */
+.pagination-modern .page-active,
+.pagination-modern a.page-active,
+.pagination-modern .active,
+.pagination-modern .active .page-link {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16) !important;
+}
+
+/* Bootstrap pagination support if any page uses ul.pagination */
+.pagination {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 34px 0 10px !important;
+    flex-wrap: wrap !important;
+}
+
+.pagination .page-item {
+    margin: 0 !important;
+}
+
+.pagination .page-link {
+    min-width: 38px !important;
+    height: 38px !important;
+    padding: 0 13px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 12px !important;
+    border: 1px solid rgba(15, 23, 42, 0.16) !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+
+    box-shadow: none !important;
+    transition: 0.22s ease !important;
+}
+
+.pagination .page-link:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14) !important;
+}
+
+.pagination .page-item.active .page-link {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16) !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    background: #f8fafc !important;
+    color: #94a3b8 !important;
+    border-color: rgba(15, 23, 42, 0.08) !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .pagination-modern,
+    .pagination {
+        gap: 6px !important;
+    }
+
+    .pagination-modern a,
+    .pagination-modern button,
+    .pagination-modern .page-link,
+    .pagination .page-link {
+        min-width: 34px !important;
+        height: 34px !important;
+        padding: 0 10px !important;
+        border-radius: 10px !important;
+        font-size: 13px !important;
+    }
+}
+/* =========================
+   SMART PAGINATION - FUTURISTIC SOFT STYLE
+   ========================= */
+
+.smart-pagination-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
+    margin: 34px 0 10px !important;
+}
+
+.smart-pagination {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+
+    padding: 10px 14px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.55) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06) !important;
+}
+
+.smart-page-number,
+.smart-page-arrow,
+.smart-page-dots {
+    min-width: 38px !important;
+    height: 38px !important;
+    padding: 0 14px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 999px !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    background: rgba(255, 255, 255, 0.58) !important;
+    color: #111827 !important;
+
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    transition: 0.22s ease !important;
+}
+
+.smart-page-arrow {
+    min-width: 96px !important;
+}
+
+.smart-page-number:hover,
+.smart-page-arrow:hover {
+    background: rgba(17, 24, 39, 0.88) !important;
+    color: #ffffff !important;
+    border-color: rgba(17, 24, 39, 0.18) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12) !important;
+}
+
+.smart-page-number.active {
+    background: rgba(17, 24, 39, 0.92) !important;
+    color: #ffffff !important;
+    border-color: rgba(17, 24, 39, 0.18) !important;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.14) !important;
+}
+
+.smart-page-arrow.disabled {
+    background: rgba(248, 250, 252, 0.65) !important;
+    color: #a1a8b3 !important;
+    border-color: rgba(15, 23, 42, 0.06) !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+.smart-page-arrow.disabled:hover {
+    background: rgba(248, 250, 252, 0.65) !important;
+    color: #a1a8b3 !important;
+    border-color: rgba(15, 23, 42, 0.06) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.smart-page-dots {
+    min-width: 24px !important;
+    padding: 0 4px !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    color: #94a3b8 !important;
+    box-shadow: none !important;
+}
+
+/* Go to page kısmı */
+.smart-page-jump {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    padding: 8px 10px 8px 16px !important;
+    border-radius: 999px !important;
+
+    background: rgba(255, 255, 255, 0.58) !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.055) !important;
+}
+
+.smart-page-jump label {
+    color: #64748b !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+}
+
+.smart-page-jump input {
+    width: 74px !important;
+    height: 36px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+
+    border-radius: 999px !important;
+    border: 1px solid rgba(15, 23, 42, 0.10) !important;
+    background: rgba(248, 250, 252, 0.8) !important;
+
+    color: #111827 !important;
+    text-align: center !important;
+    font-weight: 800 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.smart-page-jump input:focus {
+    border-color: rgba(255, 5, 105, 0.35) !important;
+    box-shadow: 0 0 0 4px rgba(255, 5, 105, 0.07) !important;
+}
+
+/* Go butonu daha sakin */
+.smart-page-jump button {
+    height: 36px !important;
+    padding: 0 18px !important;
+
+    border-radius: 999px !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+
+    background: rgba(17, 24, 39, 0.86) !important;
+    color: #ffffff !important;
+
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    box-shadow: none !important;
+    transition: 0.22s ease !important;
+}
+
+.smart-page-jump button:hover {
+    background: rgba(17, 24, 39, 0.96) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Eski pembe button global kuralı bu Go butonunu ezmesin */
+.smart-page-jump button.btn-pink,
+.smart-page-jump button {
+    background: rgba(17, 24, 39, 0.86) !important;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .smart-pagination {
+        border-radius: 22px !important;
+        gap: 6px !important;
+    }
+
+    .smart-page-number,
+    .smart-page-arrow,
+    .smart-page-dots {
+        min-width: 34px !important;
+        height: 34px !important;
+        padding: 0 10px !important;
+        font-size: 13px !important;
+    }
+
+    .smart-page-arrow {
+        min-width: 78px !important;
+    }
+
+    .smart-page-jump {
+        width: 100% !important;
+        justify-content: center !important;
+        border-radius: 22px !important;
+        flex-wrap: wrap !important;
+    }
+}
+/* =========================
+   ADMIN USERS / CATERERS PANEL
+   ========================= */
+
+.admin-users-title h1 {
+    font-weight: 800 !important;
+}
+
+.admin-users-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.admin-users-stat-card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.055);
+    backdrop-filter: blur(14px);
+    transition: 0.22s ease;
+}
+
+.admin-users-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 5, 105, 0.20);
+    box-shadow: 0 18px 40px rgba(255, 5, 105, 0.07);
+}
+
+.admin-users-stat-card span {
+    display: block;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 7px;
+}
+
+.admin-users-stat-card strong {
+    display: block;
+    color: #111827;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.admin-users-stat-card small {
+    display: block;
+    color: #64748b;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.admin-users-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin: 24px 0 26px;
+    flex-wrap: wrap;
+}
+
+.admin-users-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.055);
+}
+
+.admin-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    padding: 11px 20px;
+    border-radius: 999px;
+    color: #111827 !important;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.22s ease;
+}
+
+.admin-tab:hover {
+    background: rgba(15, 23, 42, 0.06);
+    color: #111827 !important;
+    transform: translateY(-1px);
+}
+
+.admin-tab.active {
+    background: rgba(17, 24, 39, 0.92);
+    color: #ffffff !important;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+.admin-users-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 8px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.055);
+}
+
+.admin-users-search input {
+    width: 310px;
+    max-width: 100%;
+    height: 38px;
+    margin: 0;
+    border-radius: 999px;
+    background: rgba(248, 250, 252, 0.85);
+    border: 1px solid rgba(15, 23, 42, 0.09);
+    font-size: 14px;
+}
+
+.admin-users-search button {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.9) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.admin-users-search button:hover {
+    background: #111827 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+.admin-users-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+.admin-user-card {
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.13), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.05), transparent 38%),
+        rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    border-radius: 26px;
+    padding: 22px;
+    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.055);
+    transition: 0.24s ease;
+}
+
+.admin-user-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 5, 105, 0.18);
+    box-shadow: 0 20px 46px rgba(255, 5, 105, 0.08);
+}
+
+.admin-user-card.deleted {
+    opacity: 0.72;
+    background: #f8fafc;
+}
+
+.admin-user-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-user-id {
+    display: inline-flex;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.admin-user-card-header h2 {
+    margin: 0 0 5px;
+    color: #111827;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.admin-user-card-header p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.admin-user-status-area {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-role-pill,
+.admin-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-role-pill {
+    color: #111827;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.admin-status-pill.active {
+    background: rgba(153, 255, 224, 0.35);
+    color: #065f46;
+}
+
+.admin-status-pill.deleted {
+    background: rgba(248, 113, 113, 0.12);
+    color: #991b1b;
+}
+
+.admin-user-form {
+    margin-top: 18px;
+}
+
+.admin-user-form-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.admin-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-field label {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-field input,
+.admin-field select {
+    width: 100%;
+    max-width: 100%;
+    height: 42px;
+    margin: 0;
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.11);
+    background: rgba(255, 255, 255, 0.90);
+    color: #111827;
+    font-size: 14px;
+}
+
+.admin-field input:focus,
+.admin-field select:focus {
+    border-color: rgba(255, 5, 105, 0.35);
+    box-shadow: 0 0 0 4px rgba(255, 5, 105, 0.07);
+}
+
+.admin-user-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-user-note {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.admin-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-save-btn,
+.admin-soft-delete-btn,
+.admin-restore-btn {
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 850;
+    box-shadow: none !important;
+}
+
+.admin-save-btn {
+    background: rgba(17, 24, 39, 0.90) !important;
+    color: #ffffff !important;
+}
+
+.admin-save-btn:hover {
+    background: #111827 !important;
+    transform: translateY(-1px);
+}
+
+.admin-user-danger-zone {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.admin-soft-delete-btn {
+    background: rgba(248, 113, 113, 0.10) !important;
+    color: #991b1b !important;
+    border: 1px solid rgba(248, 113, 113, 0.25) !important;
+}
+
+.admin-soft-delete-btn:hover {
+    background: #991b1b !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.admin-restore-btn {
+    background: rgba(153, 255, 224, 0.28) !important;
+    color: #065f46 !important;
+    border: 1px solid rgba(6, 95, 70, 0.18) !important;
+}
+
+.admin-restore-btn:hover {
+    background: #065f46 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.admin-caterer-mini-info {
+    display: grid;
+    grid-template-columns: 1.5fr 0.5fr 0.7fr;
+    gap: 12px;
+    margin: 18px 0;
+}
+
+.admin-caterer-mini-info div {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(248, 250, 252, 0.82);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.admin-caterer-mini-info span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-caterer-mini-info strong {
+    display: block;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 800;
+    word-break: break-word;
+}
+
+.admin-caterer-mini-info small {
+    display: block;
+    color: #64748b;
+    margin-top: 3px;
+    font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+    .admin-user-form-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .admin-users-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-caterer-mini-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-users-toolbar {
+        align-items: stretch;
+    }
+
+    .admin-users-tabs,
+    .admin-users-search {
+        width: 100%;
+    }
+
+    .admin-users-search {
+        border-radius: 22px;
+        flex-wrap: wrap;
+    }
+
+    .admin-users-search input {
+        width: 100%;
+    }
+
+    .admin-tab {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .admin-user-card-header,
+    .admin-user-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-user-status-area {
+        align-items: flex-start;
+    }
+
+    .admin-user-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-user-danger-zone {
+        justify-content: flex-start;
+    }
+}
+/* =========================
+   ADMIN USERS BUTTON COLOR FIX
+   Only pink / mint / black-gray palette
+   ========================= */
+
+.admin-soft-delete-btn {
+    background: rgba(255, 5, 105, 0.08) !important;
+    color: #FF0569 !important;
+    border: 1px solid rgba(255, 5, 105, 0.22) !important;
+    box-shadow: none !important;
+}
+
+.admin-soft-delete-btn:hover {
+    background: #FF0569 !important;
+    color: #ffffff !important;
+    border-color: #FF0569 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(255, 5, 105, 0.16) !important;
+}
+
+.admin-restore-btn {
+    background: rgba(153, 255, 224, 0.26) !important;
+    color: #111827 !important;
+    border: 1px solid rgba(153, 255, 224, 0.55) !important;
+    box-shadow: none !important;
+}
+
+.admin-restore-btn:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(17, 24, 39, 0.12) !important;
+}
+
+.admin-status-pill.deleted {
+    background: rgba(255, 5, 105, 0.08) !important;
+    color: #FF0569 !important;
+    border-color: rgba(255, 5, 105, 0.22) !important;
+}
+
+.admin-status-pill.active {
+    background: rgba(153, 255, 224, 0.30) !important;
+    color: #111827 !important;
+    border-color: rgba(153, 255, 224, 0.55) !important;
+}
+/* =========================
+   FINAL COMPACT FILTER DESIGN
+   Logs + Admin style search
+   ========================= */
+
+.compact-filter-card {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 0 28px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.compact-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px;
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.055);
+    backdrop-filter: blur(16px);
+}
+
+.compact-filter-form input {
+    width: 330px;
+    max-width: 100%;
+    height: 42px;
+    margin: 0;
+    padding: 0 16px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgba(248, 250, 252, 0.72);
+
+    color: #111827;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.compact-filter-form input:focus {
+    border-color: rgba(255, 5, 105, 0.28);
+    box-shadow: 0 0 0 4px rgba(255, 5, 105, 0.06);
+}
+
+.compact-filter-form button {
+    height: 42px;
+    padding: 0 22px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+
+    background: rgba(17, 24, 39, 0.92) !important;
+    color: #ffffff !important;
+
+    font-size: 14px;
+    font-weight: 850;
+
+    box-shadow: none !important;
+}
+
+.compact-filter-form button:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* =========================
+   FINAL ORDERS FILTER DESIGN
+   ========================= */
+
+.admin-order-filter-card {
+    margin: 26px 0 30px;
+    padding: 18px;
+
+    border-radius: 28px;
+    border: 1px solid rgba(15, 23, 42, 0.10);
+
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.14), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.045), transparent 38%),
+        rgba(255, 255, 255, 0.78);
+
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.055);
+    backdrop-filter: blur(16px);
+}
+
+.admin-order-filter-form {
+    display: grid;
+    grid-template-columns: 1.5fr 0.8fr 0.7fr 0.7fr 0.8fr 0.8fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.admin-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-filter-field label {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-filter-field input,
+.admin-filter-field select {
+    width: 100%;
+    max-width: 100%;
+    height: 42px;
+    margin: 0;
+    padding: 0 14px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.09);
+
+    background: rgba(248, 250, 252, 0.78);
+    color: #111827;
+
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: none;
+}
+
+.admin-filter-field input:focus,
+.admin-filter-field select:focus {
+    border-color: rgba(255, 5, 105, 0.28);
+    box-shadow: 0 0 0 4px rgba(255, 5, 105, 0.06);
+}
+
+.admin-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-filter-actions button,
+.admin-clear-filter-btn {
+    height: 42px;
+    padding: 0 20px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+    font-weight: 850;
+    text-decoration: none;
+
+    box-shadow: none !important;
+    white-space: nowrap;
+}
+
+.admin-filter-actions button {
+    background: rgba(17, 24, 39, 0.92) !important;
+    color: #ffffff !important;
+}
+
+.admin-filter-actions button:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+.admin-clear-filter-btn {
+    background: rgba(255, 255, 255, 0.72) !important;
+    color: #111827 !important;
+}
+
+.admin-clear-filter-btn:hover {
+    background: rgba(255, 5, 105, 0.08) !important;
+    color: #FF0569 !important;
+    border-color: rgba(255, 5, 105, 0.22) !important;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 1200px) {
+    .admin-order-filter-form {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .admin-filter-actions {
+        grid-column: span 3;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .compact-filter-card {
+        width: 100%;
+    }
+
+    .compact-filter-form {
+        width: 100%;
+        border-radius: 22px;
+        flex-wrap: wrap;
+    }
+
+    .compact-filter-form input {
+        width: 100%;
+    }
+
+    .compact-filter-form button {
+        width: 100%;
+    }
+
+    .admin-order-filter-form {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-filter-actions {
+        grid-column: auto;
+        justify-content: stretch;
+        flex-direction: column;
+    }
+
+    .admin-filter-actions button,
+    .admin-clear-filter-btn {
+        width: 100%;
+    }
+}
+/* =========================
+   FINAL ERROR MESSAGE COLOR FIX
+   No red - only GOGOFOOD pink palette
+   ========================= */
+
+.alert-danger-modern {
+    color: #FF0569 !important;
+    background: rgba(255, 5, 105, 0.08) !important;
+    border: 1px solid rgba(255, 5, 105, 0.22) !important;
+    box-shadow: 0 10px 24px rgba(255, 5, 105, 0.06) !important;
+}
+
+/* ASP.NET validation errors also use pink instead of red */
+.text-danger,
+.field-validation-error,
+.validation-summary-errors {
+    color: #FF0569 !important;
+}
+
+.input-validation-error {
+    border-color: rgba(255, 5, 105, 0.35) !important;
+    box-shadow: 0 0 0 4px rgba(255, 5, 105, 0.07) !important;
+}
+/* =========================
+   CATERING SYSTEM UI
+   ========================= */
+
+.catering-filter-card select {
+    width: 220px;
+    margin: 0;
+}
+
+.catering-category-badge {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111827;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 13px;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.caterer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.caterer-menu-card {
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.18), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.06), transparent 38%),
+        #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 30px;
+    padding: 26px;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+    transition: 0.25s ease;
+}
+
+.caterer-menu-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 5, 105, 0.22);
+    box-shadow: 0 22px 52px rgba(255, 5, 105, 0.09);
+}
+
+.caterer-menu-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.caterer-menu-header h2 {
+    margin: 4px 0 7px;
+    color: #07142f;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+}
+
+.caterer-menu-header p {
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.caterer-distance {
+    display: inline-flex;
+    margin-top: 9px;
+    color: #FF0569;
+    font-weight: 900;
+}
+
+.caterer-menu-summary {
+    min-width: 125px;
+    padding: 15px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    text-align: center;
+}
+
+.caterer-menu-summary strong {
+    display: block;
+    color: #111827;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.caterer-menu-summary span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.catering-category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.catering-category-column {
+    background: rgba(248, 250, 252, 0.76);
+    border: 1px solid rgba(15, 23, 42, 0.09);
+    border-radius: 24px;
+    padding: 16px;
+}
+
+.catering-category-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.catering-category-title h3 {
+    margin: 0;
+    color: #07142f;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.catering-category-title span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.catering-empty-category {
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px dashed rgba(15, 23, 42, 0.14);
+    color: #64748b;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.catering-option-card {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 14px;
+    padding: 14px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.09);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.045);
+    margin-bottom: 14px;
+}
+
+.catering-option-image {
+    width: 120px;
+    height: 110px;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.32), transparent 45%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.10), transparent 45%),
+        #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.catering-option-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.catering-option-image span {
+    font-size: 38px;
+}
+
+.catering-option-content {
+    min-width: 0;
+}
+
+.catering-option-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.catering-option-top h4 {
+    margin: 0 0 5px;
+    color: #111827;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.catering-option-top p {
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.catering-option-top strong {
+    color: #FF0569;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.catering-add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.people-count-row {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+}
+
+.people-count-row label {
+    color: #111827;
+    font-size: 13px;
+    font-weight: 900;
+    margin: 0;
+}
+
+.people-count-row input {
+    width: 100%;
+    max-width: 100%;
+    height: 42px;
+    margin: 0;
+    border-radius: 999px;
+    text-align: center;
+    font-weight: 900;
+}
+
+.cart-category-pill {
+    display: inline-flex;
+    width: fit-content;
+    padding: 7px 13px;
+    border-radius: 999px;
+    background: rgba(255, 5, 105, 0.08);
+    border: 1px solid rgba(255, 5, 105, 0.22);
+    color: #FF0569;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.cart-caterer-name {
+    color: #64748b;
+    font-weight: 800;
+    margin: 0 0 8px;
+}
+
+.cart-quantity-box small {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.social-icon-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.social-svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.payment-item-info small {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+@media (max-width: 1100px) {
+    .catering-category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .catering-option-card {
+        grid-template-columns: 1fr;
+    }
+
+    .catering-option-image {
+        width: 100%;
+        height: 180px;
+    }
+}
+
+@media (max-width: 700px) {
+    .caterer-menu-header {
+        flex-direction: column;
+    }
+
+    .caterer-menu-summary {
+        width: 100%;
+    }
+
+    .catering-option-top {
+        flex-direction: column;
+    }
+
+    .people-count-row {
+        grid-template-columns: 1fr;
+    }
+}
+/* =========================
+   USER CATERER FIRST PAGE
+   ========================= */
+
+.user-caterer-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 26px;
+}
+
+.user-caterer-card {
+    display: block;
+    text-decoration: none !important;
+    color: inherit !important;
+
+    padding: 24px;
+    border-radius: 30px;
+    border: 1px solid rgba(15, 23, 42, 0.10);
+
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.20), transparent 36%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.055), transparent 40%),
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+    transition: 0.24s ease;
+}
+
+.user-caterer-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 5, 105, 0.24);
+    box-shadow: 0 24px 58px rgba(255, 5, 105, 0.10);
+}
+
+.user-caterer-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.user-caterer-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.40), transparent 45%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.12), transparent 45%),
+        #ffffff;
+
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    font-size: 31px;
+    flex-shrink: 0;
+}
+
+.user-caterer-main h2 {
+    margin: 8px 0 6px;
+    color: #07142f;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.user-caterer-main p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.user-caterer-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.user-caterer-info-grid div {
+    padding: 14px;
+    border-radius: 19px;
+    background: rgba(248, 250, 252, 0.78);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.user-caterer-info-grid span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.user-caterer-info-grid strong {
+    display: block;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.user-caterer-info-grid small {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.user-caterer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.user-caterer-footer span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.user-caterer-footer strong {
+    color: #FF0569;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+/* =========================
+   SELECTED CATERER MENU BUILDER
+   ========================= */
+
+.selected-caterer-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+
+    margin: 24px 0;
+    padding: 25px;
+
+    border-radius: 30px;
+    border: 1px solid rgba(15, 23, 42, 0.10);
+
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.06), transparent 38%),
+        rgba(255, 255, 255, 0.94);
+
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+}
+
+.selected-caterer-hero h2 {
+    margin: 8px 0 6px;
+    color: #07142f;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+}
+
+.selected-caterer-hero p {
+    margin: 0;
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.selected-caterer-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    min-width: 360px;
+}
+
+.selected-caterer-stats div {
+    padding: 16px;
+    border-radius: 22px;
+    background: rgba(248, 250, 252, 0.80);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.selected-caterer-stats span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.selected-caterer-stats strong {
+    display: block;
+    color: #111827;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.selected-caterer-stats small {
+    display: block;
+    color: #64748b;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+.user-menu-builder-grid {
+    margin-top: 24px;
+}
+
+.user-menu-builder-grid .catering-category-column {
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.14), transparent 34%),
+        rgba(248, 250, 252, 0.86);
+}
+
+.catering-category-title p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.user-builder-option {
+    transition: 0.22s ease;
+}
+
+.user-builder-option:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 5, 105, 0.18);
+    box-shadow: 0 16px 32px rgba(255, 5, 105, 0.075);
+}
+
+/* Make selected category buttons softer but still signature */
+.user-builder-option .add-cart-full {
+    background: rgba(17, 24, 39, 0.92) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.user-builder-option .add-cart-full:hover {
+    background: #FF0569 !important;
+    color: #ffffff !important;
+    box-shadow: 0 12px 28px rgba(255, 5, 105, 0.18) !important;
+}
+
+@media (max-width: 1100px) {
+    .user-caterer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-caterer-hero {
+        flex-direction: column;
+    }
+
+    .selected-caterer-stats {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .user-caterer-main {
+        flex-direction: column;
+    }
+
+    .user-caterer-info-grid,
+    .selected-caterer-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .user-caterer-footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+/* =========================
+   USER MENU BUILDER ACCORDION
+   Starter / Main / Dessert / Drink
+   ========================= */
+
+.catering-accordion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 26px;
+}
+
+.catering-accordion-item {
+    border-radius: 26px;
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.045), transparent 38%),
+        rgba(255, 255, 255, 0.95);
+    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.055);
+    overflow: hidden;
+    transition: 0.24s ease;
+}
+
+.catering-accordion-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 5, 105, 0.18);
+    box-shadow: 0 20px 48px rgba(255, 5, 105, 0.075);
+}
+
+.catering-accordion-item.selected {
+    border-color: rgba(255, 5, 105, 0.24);
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.18), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.075), transparent 38%),
+        rgba(255, 255, 255, 0.97);
+}
+
+.catering-accordion-header {
+    width: 100%;
+    padding: 20px 22px;
+    border: none;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.catering-accordion-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.catering-accordion-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.35), transparent 45%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.11), transparent 45%),
+        #ffffff;
+
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    font-size: 27px;
+    flex-shrink: 0;
+}
+
+.catering-accordion-left h3 {
+    margin: 0 0 4px;
+    color: #07142f;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.catering-accordion-left p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.catering-accordion-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.category-count-badge,
+.category-selected-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 7px 12px;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.category-count-badge {
+    color: #111827;
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.category-selected-badge {
+    color: #FF0569;
+    background: rgba(255, 5, 105, 0.08);
+    border: 1px solid rgba(255, 5, 105, 0.22);
+}
+
+.accordion-arrow {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111827;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+
+    font-weight: 900;
+    transition: 0.22s ease;
+}
+
+.catering-accordion-item.open .accordion-arrow {
+    transform: rotate(180deg);
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+.catering-accordion-body {
+    display: none;
+    padding: 0 22px 22px;
+    animation: accordionOpen 0.22s ease;
+}
+
+.catering-accordion-item.open .catering-accordion-body {
+    display: block;
+}
+
+@keyframes accordionOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.catering-accordion-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.selected-category-note {
+    margin-bottom: 14px;
+    padding: 13px 16px;
+    border-radius: 18px;
+    color: #FF0569;
+    background: rgba(255, 5, 105, 0.08);
+    border: 1px solid rgba(255, 5, 105, 0.20);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.accordion-close-btn {
+    width: fit-content;
+    margin-top: 16px;
+    padding: 11px 20px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+
+    background: rgba(255, 255, 255, 0.76) !important;
+    color: #111827 !important;
+
+    font-size: 14px;
+    font-weight: 850;
+
+    box-shadow: none !important;
+    transition: 0.22s ease;
+}
+
+.accordion-close-btn:hover {
+    background: #111827 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12) !important;
+}
+
+.catering-accordion-body .catering-option-card {
+    margin-bottom: 0;
+}
+
+.catering-accordion-body .catering-option-card + .catering-option-card {
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    .catering-accordion-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .catering-accordion-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .catering-accordion-left {
+        align-items: flex-start;
+    }
+}
+/* =========================
+   ACCORDION HEADER HOVER GRADIENT ONLY
+   Gradient opacity 70%
+   ========================= */
+
+.catering-accordion-item {
+    overflow: hidden !important;
+    border-radius: 28px !important;
+    border: 1px solid rgba(15, 23, 42, 0.10) !important;
+    background: #ffffff !important;
+    box-shadow: 0 16px 38px rgba(15, 23, 42, 0.055) !important;
+}
+
+/* Normalde gradient yok: sade soft görünüm */
+.catering-accordion-header,
+button.catering-accordion-header {
+    width: 100% !important;
+    min-height: 96px !important;
+
+    padding: 20px 24px !important;
+    border: none !important;
+    border-radius: 0 !important;
+
+    background: rgba(255, 255, 255, 0.92) !important;
+    box-shadow: none !important;
+    color: #07142f !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+
+    text-align: left !important;
+    cursor: pointer !important;
+    transition: 0.24s ease !important;
+}
+
+/* Sadece hover olunca %70 opak gradient */
+.catering-accordion-header:hover,
+button.catering-accordion-header:hover,
+.catering-accordion-item.open .catering-accordion-header {
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.70) 0%,
+            rgba(255, 255, 255, 0.70) 42%,
+            rgba(255, 5, 105, 0.70) 100%
+        ) !important;
+
+    transform: none !important;
+}
+
+/* Seçili kategori hover olmasa bile çok hafif pembe/mint dursun */
+.catering-accordion-item.selected .catering-accordion-header {
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.22) 0%,
+            rgba(255, 255, 255, 0.88) 42%,
+            rgba(255, 5, 105, 0.16) 100%
+        ) !important;
+}
+
+/* Seçili kategoriye hover gelince yine %70 opak gradient */
+.catering-accordion-item.selected .catering-accordion-header:hover,
+.catering-accordion-item.selected.open .catering-accordion-header {
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.70) 0%,
+            rgba(255, 255, 255, 0.70) 42%,
+            rgba(255, 5, 105, 0.70) 100%
+        ) !important;
+}
+
+/* İç body beyaz ve temiz kalsın */
+.catering-accordion-body {
+    background:
+        radial-gradient(circle at top left, rgba(153, 255, 224, 0.10), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 5, 105, 0.045), transparent 38%),
+        #ffffff !important;
+
+    padding: 22px !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Icon ve badge'ler gradient üstünde okunaklı kalsın */
+.catering-accordion-icon,
+.category-count-badge,
+.category-selected-badge,
+.accordion-arrow {
+    background: rgba(255, 255, 255, 0.86) !important;
+    border: 1px solid rgba(15, 23, 42, 0.10) !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07) !important;
+}
+
+.category-selected-badge {
+    color: #FF0569 !important;
+    border-color: rgba(255, 5, 105, 0.22) !important;
+}
+
+.catering-accordion-item.open .accordion-arrow {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+}
+
+/* Yazılar net kalsın */
+.catering-accordion-left h3 {
+    color: #07142f !important;
+    font-weight: 800 !important;
+}
+
+.catering-accordion-left p {
+    color: #475569 !important;
+    font-weight: 700 !important;
+}
+
+@media (max-width: 768px) {
+    .catering-accordion-header,
+    button.catering-accordion-header {
+        min-height: auto !important;
+        padding: 18px !important;
+        align-items: flex-start !important;
+    }
+
+    .catering-accordion-right {
+        margin-top: 8px !important;
+    }
+}
+/* =========================
+   FINAL ALIGNMENT FIXES
+   Login/Register + Home Steps + File Input
+   ========================= */
+
+/* Login/Register form alanları aynı hizada ve aynı genişlikte dursun */
+.auth-card form,
+.login-card form,
+.register-card form,
+.modern-form-card form {
+    width: 100%;
+}
+
+/* Register/Login gibi sade formlarda label + input hizası */
+.auth-card .form-group,
+.login-card .form-group,
+.register-card .form-group,
+.auth-form-group,
+.form-group-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+/* Label solda sabit, inputlar aynı çizgide temiz dursun */
+.auth-card label,
+.login-card label,
+.register-card label,
+.auth-form-group label,
+.form-group-modern label {
+    display: block;
+    margin-bottom: 0;
+    color: #07142f;
+    font-weight: 800;
+}
+
+/* Login/Register input/select genişliklerini eşitle */
+.auth-card input,
+.auth-card select,
+.login-card input,
+.login-card select,
+.register-card input,
+.register-card select {
+    width: 100% !important;
+    max-width: 430px !important;
+    height: 48px !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
+
+    border-radius: 14px !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    background: rgba(248, 250, 252, 0.82) !important;
+
+    color: #07142f !important;
+    font-size: 14px !important;
+    box-shadow: none !important;
+}
+
+/* Browser autofill mavi görüntüyü daha temiz hale getir */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #07142f !important;
+    box-shadow: 0 0 0 1000px rgba(248, 250, 252, 0.82) inset !important;
+    transition: background-color 9999s ease-in-out 0s !important;
+}
+
+/* Login/Register başlıkları sayfayla aynı hizaya gelsin */
+.auth-card h1,
+.login-card h1,
+.register-card h1,
+.auth-title {
+    margin-bottom: 18px !important;
+    color: #07142f !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px !important;
+}
+
+/* Home - How Catering Works kartlarındaki numarayı ortala */
+.home-step-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+
+/* Numaralar kart içinde ortalı ve dengeli dursun */
+.home-step-card > span {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 auto 18px auto !important;
+
+    border-radius: 999px !important;
+    background: #FF0569 !important;
+    color: #ffffff !important;
+
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-align: center !important;
+}
+
+/* Home step kartının yazıları daha dengeli görünsün */
+.home-step-card h3,
+.home-step-card p {
+    width: 100%;
+}
+
+.home-step-card h3 {
+    text-align: left;
+}
+
+/* Add Menu / Edit Menu file input alanı çakışmasın */
+.form-group-modern input[type="file"] {
+    height: auto !important;
+    min-height: 54px !important;
+    padding: 14px 16px !important;
+    line-height: 1.4 !important;
+
+    display: block !important;
+    width: 100% !important;
+
+    border-radius: 18px !important;
+    border: 1px dashed rgba(255, 5, 105, 0.35) !important;
+    background: rgba(255, 5, 105, 0.035) !important;
+}
+
+/* Dosya seç alanının alt yazısı aşağı insin, üstüne binmesin */
+.form-group-modern input[type="file"] + small,
+.form-group-modern small {
+    display: block !important;
+    margin-top: 10px !important;
+    line-height: 1.55 !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+}
+
+/* File input butonu daha düzgün dursun */
+.form-group-modern input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 8px 14px;
+
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+
+    background: rgba(255, 255, 255, 0.90);
+    color: #111827;
+
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.form-group-modern input[type="file"]::file-selector-button:hover {
+    background: rgba(255, 5, 105, 0.08);
+    color: #FF0569;
+    border-color: rgba(255, 5, 105, 0.24);
+}
+
+/* Add menu kartında form elemanları birbirine binmesin */
+.vertical-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+}
+
+.vertical-form .form-group-modern {
+    margin-bottom: 0 !important;
+}
+
+/* Mobilde inputlar tam genişlik olsun */
+@media (max-width: 768px) {
+    .auth-card input,
+    .auth-card select,
+    .login-card input,
+    .login-card select,
+    .register-card input,
+    .register-card select {
+        max-width: 100% !important;
+    }
+
+    .home-step-card > span {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
+/* =========================
+   LOGIN / REGISTER INPUT ALIGNMENT FINAL
+   ========================= */
+
+/* Login ve Register form satırları aynı hizaya gelsin */
+.login-card form,
+.register-card form,
+.auth-card form {
+    width: 100% !important;
+    max-width: 540px !important;
+}
+
+/* Her input satırı: label solda, input sağda */
+.login-card .form-group,
+.register-card .form-group,
+.auth-card .form-group,
+.login-card .form-group-modern,
+.register-card .form-group-modern,
+.auth-card .form-group-modern {
+    display: grid !important;
+    grid-template-columns: 72px 1fr !important;
+    align-items: center !important;
+    column-gap: 14px !important;
+    margin-bottom: 24px !important;
+}
+
+/* Label genişliği sabit olsun */
+.login-card label,
+.register-card label,
+.auth-card label {
+    margin: 0 !important;
+    color: #07142f !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+}
+
+/* Bütün input/select kutuları aynı çizgide ve aynı genişlikte başlasın */
+.login-card input,
+.login-card select,
+.register-card input,
+.register-card select,
+.auth-card input,
+.auth-card select {
+    width: 100% !important;
+    max-width: none !important;
+    height: 48px !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
+
+    border-radius: 14px !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    background: rgba(248, 250, 252, 0.82) !important;
+
+    color: #07142f !important;
+    font-size: 14px !important;
+    box-shadow: none !important;
+}
+
+/* Button input hizasına değil, formun soluna düzgün otursun */
+.login-card button,
+.register-card button,
+.auth-card button {
+    margin-top: 4px !important;
+}
+
+/* Alt link yazısı da düzgün kalsın */
+.login-card p,
+.register-card p,
+.auth-card p {
+    margin-top: 8px !important;
+}
+
+/* Mobilde label üstte, input altta olsun */
+@media (max-width: 576px) {
+    .login-card .form-group,
+    .register-card .form-group,
+    .auth-card .form-group,
+    .login-card .form-group-modern,
+    .register-card .form-group-modern,
+    .auth-card .form-group-modern {
+        grid-template-columns: 1fr !important;
+        row-gap: 8px !important;
+    }
+
+    .login-card input,
+    .login-card select,
+    .register-card input,
+    .register-card select,
+    .auth-card input,
+    .auth-card select {
+        width: 100% !important;
+    }
+}
+/* =========================
+   FOOTER GRADIENT OPACITY FIX
+   60% opacity
+   ========================= */
+
+.footer-modern {
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.70) 0%,
+            rgba(255, 255, 255, 0.70) 42%,
+            rgba(255, 5, 105, 0.70) 100%
+        ) !important;
+}
+.footer-bottom {
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.70) 0%,
+            rgba(255, 255, 255, 0.70) 42%,
+            rgba(255, 5, 105, 0.70) 100%
+        ) !important;
+}
+/* =========================
+   LOGIN / REGISTER VERTICAL FORM FINAL
+   Label top, input below
+   ========================= */
+
+.login-card form,
+.register-card form,
+.auth-card form {
+    width: 100% !important;
+    max-width: 520px !important;
+}
+
+/* Önceki grid hizalamayı tamamen iptal ediyoruz */
+.login-card .form-group,
+.register-card .form-group,
+.auth-card .form-group,
+.login-card .form-group-modern,
+.register-card .form-group-modern,
+.auth-card .form-group-modern {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    margin-bottom: 22px !important;
+}
+
+/* Label artık inputun üstünde */
+.login-card label,
+.register-card label,
+.auth-card label {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+
+    color: #07142f !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+}
+
+/* Tüm input/select kutuları aynı başlangıç hizasında */
+.login-card input,
+.login-card select,
+.register-card input,
+.register-card select,
+.auth-card input,
+.auth-card select {
+    display: block !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    height: 48px !important;
+
+    margin: 0 !important;
+    padding: 0 16px !important;
+
+    border-radius: 14px !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
+    background: rgba(248, 250, 252, 0.82) !important;
+
+    color: #07142f !important;
+    font-size: 14px !important;
+    box-shadow: none !important;
+}
+
+/* Register/Login button düzgün boşlukla gelsin */
+.login-card button,
+.register-card button,
+.auth-card button {
+    margin-top: 2px !important;
+}
+
+/* Alt login/register linki çok yapışmasın */
+.login-card p,
+.register-card p,
+.auth-card p {
+    margin-top: 8px !important;
+}
+
+/* Autofill mavi görünümü soft gri yap */
+.login-card input:-webkit-autofill,
+.register-card input:-webkit-autofill,
+.auth-card input:-webkit-autofill {
+    -webkit-text-fill-color: #07142f !important;
+    box-shadow: 0 0 0 1000px rgba(248, 250, 252, 0.82) inset !important;
+}
+
+/* Mobilde de aynı kalsın */
+@media (max-width: 576px) {
+    .login-card form,
+    .register-card form,
+    .auth-card form {
+        max-width: 100% !important;
+    }
+
+    .login-card input,
+    .login-card select,
+    .register-card input,
+    .register-card select,
+    .auth-card input,
+    .auth-card select {
+        max-width: 100% !important;
+    }
+}
+/* =========================
+   FOOTER FINAL COMPACT FIX
+   Smaller footer + 30% gradient opacity
+   ========================= */
+
+.footer-modern {
+    margin-top: 40px !important;
+    padding: 34px 70px 18px !important;
+
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.30) 0%,
+            rgba(255, 255, 255, 0.30) 42%,
+            rgba(255, 5, 105, 0.30) 100%
+        ) !important;
+
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+.footer-grid {
+    max-width: 1150px !important;
+    margin: 0 auto !important;
+
+    display: grid !important;
+    grid-template-columns: 1.4fr 0.7fr 1fr 0.9fr !important;
+    gap: 44px !important;
+    align-items: flex-start !important;
+}
+
+.footer-logo {
+    font-size: 28px !important;
+    margin-bottom: 10px !important;
+}
+
+.footer-brand p,
+.footer-column p {
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 12px !important;
+}
+
+.footer-contact {
+    margin-top: 12px !important;
+}
+
+.footer-contact p {
+    margin: 8px 0 !important;
+    font-size: 14px !important;
+}
+
+.footer-column h3 {
+    font-size: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+.footer-column a {
+    margin-bottom: 9px !important;
+    font-size: 14px !important;
+}
+
+.social-links {
+    gap: 8px !important;
+}
+
+.social-icon-links a {
+    font-size: 14px !important;
+}
+
+.social-svg {
+    width: 18px !important;
+    height: 18px !important;
+}
+
+/* En alt copyright kısmı daha küçük ve %30 gradient */
+.footer-bottom {
+    margin-top: 22px !important;
+    padding-top: 14px !important;
+
+    font-size: 13px !important;
+    text-align: center !important;
+
+    background: transparent !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+.footer-bottom-logo {
+    font-size: 13px !important;
+}
+
+/* Sayfa içeriği az olduğunda footer yukarıda dev gibi durmasın */
+.page-wrapper {
+    min-height: calc(100vh - 260px) !important;
+}
+
+@media (max-width: 992px) {
+    .footer-modern {
+        padding: 30px 28px 18px !important;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 28px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .footer-modern {
+        padding: 28px 20px 16px !important;
+    }
+}
+/* =========================
+   AUTH PAGES FINAL CLEAN ALIGNMENT
+   Label top, input below
+   ========================= */
+
+.auth-page-clean {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding: 20px 0 40px;
+}
+
+.auth-card-clean {
+    width: 100%;
+    max-width: 520px;
+}
+
+.auth-card-clean h1 {
+    margin: 0 0 24px;
+    color: #07142f;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.auth-form-clean {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-field-clean {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-field-clean label {
+    display: block;
+    width: 100%;
+    margin: 0;
+
+    color: #07142f;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.auth-field-clean input,
+.auth-field-clean select {
+    display: block;
+    width: 100%;
+    height: 48px;
+
+    margin: 0;
+    padding: 0 16px;
+
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(248, 250, 252, 0.82);
+
+    color: #07142f;
+    font-size: 14px;
+    box-shadow: none;
+    outline: none;
+}
+
+.auth-field-clean input:focus,
+.auth-field-clean select:focus {
+    border-color: rgba(255, 5, 105, 0.30);
+    box-shadow: 0 0 0 4px rgba(255, 5, 105, 0.06);
+}
+
+.auth-submit-clean {
+    width: fit-content;
+    margin-top: 2px;
+}
+
+.auth-link-text-clean {
+    margin: -10px 0 0;
+    color: #07142f;
+    font-size: 15px;
+}
+
+.auth-link-text-clean a {
+    color: #FF0569;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+/* Browser autofill rengini siteye uydur */
+.auth-field-clean input:-webkit-autofill,
+.auth-field-clean input:-webkit-autofill:hover,
+.auth-field-clean input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #07142f !important;
+    box-shadow: 0 0 0 1000px rgba(248, 250, 252, 0.82) inset !important;
+    transition: background-color 9999s ease-in-out 0s !important;
+}
+
+/* Eski login/register grid CSS'lerini kesin ezer */
+.login-card .form-group,
+.register-card .form-group,
+.auth-card .form-group,
+.login-card .form-group-modern,
+.register-card .form-group-modern,
+.auth-card .form-group-modern {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+}
+
+@media (max-width: 576px) {
+    .auth-card-clean {
+        max-width: 100%;
+    }
+
+    .auth-card-clean h1 {
+        font-size: 30px;
+    }
+}
+/* =========================
+   FOOTER SEPARATION FINAL
+   Upper footer 35% gradient
+   Bottom footer 70% gradient
+   ========================= */
+
+.footer-modern {
+    margin-top: 40px !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+    border-top: none !important;
+}
+
+/* Üst footer alanı ayrı kutu gibi */
+.footer-grid {
+    width: 100% !important;
+    max-width: none !important;
+
+    padding: 38px 70px 34px !important;
+    margin: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: 1.4fr 0.7fr 1fr 0.9fr !important;
+    gap: 44px !important;
+    align-items: flex-start !important;
+
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.20) 0%,
+            rgba(255, 255, 255, 0.20) 42%,
+            rgba(255, 5, 105, 0.20) 100%
+        ) !important;
+
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+/* İçerik çok geniş yayılmasın diye kolonları ortada tut */
+.footer-grid > * {
+    max-width: 340px !important;
+}
+
+.footer-grid {
+    justify-content: center !important;
+}
+
+/* Alt copyright bar artık ayrı bir bar */
+.footer-bottom {
+    margin: 0 !important;
+    padding: 18px 20px !important;
+
+    width: 100% !important;
+
+    text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            100deg,
+            rgba(153, 255, 224, 0.80) 0%,
+            rgba(255, 255, 255, 0.20) 42%,
+            rgba(255, 5, 105, 0.80) 100%
+        ) !important;
+
+    border-top: 1px solid rgba(15, 23, 42, 0.10) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Alt bardaki GOGOFOOD yazısı okunaklı kalsın */
+.footer-bottom .brand-gogo {
+    color: #FF0569 !important;
+    font-weight: 900 !important;
+}
+
+.footer-bottom .brand-food {
+    color: #99FFE0 !important;
+    font-weight: 900 !important;
+}
+
+.footer-bottom-logo {
+    font-size: 13px !important;
+}
+
+/* Üst footer yazıları daha kompakt kalsın */
+.footer-logo {
+    font-size: 28px !important;
+    margin-bottom: 10px !important;
+}
+
+.footer-brand p,
+.footer-column p {
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    margin-bottom: 12px !important;
+}
+
+.footer-contact {
+    margin-top: 12px !important;
+}
+
+.footer-contact p {
+    margin: 8px 0 !important;
+    font-size: 14px !important;
+}
+
+.footer-column h3 {
+    font-size: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+.footer-column a {
+    margin-bottom: 9px !important;
+    font-size: 14px !important;
+}
+
+@media (max-width: 992px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        padding: 34px 28px 30px !important;
+        gap: 28px !important;
+        justify-content: stretch !important;
+    }
+
+    .footer-grid > * {
+        max-width: none !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-grid {
+        grid-template-columns: 1fr !important;
+        padding: 30px 20px 26px !important;
+    }
+
+    .footer-bottom {
+        padding: 16px 14px !important;
+    }
+}
+/* =========================
+   FINAL CART + DELETE + PAYMENT FIXES
+   ========================= */
+
+/* Admin panelde Soft Delete yazısı ekranda Delete görünsün */
+.admin-soft-delete-btn {
+    font-size: 0 !important;
+}
+
+.admin-soft-delete-btn::after {
+    content: "Delete";
+    font-size: 13px !important;
+    font-weight: 850 !important;
+}
+
+/* Cart total kutusunda büyük fiyat taşmasın */
+.cart-total-box {
+    min-width: 160px !important;
+    max-width: 210px !important;
+    overflow: hidden !important;
+}
+
+.cart-total-box h4 {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    font-size: clamp(18px, 2vw, 28px) !important;
+    line-height: 1.15 !important;
+
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+
+    text-align: center !important;
+}
+
+/* Büyük total yazısı kutunun içinde dengeli dursun */
+.cart-total-box p,
+.cart-total-box .cart-remove-link {
+    text-align: center !important;
+}
+
+/* Quantity ve Total kutuları daha dengeli */
+.cart-quantity-box,
+.cart-total-box {
+    align-self: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+/* Remove linki taşmasın */
+.cart-remove-link {
+    display: inline-flex !important;
+    justify-content: center !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin: 10px auto 0 !important;
+}
+
+/* Payment summary fiyatları büyük siparişte taşmasın */
+.payment-price,
+.payment-total-box strong,
+.payment-button {
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+}
+
+.payment-total-box strong {
+    font-size: clamp(24px, 3vw, 34px) !important;
+    line-height: 1.15 !important;
+    text-align: right !important;
+}
+
+/* Payment table içinde total daha kontrollü */
+.payment-table td,
+.payment-table th {
+    vertical-align: middle !important;
+}
+
+.payment-table .payment-price {
+    max-width: 150px !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+}
+
+/* Payment ekranı daha gerçek checkout gibi */
+.payment-heading h1 {
+    font-size: clamp(36px, 4vw, 52px) !important;
+}
+
+.payment-note {
+    background: rgba(153, 255, 224, 0.18) !important;
+    border: 1px solid rgba(153, 255, 224, 0.55) !important;
+    color: #07142f !important;
+}
+
+.payment-secure-text {
+    color: #07142f !important;
+    font-weight: 800 !important;
+}
+
+/* Mobile cartta kutular alt alta düzgün gelsin */
+@media (max-width: 900px) {
+    .cart-total-box {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .cart-total-box h4 {
+        font-size: 24px !important;
+    }
+
+    .payment-table .payment-price {
+        max-width: none !important;
+    }
+}
+/* =========================
+   CART TOTAL BOX FINAL REAL FIX
+   Small box + smaller price + remove outside
+   ========================= */
+
+/* Cart item sağ tarafı taşmasın */
+.cart-item-card {
+    overflow: visible !important;
+}
+
+/* People Count kutusu eski küçük haline yakın */
+.cart-quantity-box {
+    width: 135px !important;
+    min-width: 135px !important;
+    max-width: 135px !important;
+
+    min-height: 118px !important;
+    padding: 16px 12px !important;
+
+    border-radius: 22px !important;
+    align-self: center !important;
+}
+
+/* Total kutusu küçük kalsın */
+.cart-total-box {
+    position: relative !important;
+
+    width: 135px !important;
+    min-width: 135px !important;
+    max-width: 135px !important;
+
+    min-height: 118px !important;
+    padding: 16px 10px !important;
+
+    border-radius: 22px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: visible !important;
+    align-self: center !important;
+}
+
+/* Total başlığı */
+.cart-total-box p {
+    margin: 0 0 8px !important;
+    width: 100% !important;
+
+    text-align: center !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+    font-weight: 850 !important;
+}
+
+/* Fiyat küçük kalsın, kutudan taşmasın */
+.cart-total-box h4 {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    margin: 0 !important;
+
+    color: #FF0569 !important;
+    text-align: center !important;
+    font-weight: 900 !important;
+
+    font-size: 17px !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.8px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+}
+
+/* Remove artık kutunun içinde değil, kutunun altında dursun */
+.cart-remove-link {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: -28px !important;
+    transform: translateX(-50%) !important;
+
+    display: block !important;
+    width: max-content !important;
+    max-width: 120px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #FF0569 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+    text-decoration: none !important;
+}
+
+/* Remove altta olduğu için kartın altına biraz boşluk ver */
+.cart-item-card {
+    padding-bottom: 34px !important;
+}
+
+/* Quantity içindeki yazıları kompakt tut */
+.cart-quantity-box p {
+    margin: 0 0 8px !important;
+    font-size: 13px !important;
+    font-weight: 850 !important;
+    color: #64748b !important;
+}
+
+.cart-quantity-box small {
+    margin-top: 8px !important;
+    max-width: 105px !important;
+    text-align: center !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+/* Quantity sayı ve butonlar */
+.quantity-controls {
+    gap: 8px !important;
+}
+
+.quantity-controls span {
+    min-width: 36px !important;
+    font-size: 21px !important;
+}
+
+/* Çok büyük fiyatlarda biraz daha küçült */
+@media (min-width: 901px) {
+    .cart-total-box h4 {
+        font-size: 16px !important;
+    }
+}
+
+/* Mobilde kutular rahatlasın */
+@media (max-width: 900px) {
+    .cart-quantity-box,
+    .cart-total-box {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .cart-total-box h4 {
+        font-size: 22px !important;
+    }
+
+    .cart-remove-link {
+        position: static !important;
+        transform: none !important;
+        margin-top: 12px !important;
+    }
+
+    .cart-item-card {
+        padding-bottom: 22px !important;
+    }
+}
+/* =========================
+   CART REMOVE BUTTON FINAL
+   Bottom-right soft pink button
+   ========================= */
+
+/* Cart card remove butonu için konum referansı */
+.cart-item-card {
+    position: relative !important;
+    padding-bottom: 56px !important;
+}
+
+/* Eski remove konumlarını tamamen ezer */
+.cart-remove-link {
+    position: absolute !important;
+    right: 28px !important;
+    bottom: 22px !important;
+    left: auto !important;
+    transform: none !important;
+
+    width: auto !important;
+    max-width: none !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 !important;
+    padding: 10px 22px !important;
+
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 5, 105, 0.24) !important;
+
+    background: rgba(255, 5, 105, 0.08) !important;
+    color: #FF0569 !important;
+
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+
+    box-shadow: none !important;
+    transition: 0.22s ease !important;
+}
+
+/* Hover: signature pink */
+.cart-remove-link:hover {
+    background: #FF0569 !important;
+    color: #ffffff !important;
+    border-color: #FF0569 !important;
+
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 22px rgba(255, 5, 105, 0.16) !important;
+}
+
+/* Total kutusu artık remove için yer açmaya çalışmasın */
+.cart-total-box {
+    position: static !important;
+    overflow: hidden !important;
+}
+
+/* Mobilde buton alta tam genişlikte insin */
+@media (max-width: 900px) {
+    .cart-item-card {
+        padding-bottom: 22px !important;
+    }
+
+    .cart-remove-link {
+        position: static !important;
+        width: 100% !important;
+        margin-top: 14px !important;
+        padding: 11px 18px !important;
+        transform: none !important;
+    }
+
+    .cart-remove-link:hover {
+        transform: translateY(-1px) !important;
+    }
+}
+/* =========================
+   CART CATEGORY LABEL FIX
+   Make Starter / Main Course look like text label, not button
+   ========================= */
+
+.cart-category-pill {
+    display: inline-block !important;
+
+    padding: 0 !important;
+    margin: 0 0 8px 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+
+    color: #FF0569 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+
+    text-transform: none !important;
+}
+
+/* Hover gibi buton davranışı varsa tamamen kapat */
+.cart-category-pill:hover {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Menü adıyla hizası daha doğal dursun */
+.cart-item-info h3 {
+    margin-top: 0 !important;
+}
+/* =========================
+   PAYMENT TABLE PRICE FIT FIX
+   Keep line totals on one line
+   ========================= */
+
+.payment-table .payment-price {
+    min-width: 105px !important;
+    max-width: 125px !important;
+
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.6px !important;
+
+    white-space: nowrap !important;
+    overflow: visible !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+
+    text-align: right !important;
+}
+
+/* Total Catering Price büyük kalabilir ama tek satırda düzgün küçülsün */
+.payment-total-box strong {
+    font-size: clamp(26px, 3vw, 38px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -1.2px !important;
+
+    white-space: nowrap !important;
+    overflow: visible !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* Payment table kolonları daha dengeli dursun */
+.payment-table th:last-child,
+.payment-table td:last-child {
+    width: 130px !important;
+    text-align: right !important;
+}
+
+/* Çok dar ekranda fiyat yine taşmasın */
+@media (max-width: 768px) {
+    .payment-table .payment-price {
+        font-size: 13px !important;
+        min-width: 90px !important;
+        max-width: 100px !important;
+        letter-spacing: -0.8px !important;
+    }
+
+    .payment-total-box strong {
+        font-size: 25px !important;
+        letter-spacing: -0.8px !important;
+    }
+}
+/* =========================
+   FLOATING CART BUTTON
+   Caterers page bottom-right
+   ========================= */
+
+.floating-cart-button {
+    position: fixed !important;
+    right: 28px !important;
+    bottom: 28px !important;
+    z-index: 9999 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 9px !important;
+
+    padding: 14px 22px !important;
+    border-radius: 999px !important;
+
+    background: rgba(255, 5, 105, 0.10) !important;
+    color: #FF0569 !important;
+
+    border: 1px solid rgba(255, 5, 105, 0.24) !important;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12) !important;
+
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+
+    backdrop-filter: blur(10px) !important;
+    transition: 0.22s ease !important;
+}
+
+.floating-cart-button:hover {
+    background: #FF0569 !important;
+    color: #ffffff !important;
+    border-color: #FF0569 !important;
+
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 20px 44px rgba(255, 5, 105, 0.22) !important;
+}
+
+.floating-cart-icon {
+    font-size: 20px !important;
+    line-height: 1 !important;
+}
+
+.floating-cart-text {
+    font-size: 14px !important;
+    line-height: 1 !important;
+}
+
+/* Mobilde daha kompakt olsun */
+@media (max-width: 768px) {
+    .floating-cart-button {
+        right: 18px !important;
+        bottom: 18px !important;
+        padding: 13px 16px !important;
+    }
+
+    .floating-cart-text {
+        display: none !important;
+    }
+
+    .floating-cart-icon {
+        font-size: 22px !important;
+    }
+}
+/* =========================
+   CART BUTTON INSIDE FILTER CARD
+   Not floating on whole screen
+   ========================= */
+
+.floating-cart-button {
+    display: none !important;
+}
+
+.catering-filter-card {
+    position: relative !important;
+    padding-bottom: 72px !important;
+}
+
+.filter-cart-button {
+    position: absolute !important;
+    right: 28px !important;
+    bottom: 22px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+
+    padding: 11px 22px !important;
+    border-radius: 999px !important;
+
+    background: rgba(255, 5, 105, 0.08) !important;
+    color: #FF0569 !important;
+
+    border: 1px solid rgba(255, 5, 105, 0.24) !important;
+    box-shadow: none !important;
+
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    text-decoration: none !important;
+
+    transition: 0.22s ease !important;
+}
+
+.filter-cart-button:hover {
+    background: #FF0569 !important;
+    color: #ffffff !important;
+    border-color: #FF0569 !important;
+
+    transform: translateY(-1px) !important;
+    box-shadow: 0 12px 26px rgba(255, 5, 105, 0.16) !important;
+}
+
+.filter-cart-button span {
+    font-size: 18px !important;
+    line-height: 1 !important;
+}
+
+@media (max-width: 768px) {
+    .catering-filter-card {
+        padding-bottom: 84px !important;
+    }
+
+    .filter-cart-button {
+        left: 22px !important;
+        right: 22px !important;
+        bottom: 22px !important;
+        width: auto !important;
+    }
+}
+/* =========================
+   FOOTER COPYRIGHT TEXT COLOR FIX
+   Only GOGOFOOD stays colored
+   ========================= */
+
+.footer-bottom {
+    color: #111827 !important;
+}
+
+.footer-bottom .brand-gogo {
+    color: #FF0569 !important;
+    font-weight: 900 !important;
+}
+
+.footer-bottom .brand-food {
+    color: #99FFE0 !important;
+    font-weight: 900 !important;
+}
+
+.footer-bottom-logo {
+    color: inherit !important;
+}
+/* ============================= */
+/* EMAIL VERIFICATION BUTTON GAP */
+/* ============================= */
+
+.verification-card .btn-pink,
+.verify-card .btn-pink,
+.email-verification-card .btn-pink {
+    margin-bottom: 14px;
+}
+
+.verification-card .btn-outline-pink,
+.verify-card .btn-outline-pink,
+.email-verification-card .btn-outline-pink {
+    margin-top: 6px;
+}
+
+
+/* ============================= */
+/* CART PEOPLE COUNT BOX FIX */
+/* ============================= */
+
+/* People Count ve Total kutularını aynı boyuta getirir */
+.cart-quantity-box,
+.cart-total-box,
+.people-count-box,
+.total-box {
+    width: 112px;
+    min-width: 112px;
+    height: 100px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* People count içindeki + - butonlarını tam daire yapar */
+.cart-quantity-actions a,
+.quantity-actions a,
+.people-count-actions a,
+.qty-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    max-width: 26px;
+    max-height: 26px;
+    border-radius: 50% !important;
+    padding: 0 !important;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+    font-size: 18px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* + - ve sayı aynı hizada dursun */
+.cart-quantity-control,
+.quantity-control,
+.people-count-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Quantity sayısını ortalar */
+.cart-quantity-control strong,
+.quantity-control strong,
+.people-count-control strong {
+    min-width: 34px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Total yazısı tek satırda düzgün dursun */
+.cart-total-box strong,
+.total-box strong {
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+/* =====================================================
+   FINAL FIX - TWO FACTOR BUTTON GAP + CART BOX ALIGNMENT
+   Add this to the VERY BOTTOM of site.css
+   ===================================================== */
+
+
+/* ============================= */
+/* 1) EMAIL VERIFICATION GAP FIX */
+/* ============================= */
+
+/* Verify formu ile Resend formu arasına net boşluk koyar */
+.two-factor-form {
+    margin-bottom: 16px !important;
+}
+
+/* Verify and Login butonunun altına boşluk verir */
+.two-factor-submit {
+    margin-bottom: 0 !important;
+}
+
+/* Resend formu ayrı olduğu için üst boşluğunu garanti eder */
+.two-factor-card form + form {
+    margin-top: 14px !important;
+}
+
+/* Resend butonu aynı genişlikte kalsın */
+.two-factor-resend {
+    width: 100% !important;
+}
+
+
+/* ============================= */
+/* 2) CART PEOPLE COUNT BUTTON FIX */
+/* ============================= */
+
+/* + ve - butonlarını tam daire yapar */
+.quantity-btn {
+    width: 26px !important;
+    height: 26px !important;
+
+    min-width: 26px !important;
+    min-height: 26px !important;
+
+    max-width: 26px !important;
+    max-height: 26px !important;
+
+    flex: 0 0 26px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border-radius: 50% !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    line-height: 1 !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+
+    box-sizing: border-box !important;
+    text-align: center !important;
+}
+
+/* + - ve sayı ortalı dursun */
+.quantity-controls {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 9px !important;
+}
+
+.quantity-controls span {
+    min-width: 38px !important;
+    text-align: center !important;
+    font-size: 21px !important;
+    font-weight: 900 !important;
+}
+
+
+/* ============================= */
+/* 3) CART PEOPLE COUNT + TOTAL SAME SIZE */
+/* ============================= */
+
+/* People Count ve Total kutularını birebir aynı boyuta getirir */
+.cart-quantity-box,
+.cart-total-box {
+    width: 138px !important;
+    min-width: 138px !important;
+    max-width: 138px !important;
+
+    height: 124px !important;
+    min-height: 124px !important;
+    max-height: 124px !important;
+
+    padding: 14px 12px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    box-sizing: border-box !important;
+    align-self: center !important;
+
+    border-radius: 24px !important;
+}
+
+/* Total kutusu static kalmalı, remove butonu dışarıda sağ altta durmaya devam eder */
+.cart-total-box {
+    position: static !important;
+    overflow: hidden !important;
+}
+
+/* Başlıklar aynı hizada ve aynı boyutta */
+.cart-quantity-box p,
+.cart-total-box p {
+    margin: 0 0 8px 0 !important;
+    font-size: 13px !important;
+    line-height: 1.15 !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+}
+
+/* People Count alt yazısı kutunun içinde taşmasın */
+.cart-quantity-box small {
+    margin-top: 8px !important;
+    max-width: 110px !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+}
+
+/* Total fiyatı kutuya sığsın */
+.cart-total-box h4 {
+    width: 100% !important;
+    margin: 0 !important;
+
+    color: #FF0569 !important;
+    font-size: 16px !important;
+    line-height: 1.1 !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.7px !important;
+
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+}
+
+/* Cart grid kolonları iki kutu için eşit kalsın */
+.cart-item-card {
+    grid-template-columns: 130px minmax(0, 1fr) 150px 150px !important;
+}
+
+
+/* ============================= */
+/* 4) MOBILE SAFETY */
+/* ============================= */
+
+@media (max-width: 900px) {
+    .cart-quantity-box,
+    .cart-total-box {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+
+        height: auto !important;
+        min-height: 110px !important;
+        max-height: none !important;
+    }
+
+    .cart-total-box h4 {
+        font-size: 22px !important;
+    }
+}
+/* ============================= */
+/* FORGOT / RESET PASSWORD DESIGN */
+/* ============================= */
+
+.forgot-password-desc {
+    color: #596070;
+    font-size: 15px;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.forgot-password-link {
+    text-align: right;
+    margin-top: -6px;
+    margin-bottom: 16px;
+}
+
+.forgot-password-link a {
+    color: #FF0569;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.forgot-password-link a:hover {
+    text-decoration: underline;
+}
+
+.reset-password-form {
+    margin-top: 18px;
+}
+
+.reset-resend-form {
+    margin-top: 14px;
+}
+
+.reset-resend-btn {
+    width: 100%;
+}
+
+/* Forgot password ve reset password sayfalarının kart içi uyumu */
+.auth-card-clean .two-factor-icon {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 16px;
+}
+
+/* Reset password içindeki email pill ortalı dursun */
+.auth-card-clean .two-factor-email {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 18px;
+}
+/* ============================= */
+/* LOGIN BOTTOM LINKS FIX */
+/* ============================= */
+
+.login-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+.login-bottom-row .auth-link-text-clean {
+    margin: 0 !important;
+}
+
+.forgot-password-soft-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 18px;
+    border-radius: 999px;
+
+    background: #fff0f6;
+    border: 1px solid #ffc1d8;
+
+    color: #FF0569;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+
+    transition: all 0.25s ease;
+}
+
+.forgot-password-soft-btn:hover {
+    background: #FF0569;
+    border-color: #FF0569;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(255, 5, 105, 0.22);
+}
+
+/* Eski forgot password link style'ı karışmasın */
+.forgot-password-link {
+    display: none !important;
+}
+
+@media (max-width: 600px) {
+    .login-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .forgot-password-soft-btn {
+        width: 100%;
+    }
+}
+/* ================================================= */
+/* FINAL AUTH CENTER ALIGNMENT FIX */
+/* Forgot Password + Reset Password pages */
+/* Add this to the VERY BOTTOM of site.css */
+/* ================================================= */
+
+.auth-card-clean {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* Emoji / icon tam ortada */
+.auth-card-clean .two-factor-icon {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Başlıklar tam ortada */
+.auth-card-clean h1 {
+    width: 100% !important;
+    text-align: center !important;
+}
+
+/* Açıklama yazıları tam ortada */
+.forgot-password-desc {
+    width: 100% !important;
+    max-width: 380px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+}
+
+/* Form genel olarak ortada */
+.auth-form-clean {
+    width: 100% !important;
+    max-width: 360px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* Form alanları input genişliği kadar olsun */
+.auth-field-clean {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+/* Label inputun sol hizasından başlasın */
+.auth-field-clean label {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+}
+
+/* Inputlar aynı genişlikte ve ortada */
+.auth-field-clean input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Ana pembe buton ortada */
+.auth-submit-clean,
+.reset-main-btn {
+    align-self: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 18px !important;
+    min-width: 170px !important;
+    width: auto !important;
+}
+
+/* Forgot Password sayfasındaki Send Reset Code ortada */
+.auth-form-clean > .btn-pink {
+    align-self: center !important;
+}
+
+/* Back to Login / Register yazısı ortada */
+.auth-link-text-clean {
+    width: 100% !important;
+    text-align: center !important;
+    margin-top: 18px !important;
+}
+
+/* Reset password email pill ortada */
+.two-factor-email {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+}
+
+/* Reset password resend butonu ortada ve ayrı dursun */
+.reset-resend-form {
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 18px auto 0 auto !important;
+
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.reset-resend-btn {
+    width: 100% !important;
+    height: 46px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 999px !important;
+    text-align: center !important;
+}
+
+/* Back to login reset sayfasında ayrı satırda ortada */
+.reset-back-wrapper {
+    width: 100% !important;
+    text-align: center !important;
+    margin-top: 18px !important;
+}
+
+.reset-back-link {
+    color: #FF0569 !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+
+.reset-back-link:hover {
+    text-decoration: underline !important;
+}
+/* ================================================= */
+/* LOGIN PAGE RESTORE FIX */
+/* Add this to the VERY BOTTOM of site.css */
+/* ================================================= */
+
+.login-card-clean {
+    align-items: flex-start !important;
+    text-align: left !important;
+}
+
+.login-card-clean h1 {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.login-form-clean {
+    width: 100% !important;
+    max-width: none !important;
+    align-items: stretch !important;
+}
+
+.login-form-clean .auth-field-clean {
+    width: 100% !important;
+    text-align: left !important;
+}
+
+.login-form-clean .auth-field-clean label {
+    text-align: left !important;
+}
+
+.login-form-clean .auth-field-clean input {
+    width: 100% !important;
+}
+
+.login-main-btn {
+    align-self: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 18px !important;
+    width: auto !important;
+    min-width: 120px !important;
+}
+
+.login-register-text {
+    width: 100% !important;
+    text-align: left !important;
+    margin-top: 16px !important;
+    margin-bottom: 0 !important;
+}
+
+.login-forgot-wrapper {
+    width: 100% !important;
+    margin-top: 14px !important;
+    text-align: left !important;
+}
+
+.forgot-password-soft-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 10px 18px !important;
+    border-radius: 999px !important;
+
+    background: #fff0f6 !important;
+    border: 1px solid #ffc1d8 !important;
+
+    color: #FF0569 !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+
+    transition: all 0.25s ease !important;
+}
+
+.forgot-password-soft-btn:hover {
+    background: #FF0569 !important;
+    border-color: #FF0569 !important;
+    color: white !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 18px rgba(255, 5, 105, 0.22) !important;
+}
+/* ============================= */
+/* LOGIN BUTTON LEFT ALIGN FIX */
+/* ============================= */
+
+.login-form-clean .login-main-btn,
+.login-card-clean .auth-submit-clean {
+    align-self: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    margin-top: 18px !important;
+    width: auto !important;
+    min-width: 120px !important;
+}
+
+/* Login form içindeki tüm alt elemanlar aynı sol hizada dursun */
+.login-form-clean {
+    align-items: flex-start !important;
+}
+
+/* Inputlar yine tam genişlikte kalsın */
+.login-form-clean .auth-field-clean {
+    width: 100% !important;
+}
+
+.login-form-clean .auth-field-clean input {
+    width: 100% !important;
+}

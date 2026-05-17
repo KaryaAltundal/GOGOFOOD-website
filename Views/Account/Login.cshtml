@@ -1,27 +1,60 @@
-<h2>Login</h2>
-
-<form asp-action="Login" method="post">
-    @Html.AntiForgeryToken()
-
-    <div>
-        <label>Email</label>
-        <input type="email" name="email" />
-    </div>
-
-    <div>
-        <label>Password</label>
-        <input type="password" name="password" />
-    </div>
-
-    <button type="submit">Login</button>
-</form>
-
-@if (ViewBag.Error != null)
-{
-    <p style="color:red;">@ViewBag.Error</p>
+@{
+    ViewData["Title"] = "Login";
 }
 
-<p>
-    Do not have an account?
-    <a asp-controller="Account" asp-action="Register">Register</a>
-</p>
+<div class="auth-page-clean">
+    <div class="auth-card-clean login-card-clean">
+        <h1>Login</h1>
+
+        @if (TempData["LoginMessage"] != null)
+        {
+            <div class="alert-modern alert-success-modern">
+                @TempData["LoginMessage"]
+            </div>
+        }
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert-modern alert-danger-modern">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form asp-controller="Account" asp-action="Login" method="post" class="auth-form-clean login-form-clean">
+            <div class="auth-field-clean">
+                <label>Email</label>
+                <input type="email"
+                       name="email"
+                       placeholder="Enter your email"
+                       autocomplete="off"
+                       required />
+            </div>
+
+            <div class="auth-field-clean">
+                <label>Password</label>
+                <input type="password"
+                       name="password"
+                       placeholder="Enter your password"
+                       autocomplete="off"
+                       required />
+            </div>
+
+            <button type="submit" class="btn-pink auth-submit-clean login-main-btn">
+                Login
+            </button>
+
+            <p class="auth-link-text-clean login-register-text">
+                Do not have an account?
+                <a asp-controller="Account" asp-action="Register">Register</a>
+            </p>
+
+            <div class="login-forgot-wrapper">
+                <a asp-controller="Account"
+                   asp-action="ForgotPassword"
+                   class="forgot-password-soft-btn">
+                    Forgot password?
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

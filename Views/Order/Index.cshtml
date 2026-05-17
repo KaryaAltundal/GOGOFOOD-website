@@ -1,13 +1,41 @@
 @model List<GOGOFOOD.Models.Order>
 
+@using System.Globalization
+
 @{
     ViewData["Title"] = "Orders";
+
     var role = Context.Session.GetString("UserRole");
+    var isAdmin = role == "Admin";
+
+    var searchText = ViewBag.SearchText as string ?? "";
+    var statusFilter = ViewBag.StatusFilter as string ?? "";
+    var startDate = ViewBag.StartDate as string ?? "";
+    var endDate = ViewBag.EndDate as string ?? "";
+
+    string minTotalValue = ViewBag.MinTotal != null
+        ? Convert.ToDecimal(ViewBag.MinTotal).ToString("0.##", CultureInfo.InvariantCulture)
+        : "";
+
+    string maxTotalValue = ViewBag.MaxTotal != null
+        ? Convert.ToDecimal(ViewBag.MaxTotal).ToString("0.##", CultureInfo.InvariantCulture)
+        : "";
+
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
 }
 
-<div class="page-title">
-    <h1>Orders 📦</h1>
-    <p>Review completed orders and leave ratings for meals or restaurants.</p>
+<div class="page-title @(isAdmin ? "admin-page-title" : "")">
+    @if (isAdmin)
+    {
+        <h1>Admin Orders Panel 📦</h1>
+        <p>Monitor completed orders, customers, caterers, locations and order totals.</p>
+    }
+    else
+    {
+        <h1>Orders 📦</h1>
+        <p>Review completed catering orders and leave ratings for meals or caterers.</p>
+    }
 </div>
 
 @if (TempData["RatingMessage"] != null)
@@ -17,19 +45,145 @@
     </div>
 }
 
-<div class="filter-card">
-    <form asp-controller="Order" asp-action="Index" method="get" class="filter-form">
-        <div class="filter-input-group">
-            <label>Search orders</label>
-            <input type="text"
-                   name="searchText"
-                   value="@ViewBag.SearchText"
-                   placeholder="Search customer, meal or status" />
+@if (isAdmin)
+{
+    <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+            <span>Total Orders</span>
+            <strong>@ViewBag.AdminTotalOrders</strong>
         </div>
 
-        <button type="submit" class="btn-pink">
-            Filter Orders
-        </button>
+        <div class="admin-stat-card">
+            <span>Total Revenue</span>
+            <strong>₺@String.Format("{0:0.00}", ViewBag.AdminTotalRevenue)</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>Total Items Sold</span>
+            <strong>@ViewBag.AdminTotalItems</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>Average Order</span>
+            <strong>₺@String.Format("{0:0.00}", ViewBag.AdminAverageOrderValue)</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>Completed Orders</span>
+            <strong>@ViewBag.AdminCompletedOrders</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>Today's Orders</span>
+            <strong>@ViewBag.AdminTodayOrders</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>Unique Customers</span>
+            <strong>@ViewBag.AdminUniqueCustomers</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>Active Caterers</span>
+            <strong>@ViewBag.AdminUniqueRestaurants</strong>
+        </div>
+    </div>
+}
+
+<div class="admin-order-filter-card">
+    <form asp-controller="Order" asp-action="Index" method="get" class="admin-order-filter-form">
+        <div class="admin-filter-field admin-filter-search">
+            <label>Search</label>
+            <input type="text"
+                   name="searchText"
+                   value="@searchText"
+                   placeholder="Customer, menu, caterer or status" />
+        </div>
+
+        <div class="admin-filter-field">
+            <label>Status</label>
+            <select name="statusFilter">
+                @if (string.IsNullOrWhiteSpace(statusFilter))
+                {
+                    <option value="" selected>All</option>
+                }
+                else
+                {
+                    <option value="">All</option>
+                }
+
+                @if (statusFilter == "Completed")
+                {
+                    <option value="Completed" selected>Completed</option>
+                }
+                else
+                {
+                    <option value="Completed">Completed</option>
+                }
+
+                @if (statusFilter == "Pending")
+                {
+                    <option value="Pending" selected>Pending</option>
+                }
+                else
+                {
+                    <option value="Pending">Pending</option>
+                }
+
+                @if (statusFilter == "Cancelled")
+                {
+                    <option value="Cancelled" selected>Cancelled</option>
+                }
+                else
+                {
+                    <option value="Cancelled">Cancelled</option>
+                }
+            </select>
+        </div>
+
+        <div class="admin-filter-field">
+            <label>Min Total</label>
+            <input type="number"
+                   step="0.01"
+                   name="minTotal"
+                   value="@minTotalValue"
+                   placeholder="0" />
+        </div>
+
+        <div class="admin-filter-field">
+            <label>Max Total</label>
+            <input type="number"
+                   step="0.01"
+                   name="maxTotal"
+                   value="@maxTotalValue"
+                   placeholder="1000" />
+        </div>
+
+        <div class="admin-filter-field">
+            <label>Start Date</label>
+            <input type="date"
+                   name="startDate"
+                   value="@startDate" />
+        </div>
+
+        <div class="admin-filter-field">
+            <label>End Date</label>
+            <input type="date"
+                   name="endDate"
+                   value="@endDate" />
+        </div>
+
+        <div class="admin-filter-actions">
+            <button type="submit">
+                Search
+            </button>
+
+            <a asp-controller="Order"
+               asp-action="Index"
+               class="admin-clear-filter-btn">
+                Clear
+            </a>
+        </div>
     </form>
 </div>
 
@@ -37,7 +191,238 @@
 {
     <div class="empty-state">
         <h3>No orders found</h3>
-        <p>Your completed orders will appear here.</p>
+
+        @if (isAdmin)
+        {
+            <p>No order records match your current filter.</p>
+        }
+        else
+        {
+            <p>Your completed catering orders will appear here.</p>
+        }
+    </div>
+}
+else if (isAdmin)
+{
+    <div class="admin-orders-shell">
+        <div class="admin-orders-list">
+            @foreach (var order in Model)
+            {
+                var totalItems = order.OrderItems != null
+                    ? order.OrderItems.Sum(x => x.Quantity)
+                    : 0;
+
+                var restaurants = order.OrderItems != null
+                    ? order.OrderItems
+                        .Where(x => x.MenuItem?.Caretaker != null)
+                        .Select(x => x.MenuItem!.Caretaker!)
+                        .GroupBy(x => x.CaretakerId)
+                        .Select(x => x.First())
+                        .ToList()
+                    : new List<GOGOFOOD.Models.Caretaker>();
+
+                <div class="admin-order-card">
+                    <div class="admin-order-top">
+                        <div>
+                            <h2>Order #@order.OrderId</h2>
+                            <p>@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</p>
+                        </div>
+
+                        <div class="admin-order-status">
+                            @order.Status
+                        </div>
+                    </div>
+
+                    <div class="admin-order-meta-grid">
+                        <div class="admin-meta-box">
+                            <span>Total</span>
+                            <strong>₺@String.Format("{0:0.00}", order.TotalPrice)</strong>
+                            <small>@totalItems people / item count recorded</small>
+                        </div>
+
+                        <div class="admin-meta-box">
+                            <span>Customer</span>
+
+                            @if (order.User != null)
+                            {
+                                <strong>@order.User.Name</strong>
+                                <small>@order.User.Email</small>
+                            }
+                            else
+                            {
+                                <strong>Unknown Customer</strong>
+                                <small>User record is not available.</small>
+                            }
+                        </div>
+
+                        <div class="admin-meta-box">
+                            <span>Customer Location</span>
+
+                            @if (order.User != null)
+                            {
+                                <strong>@order.User.City / @order.User.District</strong>
+
+                                <small class="admin-location-text">
+                                    @order.User.AddressDetail
+                                    @if (!string.IsNullOrWhiteSpace(order.User.Street))
+                                    {
+                                        <text>, @order.User.Street</text>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(order.User.Neighborhood))
+                                    {
+                                        <text>, @order.User.Neighborhood</text>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(order.User.District))
+                                    {
+                                        <text>, @order.User.District</text>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(order.User.City))
+                                    {
+                                        <text>, @order.User.City</text>
+                                    }
+                                </small>
+
+                                @if (order.User.Latitude != null && order.User.Longitude != null)
+                                {
+                                    <small class="admin-coordinate">
+                                        Lat: @order.User.Latitude | Lng: @order.User.Longitude
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="admin-coordinate">
+                                        Coordinates not entered.
+                                    </small>
+                                }
+                            }
+                            else
+                            {
+                                <strong>Unknown</strong>
+                                <small>Location is not available.</small>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="admin-items-table-wrapper">
+                        <table class="admin-items-table">
+                            <thead>
+                                <tr>
+                                    <th>Menu Option</th>
+                                    <th>Caterer</th>
+                                    <th>Caterer Location</th>
+                                    <th>Customization</th>
+                                    <th>People</th>
+                                    <th>Price / Person</th>
+                                    <th>Custom / Person</th>
+                                    <th>Line Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (order.OrderItems != null)
+                                {
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        var caretaker = item.MenuItem?.Caretaker;
+                                        var lineTotal = (item.UnitPrice + item.CustomizationPrice) * item.Quantity;
+
+                                        <tr>
+                                            <td>
+                                                <strong>@item.MenuItem?.Name</strong>
+                                                <div class="admin-location-text">
+                                                    @item.MenuItem?.Description
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                @if (caretaker != null)
+                                                {
+                                                    <strong>@caretaker.RestaurantName</strong>
+                                                    <div class="admin-location-text">
+                                                        @caretaker.Name
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span>Not assigned</span>
+                                                }
+                                            </td>
+
+                                            <td>
+                                                @if (caretaker != null)
+                                                {
+                                                    <div class="admin-location-text">
+                                                        @caretaker.AddressDetail
+                                                        @if (!string.IsNullOrWhiteSpace(caretaker.Street))
+                                                        {
+                                                            <text>, @caretaker.Street</text>
+                                                        }
+                                                        @if (!string.IsNullOrWhiteSpace(caretaker.Neighborhood))
+                                                        {
+                                                            <text>, @caretaker.Neighborhood</text>
+                                                        }
+                                                        @if (!string.IsNullOrWhiteSpace(caretaker.District))
+                                                        {
+                                                            <text>, @caretaker.District</text>
+                                                        }
+                                                        @if (!string.IsNullOrWhiteSpace(caretaker.City))
+                                                        {
+                                                            <text>, @caretaker.City</text>
+                                                        }
+                                                    </div>
+
+                                                    @if (caretaker.Latitude != null && caretaker.Longitude != null)
+                                                    {
+                                                        <span class="admin-coordinate">
+                                                            Lat: @caretaker.Latitude | Lng: @caretaker.Longitude
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="admin-coordinate">
+                                                            Coordinates not entered.
+                                                        </span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span>Caterer location is not available.</span>
+                                                }
+                                            </td>
+
+                                            <td>@item.CustomizationName</td>
+                                            <td>@item.Quantity</td>
+                                            <td>₺@String.Format("{0:0.00}", item.UnitPrice)</td>
+                                            <td>₺@String.Format("{0:0.00}", item.CustomizationPrice)</td>
+                                            <td class="admin-money">
+                                                ₺@String.Format("{0:0.00}", lineTotal)
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (restaurants.Count > 0)
+                    {
+                        <div class="admin-order-meta-grid">
+                            <div class="admin-meta-box">
+                                <span>Caterer Count</span>
+                                <strong>@restaurants.Count</strong>
+                                <small>Unique caterer(s) included in this order.</small>
+                            </div>
+
+                            <div class="admin-meta-box">
+                                <span>Caterers</span>
+                                <strong>@string.Join(", ", restaurants.Select(x => x.RestaurantName))</strong>
+                                <small>Useful for checking multi-caterer order records.</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
     </div>
 }
 else
@@ -60,7 +445,7 @@ else
                 <div class="order-info-row">
                     <div class="order-info-box">
                         <span>Total</span>
-                        <strong>₺@order.TotalPrice</strong>
+                        <strong>₺@String.Format("{0:0.00}", order.TotalPrice)</strong>
                     </div>
 
                     @if (order.User != null)
@@ -73,7 +458,7 @@ else
                     }
 
                     <div class="order-info-box">
-                        <span>Items</span>
+                        <span>People / Items</span>
                         <strong>@(order.OrderItems != null ? order.OrderItems.Sum(x => x.Quantity) : 0)</strong>
                     </div>
                 </div>
@@ -91,7 +476,9 @@ else
                                     }
                                     else
                                     {
-                                        <div class="order-image-placeholder">🍽️</div>
+                                        <div class="order-image-placeholder">
+                                            🍽️
+                                        </div>
                                     }
                                 </div>
 
@@ -100,11 +487,15 @@ else
 
                                     @if (item.MenuItem?.Caretaker != null)
                                     {
-                                        <p class="order-restaurant-name">🏪 @item.MenuItem.Caretaker.RestaurantName</p>
+                                        <p class="order-restaurant-name">
+                                            🏪 @item.MenuItem.Caretaker.RestaurantName
+                                        </p>
                                     }
                                     else
                                     {
-                                        <p class="order-restaurant-name">No restaurant assigned</p>
+                                        <p class="order-restaurant-name">
+                                            No caterer assigned
+                                        </p>
                                     }
 
                                     <p class="order-customization">
@@ -114,18 +505,18 @@ else
 
                                 <div class="order-item-prices">
                                     <div>
-                                        <span>Quantity</span>
+                                        <span>People Count</span>
                                         <strong>@item.Quantity</strong>
                                     </div>
 
                                     <div>
-                                        <span>Unit Price</span>
-                                        <strong>₺@item.UnitPrice</strong>
+                                        <span>Price / Person</span>
+                                        <strong>₺@String.Format("{0:0.00}", item.UnitPrice)</strong>
                                     </div>
 
                                     <div>
-                                        <span>Custom Price</span>
-                                        <strong>₺@item.CustomizationPrice</strong>
+                                        <span>Custom / Person</span>
+                                        <strong>₺@String.Format("{0:0.00}", item.CustomizationPrice)</strong>
                                     </div>
                                 </div>
 
@@ -137,7 +528,7 @@ else
                                            asp-route-orderId="@order.OrderId"
                                            asp-route-menuItemId="@item.MenuItemId"
                                            class="btn-outline-pink">
-                                            Rate Meal
+                                            Rate Menu
                                         </a>
 
                                         @if (item.MenuItem?.CaretakerId != null)
@@ -147,13 +538,15 @@ else
                                                asp-route-orderId="@order.OrderId"
                                                asp-route-caretakerId="@item.MenuItem.CaretakerId"
                                                class="btn-soft-rating">
-                                                Rate Restaurant
+                                                Rate Caterer
                                             </a>
                                         }
                                     }
                                     else
                                     {
-                                        <span class="order-no-action">No action</span>
+                                        <span class="order-no-action">
+                                            No action
+                                        </span>
                                     }
                                 </div>
                             </div>
@@ -165,18 +558,16 @@ else
     </div>
 }
 
-@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+@await Html.PartialAsync("_SmartPagination", new GOGOFOOD.Models.ViewModels.PaginationViewModel
 {
-    <div class="pagination-modern">
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            <a asp-controller="Order"
-               asp-action="Index"
-               asp-route-page="@i"
-               asp-route-searchText="@ViewBag.SearchText"
-               class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
-                @i
-            </a>
-        }
-    </div>
-}
+    CurrentPage = currentPage,
+    TotalPages = totalPages,
+    ControllerName = "Order",
+    ActionName = "Index",
+    SearchText = searchText,
+    StatusFilter = statusFilter,
+    MinTotal = ViewBag.MinTotal,
+    MaxTotal = ViewBag.MaxTotal,
+    StartDate = startDate,
+    EndDate = endDate
+})

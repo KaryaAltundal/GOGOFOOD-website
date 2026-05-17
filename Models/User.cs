@@ -29,6 +29,8 @@ namespace GOGOFOOD.Models
 
         public double? Longitude { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         public Caretaker? Caretaker { get; set; }
 
         public List<Order>? Orders { get; set; }

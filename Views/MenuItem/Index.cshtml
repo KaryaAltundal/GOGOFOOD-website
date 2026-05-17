@@ -1,14 +1,58 @@
 @model List<GOGOFOOD.Models.MenuItem>
 
+@using GOGOFOOD.Models
+@using System.Text.Json
+@using System.Globalization
+
 @{
-    ViewData["Title"] = "Menu";
+    ViewData["Title"] = "Caterers";
+
     var role = Context.Session.GetString("UserRole");
-    var distances = ViewBag.Distances as Dictionary<int, double>;
+    var distances = ViewBag.Distances as Dictionary<int, double> ?? new Dictionary<int, double>();
+    var catererDistances = ViewBag.CatererDistances as Dictionary<int, double> ?? new Dictionary<int, double>();
+
+    var mapsApiKey = ViewBag.GoogleMapsApiKey as string ?? "";
+    var nearbyRestaurants = ViewBag.NearbyRestaurants ?? new List<object>();
+    var nearbyRestaurantsJson = JsonSerializer.Serialize(nearbyRestaurants);
+
+    var categories = ViewBag.Categories as string[] ?? new[] { "Starter", "Main Course", "Dessert", "Drink" };
+    var categoryFilter = ViewBag.CategoryFilter as string ?? "";
+    var selectedCatererId = ViewBag.SelectedCatererId as int?;
+    var selectedCaterer = ViewBag.SelectedCaterer as Caretaker;
+
+    var caterersForCards = ViewBag.CaterersForCards as List<Caretaker> ?? new List<Caretaker>();
+    var catererMenuCounts = ViewBag.CatererMenuCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+
+    var selectedCategoryFromCart = TempData["SelectedCategory"] as string ?? "";
+    var selectedMenuNameFromCart = TempData["SelectedMenuName"] as string ?? "";
+
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+
+    var userLat = ViewBag.UserLatitude != null
+        ? ((double)ViewBag.UserLatitude).ToString(CultureInfo.InvariantCulture)
+        : "39.9208";
+
+    var userLng = ViewBag.UserLongitude != null
+        ? ((double)ViewBag.UserLongitude).ToString(CultureInfo.InvariantCulture)
+        : "32.8541";
 }
 
 <div class="page-title">
-    <h1>Our Menu 🍽️</h1>
-    <p>Discover delicious meals from nearby restaurants.</p>
+    @if (role == "Caretaker")
+    {
+        <h1>My Catering Menus 🍽️</h1>
+        <p>Manage your own catering menu options by category: starters, main courses, desserts and drinks.</p>
+    }
+    else if (selectedCaterer != null)
+    {
+        <h1>@selectedCaterer.RestaurantName 🍽️</h1>
+        <p>Choose each category step by step. Open a category, select an option, then continue with the next one.</p>
+    }
+    else
+    {
+        <h1>Choose a Caterer 🏪</h1>
+        <p>First select a caterer, then build your catering menu with starters, main courses, desserts and drinks.</p>
+    }
 </div>
 
 @if (TempData["MenuMessage"] != null)
@@ -25,15 +69,49 @@
     </div>
 }
 
-<div class="filter-card">
+<div class="filter-card catering-filter-card">
     <form asp-controller="MenuItem" asp-action="Index" method="get" class="filter-form">
+        @if (selectedCatererId != null)
+        {
+            <input type="hidden" name="selectedCatererId" value="@selectedCatererId" />
+        }
+
         <div class="filter-input-group">
             <label>Search</label>
             <input type="text"
                    name="searchText"
                    value="@ViewBag.SearchText"
-                   placeholder="Search meal or restaurant" />
+                   placeholder="Search caterer, menu or category" />
         </div>
+
+        @if (selectedCatererId != null || role == "Caretaker" || role == "Admin")
+        {
+            <div class="filter-input-group">
+                <label>Category</label>
+                <select name="categoryFilter">
+                    @if (string.IsNullOrWhiteSpace(categoryFilter))
+                    {
+                        <option value="" selected>All Categories</option>
+                    }
+                    else
+                    {
+                        <option value="">All Categories</option>
+                    }
+
+                    @foreach (var category in categories)
+                    {
+                        if (categoryFilter == category)
+                        {
+                            <option value="@category" selected>@category</option>
+                        }
+                        else
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    }
+                </select>
+            </div>
+        }
 
         @if (role == "User")
         {
@@ -48,7 +126,7 @@
         }
 
         <button type="submit" class="btn-pink">
-            Filter Menu
+            Filter
         </button>
 
         @if (role == "User")
@@ -57,108 +135,422 @@
                 📍 Update My Address
             </a>
         }
+
+        @if (selectedCatererId != null && role == "User")
+        {
+            <a asp-controller="MenuItem"
+               asp-action="Index"
+               asp-route-searchText="@ViewBag.SearchText"
+               asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
+               class="btn-outline-pink">
+                ← Back to Caterers
+            </a>
+        }
     </form>
+
+    @if (role == "User")
+    {
+        <a asp-controller="Cart"
+           asp-action="Index"
+           class="filter-cart-button"
+           title="Go to Cart">
+            <span>🛒</span>
+            Cart
+        </a>
+    }
 </div>
 
-@if (Model.Count == 0)
+@if (role == "User" && selectedCatererId == null)
 {
-    <div class="empty-state">
-        <h3>No menu items found</h3>
-        <p>Try changing your search or distance filter.</p>
+    <div class="nearby-map-card">
+        <div class="nearby-map-info">
+            <div>
+                <span class="nearby-map-badge">Nearby Caterers</span>
+                <h2>Caterers Around You 📍</h2>
+                <p>Caterers matching your search and distance filter are shown on the map.</p>
+            </div>
+
+            <a asp-controller="User" asp-action="Location" class="btn-outline-pink">
+                Update Location
+            </a>
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(mapsApiKey))
+        {
+            <div class="alert-modern alert-danger-modern">
+                Google Maps API key is missing. Add it to appsettings.json under GoogleMaps:ApiKey.
+            </div>
+        }
+        else
+        {
+            <div id="nearbyRestaurantsMap" class="nearby-restaurants-map"></div>
+        }
     </div>
 }
-else
+
+@if (role == "User" && selectedCatererId == null)
 {
-    <div class="menu-grid">
-        @foreach (var item in Model)
-        {
-            <div class="menu-card-modern">
-                <div class="menu-image-wrapper">
-                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                    {
-                        <img src="@item.ImageUrl" alt="@item.Name" class="menu-image" />
-                    }
-                    else
-                    {
-                        <div class="menu-image-placeholder">
-                            🍽️
+    if (caterersForCards.Count == 0)
+    {
+        <div class="empty-state">
+            <h3>No caterer found</h3>
+            <p>Try changing your search or distance filter.</p>
+        </div>
+    }
+    else
+    {
+        <div class="user-caterer-grid">
+            @foreach (var caterer in caterersForCards)
+            {
+                var ratingText = "No ratings yet";
+                var ratingCount = 0;
+
+                if (caterer.CaretakerRatings != null && caterer.CaretakerRatings.Count > 0)
+                {
+                    ratingCount = caterer.CaretakerRatings.Count;
+                    ratingText = caterer.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") + " / 5";
+                }
+
+                var menuCount = catererMenuCounts.ContainsKey(caterer.CaretakerId)
+                    ? catererMenuCounts[caterer.CaretakerId]
+                    : 0;
+
+                <a asp-controller="MenuItem"
+                   asp-action="Index"
+                   asp-route-selectedCatererId="@caterer.CaretakerId"
+                   asp-route-searchText="@ViewBag.SearchText"
+                   asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
+                   class="user-caterer-card">
+
+                    <div class="user-caterer-main">
+                        <div class="user-caterer-icon">
+                            🏪
                         </div>
-                    }
 
-                    @if (distances != null && distances.ContainsKey(item.MenuItemId))
-                    {
-                        <span class="distance-badge">
-                            📍 @distances[item.MenuItemId].ToString("0.0") km
-                        </span>
-                    }
-                </div>
-
-                <div class="menu-card-body">
-                    <div class="menu-card-top">
                         <div>
-                            <h3>@item.Name</h3>
-                            <p class="menu-description">@item.Description</p>
-                        </div>
-
-                        <div class="price-pill">
-                            ₺@item.Price
+                            <span class="nearby-map-badge">Caterer</span>
+                            <h2>@caterer.RestaurantName</h2>
+                            <p>@caterer.Address</p>
                         </div>
                     </div>
 
-                    <div class="restaurant-box">
-                        @if (item.Caretaker != null)
-                        {
-                            <p class="restaurant-name">🏪 @item.Caretaker.RestaurantName</p>
+                    <div class="user-caterer-info-grid">
+                        <div>
+                            <span>Rating</span>
+                            <strong>⭐ @ratingText</strong>
+                            <small>@ratingCount review(s)</small>
+                        </div>
 
-                            @if (!string.IsNullOrEmpty(item.Caretaker.Address))
+                        <div>
+                            <span>Menu Options</span>
+                            <strong>@menuCount</strong>
+                            <small>Starter, main, dessert, drink</small>
+                        </div>
+
+                        <div>
+                            <span>Distance</span>
+
+                            @if (catererDistances.ContainsKey(caterer.CaretakerId))
                             {
-                                <p class="restaurant-address">@item.Caretaker.Address</p>
+                                <strong>@catererDistances[caterer.CaretakerId].ToString("0.0") km</strong>
+                                <small>from your location</small>
                             }
+                            else
+                            {
+                                <strong>Not available</strong>
+                                <small>location missing</small>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="user-caterer-footer">
+                        <span>Click to build your catering menu</span>
+                        <strong>View Menu →</strong>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+}
+else if (role == "User" && selectedCatererId != null)
+{
+    if (selectedCaterer != null)
+    {
+        var selectedRatingText = "No ratings yet";
+        var selectedRatingCount = 0;
+
+        if (selectedCaterer.CaretakerRatings != null && selectedCaterer.CaretakerRatings.Count > 0)
+        {
+            selectedRatingCount = selectedCaterer.CaretakerRatings.Count;
+            selectedRatingText = selectedCaterer.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") + " / 5";
+        }
+
+        <div class="selected-caterer-hero">
+            <div>
+                <span class="nearby-map-badge">Selected Caterer</span>
+                <h2>@selectedCaterer.RestaurantName</h2>
+                <p>@selectedCaterer.Address</p>
+            </div>
+
+            <div class="selected-caterer-stats">
+                <div>
+                    <span>Rating</span>
+                    <strong>⭐ @selectedRatingText</strong>
+                    <small>@selectedRatingCount review(s)</small>
+                </div>
+
+                <div>
+                    <span>Build Menu</span>
+                    <strong>4 Categories</strong>
+                    <small>Starter • Main • Dessert • Drink</small>
+                </div>
+            </div>
+        </div>
+    }
+
+    if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <h3>No menu option found</h3>
+            <p>This caterer does not have a matching option for your current category/search.</p>
+        </div>
+    }
+    else
+    {
+        <div class="catering-accordion-list">
+            @foreach (var category in categories)
+            {
+                var categoryItems = Model
+                    .Where(x => x.Category == category)
+                    .OrderBy(x => x.Name)
+                    .ToList();
+
+                var categoryId = category.Replace(" ", "").Replace("/", "").ToLower();
+                var isSelected = selectedCategoryFromCart == category;
+                var selectedClass = isSelected ? "selected" : "";
+
+                <div class="catering-accordion-item @selectedClass" data-category="@categoryId">
+                    <button type="button" class="catering-accordion-header">
+                        <div class="catering-accordion-left">
+                            <span class="catering-accordion-icon">
+                                @if (category == "Starter")
+                                {
+                                    <text>🥗</text>
+                                }
+                                else if (category == "Main Course")
+                                {
+                                    <text>🍱</text>
+                                }
+                                else if (category == "Dessert")
+                                {
+                                    <text>🍡</text>
+                                }
+                                else
+                                {
+                                    <text>🍵</text>
+                                }
+                            </span>
+
+                            <div>
+                                <h3>@category</h3>
+
+                                @if (category == "Starter")
+                                {
+                                    <p>Choose or change the starter option.</p>
+                                }
+                                else if (category == "Main Course")
+                                {
+                                    <p>Choose or change the main course option.</p>
+                                }
+                                else if (category == "Dessert")
+                                {
+                                    <p>Choose or change the dessert option.</p>
+                                }
+                                else
+                                {
+                                    <p>Choose or change the drink option.</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="catering-accordion-right">
+                            @if (isSelected)
+                            {
+                                <span class="category-selected-badge">
+                                    Selected
+                                </span>
+                            }
+
+                            <span class="category-count-badge">
+                                @categoryItems.Count option(s)
+                            </span>
+
+                            <span class="accordion-arrow">
+                                ↓
+                            </span>
+                        </div>
+                    </button>
+
+                    <div class="catering-accordion-body">
+                        @if (isSelected && !string.IsNullOrWhiteSpace(selectedMenuNameFromCart))
+                        {
+                            <div class="selected-category-note">
+                                @category selected: <strong>@selectedMenuNameFromCart</strong>
+                            </div>
+                        }
+
+                        @if (categoryItems.Count == 0)
+                        {
+                            <div class="catering-empty-category">
+                                No @category.ToLower() option added yet.
+                            </div>
                         }
                         else
                         {
-                            <p class="restaurant-name">🏪 No caretaker assigned</p>
+                            <div class="catering-accordion-options">
+                                @foreach (var item in categoryItems)
+                                {
+                                    <div class="catering-option-card user-builder-option">
+                                        <div class="catering-option-image">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.Name" />
+                                            }
+                                            else
+                                            {
+                                                <span>🍽️</span>
+                                            }
+                                        </div>
+
+                                        <div class="catering-option-content">
+                                            <div class="catering-option-top">
+                                                <div>
+                                                    <h4>@item.Name</h4>
+                                                    <p>@item.Description</p>
+                                                </div>
+
+                                                <strong>₺@item.Price / person</strong>
+                                            </div>
+
+                                            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="catering-add-form">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden" name="id" value="@item.MenuItemId" />
+                                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                                                @if (item.CustomizationOptions != null && item.CustomizationOptions.Count > 0)
+                                                {
+                                                    <div class="customization-checkbox-list">
+                                                        @foreach (var option in item.CustomizationOptions)
+                                                        {
+                                                            <label class="custom-checkbox-card">
+                                                                <input type="checkbox"
+                                                                       name="customizationOptionIds"
+                                                                       value="@option.CustomizationOptionId" />
+
+                                                                <span>
+                                                                    @option.Name
+                                                                    <strong>+₺@option.ExtraPrice / person</strong>
+                                                                </span>
+                                                            </label>
+                                                        }
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <p class="no-custom-text">No custom options available.</p>
+                                                }
+
+                                                <div class="people-count-row">
+                                                    <label>People Count</label>
+
+                                                    <input type="number"
+                                                           name="peopleCount"
+                                                           min="100"
+                                                           step="100"
+                                                           value="100"
+                                                           required />
+                                                </div>
+
+                                                <button type="submit" class="btn-pink add-cart-full">
+                                                    Select This @category
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         }
+
+                        <button type="button" class="accordion-close-btn">
+                            Close @category
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}
+else
+{
+    if (Model.Count == 0)
+    {
+        <div class="empty-state">
+            <h3>No catering menu found</h3>
+            <p>Try changing your search or category filter.</p>
+        </div>
+    }
+    else
+    {
+        <div class="menu-grid">
+            @foreach (var item in Model)
+            {
+                <div class="menu-card-modern catering-menu-card">
+                    <div class="menu-image-wrapper">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.Name" class="menu-image" />
+                        }
+                        else
+                        {
+                            <div class="menu-image-placeholder">
+                                🍽️
+                            </div>
+                        }
+
+                        <span class="catering-category-badge">
+                            @item.Category
+                        </span>
                     </div>
 
-                    <div class="rating-row">
-                        <div class="rating-chip">
-                            <span class="rating-stars">★</span>
+                    <div class="menu-card-body">
+                        <div class="menu-card-top">
+                            <div>
+                                <h3>@item.Name</h3>
+                                <p class="menu-description">@item.Description</p>
+                            </div>
 
-                            @if (item.MenuItemRatings != null && item.MenuItemRatings.Count > 0)
+                            <div class="price-pill">
+                                ₺@item.Price / person
+                            </div>
+                        </div>
+
+                        <div class="restaurant-box">
+                            @if (item.Caretaker != null)
                             {
-                                <span>
-                                    Menu @item.MenuItemRatings.Average(x => x.RatingValue).ToString("0.0") / 5
-                                    (@item.MenuItemRatings.Count reviews)
-                                </span>
+                                <p class="restaurant-name">🏪 @item.Caretaker.RestaurantName</p>
+
+                                @if (!string.IsNullOrEmpty(item.Caretaker.Address))
+                                {
+                                    <p class="restaurant-address">@item.Caretaker.Address</p>
+                                }
                             }
                             else
                             {
-                                <span>Menu: No ratings yet</span>
+                                <p class="restaurant-name">🏪 No caterer assigned</p>
                             }
                         </div>
 
-                        <div class="rating-chip">
-                            <span class="rating-stars">★</span>
-
-                            @if (item.Caretaker != null &&
-                                 item.Caretaker.CaretakerRatings != null &&
-                                 item.Caretaker.CaretakerRatings.Count > 0)
-                            {
-                                <span>
-                                    Restaurant @item.Caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0") / 5
-                                    (@item.Caretaker.CaretakerRatings.Count reviews)
-                                </span>
-                            }
-                            else
-                            {
-                                <span>Restaurant: No ratings yet</span>
-                            }
-                        </div>
-                    </div>
-
-                    @if (role == "Caretaker")
-                    {
                         <div class="caretaker-actions">
                             <a asp-controller="MenuItem"
                                asp-action="Edit"
@@ -171,21 +563,21 @@ else
                                asp-action="Create"
                                asp-route-menuItemId="@item.MenuItemId"
                                class="btn-outline-pink">
-                                Add Custom Ingredient
+                                Add Custom Option
                             </a>
 
                             <a asp-controller="CustomizationOption"
                                asp-action="Index"
                                asp-route-menuItemId="@item.MenuItemId"
                                class="btn-pink-small">
-                                Manage Ingredients
+                                Manage Options
                             </a>
 
                             <form asp-controller="MenuItem"
                                   asp-action="Delete"
                                   asp-route-id="@item.MenuItemId"
                                   method="post"
-                                  onsubmit="return confirm('Are you sure you want to delete this menu item?');">
+                                  onsubmit="return confirm('Are you sure you want to delete this catering menu option?');">
                                 @Html.AntiForgeryToken()
 
                                 <button type="submit" class="btn-soft-delete">
@@ -193,86 +585,137 @@ else
                                 </button>
                             </form>
                         </div>
-                    }
-                    else if (role == "Admin")
-                    {
-                        <div class="caretaker-actions">
-                            <a asp-controller="MenuItem"
-                               asp-action="Edit"
-                               asp-route-id="@item.MenuItemId"
-                               class="btn-outline-pink">
-                                Edit Menu Item
-                            </a>
-
-                            <form asp-controller="MenuItem"
-                                  asp-action="Delete"
-                                  asp-route-id="@item.MenuItemId"
-                                  method="post"
-                                  onsubmit="return confirm('Admin action: Are you sure you want to delete this menu item?');">
-                                @Html.AntiForgeryToken()
-
-                                <button type="submit" class="btn-soft-delete">
-                                    Delete Menu Item
-                                </button>
-                            </form>
-                        </div>
-                    }
-                    else
-                    {
-                        <form asp-controller="Cart" asp-action="AddToCart" method="post" class="add-cart-form">
-                            @Html.AntiForgeryToken()
-
-                            <input type="hidden" name="id" value="@item.MenuItemId" />
-
-                            <label>Custom Ingredients</label>
-
-                            @if (item.CustomizationOptions != null && item.CustomizationOptions.Count > 0)
-                            {
-                                <div class="customization-checkbox-list">
-                                    @foreach (var option in item.CustomizationOptions)
-                                    {
-                                        <label class="custom-checkbox-card">
-                                            <input type="checkbox"
-                                                   name="customizationOptionIds"
-                                                   value="@option.CustomizationOptionId" />
-
-                                            <span>
-                                                @option.Name
-                                                <strong>+₺@option.ExtraPrice</strong>
-                                            </span>
-                                        </label>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <p class="no-custom-text">No custom ingredients available.</p>
-                            }
-
-                            <button type="submit" class="btn-pink add-cart-full">
-                                Add to Cart
-                            </button>
-                        </form>
-                    }
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
+
+    @if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+    {
+        <div class="pagination-modern">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <a asp-controller="MenuItem"
+                   asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-searchText="@ViewBag.SearchText"
+                   asp-route-categoryFilter="@ViewBag.CategoryFilter"
+                   asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
+                   class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
+                    @i
+                </a>
+            }
+        </div>
+    }
 }
 
-@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
-{
-    <div class="pagination-modern">
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            <a asp-controller="MenuItem"
-               asp-action="Index"
-               asp-route-page="@i"
-               asp-route-searchText="@ViewBag.SearchText"
-               asp-route-maxDistanceKm="@ViewBag.MaxDistanceKm"
-               class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
-                @i
-            </a>
-        }
-    </div>
+@section Scripts {
+    @if (role == "User" && selectedCatererId == null && !string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        <script>
+            const nearbyRestaurants = @Html.Raw(nearbyRestaurantsJson);
+
+            const userPosition = {
+                lat: parseFloat('@userLat'),
+                lng: parseFloat('@userLng')
+            };
+
+            function initNearbyRestaurantsMap() {
+                const map = new google.maps.Map(document.getElementById('nearbyRestaurantsMap'), {
+                    center: userPosition,
+                    zoom: 13,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: true
+                });
+
+                const infoWindow = new google.maps.InfoWindow();
+
+                new google.maps.Marker({
+                    position: userPosition,
+                    map: map,
+                    title: 'Your Location',
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 9,
+                        fillColor: '#99FFE0',
+                        fillOpacity: 1,
+                        strokeColor: '#06142e',
+                        strokeWeight: 2
+                    }
+                });
+
+                nearbyRestaurants.forEach(function (restaurant) {
+                    if (!restaurant.Latitude || !restaurant.Longitude) {
+                        return;
+                    }
+
+                    const position = {
+                        lat: parseFloat(restaurant.Latitude),
+                        lng: parseFloat(restaurant.Longitude)
+                    };
+
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: map,
+                        title: restaurant.RestaurantName,
+                        label: {
+                            text: '🍽',
+                            fontSize: '18px'
+                        }
+                    });
+
+                    marker.addListener('click', function () {
+                        const distanceText = restaurant.Distance
+                            ? `<p><strong>Distance:</strong> ${Number(restaurant.Distance).toFixed(1)} km</p>`
+                            : '';
+
+                        const content = `
+                            <div class="map-popup">
+                                <h3>${restaurant.RestaurantName}</h3>
+                                <p>${restaurant.Address || 'Address is not available.'}</p>
+                                ${distanceText}
+                                <p><strong>Menu options:</strong> ${restaurant.MenuCount}</p>
+                            </div>
+                        `;
+
+                        infoWindow.setContent(content);
+                        infoWindow.open(map, marker);
+                    });
+                });
+            }
+        </script>
+
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&callback=initNearbyRestaurantsMap"></script>
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const accordionItems = document.querySelectorAll(".catering-accordion-item");
+
+            accordionItems.forEach(function (item) {
+                const header = item.querySelector(".catering-accordion-header");
+                const closeButton = item.querySelector(".accordion-close-btn");
+
+                header.addEventListener("click", function () {
+                    const isOpen = item.classList.contains("open");
+
+                    accordionItems.forEach(function (otherItem) {
+                        otherItem.classList.remove("open");
+                    });
+
+                    if (!isOpen) {
+                        item.classList.add("open");
+                    }
+                });
+
+                if (closeButton) {
+                    closeButton.addEventListener("click", function () {
+                        item.classList.remove("open");
+                    });
+                }
+            });
+        });
+    </script>
 }

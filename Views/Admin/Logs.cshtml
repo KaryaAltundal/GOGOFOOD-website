@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "System Logs";
+
+    var searchText = ViewBag.SearchText as string ?? "";
+    int currentPage = ViewBag.CurrentPage != null ? (int)ViewBag.CurrentPage : 1;
+    int totalPages = ViewBag.TotalPages != null ? (int)ViewBag.TotalPages : 1;
 }
 
 <div class="page-title">
@@ -9,18 +13,15 @@
     <p>Track system activities, user actions, and important events.</p>
 </div>
 
-<div class="filter-card">
-    <form asp-controller="Admin" asp-action="Logs" method="get" class="filter-form">
-        <div class="filter-input-group">
-            <label>Search logs</label>
-            <input type="text"
-                   name="searchText"
-                   value="@ViewBag.SearchText"
-                   placeholder="Search event, message, email or role" />
-        </div>
+<div class="compact-filter-card">
+    <form asp-controller="Admin" asp-action="Logs" method="get" class="compact-filter-form">
+        <input type="text"
+               name="searchText"
+               value="@searchText"
+               placeholder="Search event, message, email or role" />
 
-        <button type="submit" class="btn-pink">
-            Filter Logs
+        <button type="submit">
+            Search
         </button>
     </form>
 </div>
@@ -62,18 +63,11 @@ else
     </div>
 }
 
-@if (ViewBag.TotalPages != null && ViewBag.TotalPages > 1)
+@await Html.PartialAsync("_SmartPagination", new GOGOFOOD.Models.ViewModels.PaginationViewModel
 {
-    <div class="pagination-modern">
-        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-        {
-            <a asp-controller="Admin"
-               asp-action="Logs"
-               asp-route-page="@i"
-               asp-route-searchText="@ViewBag.SearchText"
-               class="@(ViewBag.CurrentPage == i ? "page-active" : "")">
-                @i
-            </a>
-        }
-    </div>
-}
+    CurrentPage = currentPage,
+    TotalPages = totalPages,
+    ControllerName = "Admin",
+    ActionName = "Logs",
+    SearchText = searchText
+})

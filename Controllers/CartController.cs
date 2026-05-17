@@ -1,6 +1,7 @@
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace GOGOFOOD.Controllers
@@ -42,14 +43,30 @@ namespace GOGOFOOD.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddToCart(int id, int[]? customizationOptionIds)
+        public IActionResult AddToCart(
+            int id,
+            int[]? customizationOptionIds,
+            int peopleCount = 100,
+            string? returnUrl = null)
         {
             var menuItem = _context.MenuItems
-                .FirstOrDefault(x => x.MenuItemId == id);
+                .Include(x => x.Caretaker)
+                .FirstOrDefault(x => x.MenuItemId == id && !x.IsDeleted);
 
             if (menuItem == null)
             {
                 return RedirectToAction("Index", "MenuItem");
+            }
+
+            // Catering system works with 100-person steps.
+            if (peopleCount < 100)
+            {
+                peopleCount = 100;
+            }
+
+            if (peopleCount % 100 != 0)
+            {
+                peopleCount = (int)Math.Ceiling(peopleCount / 100.0) * 100;
             }
 
             var cart = GetCart();
@@ -79,7 +96,7 @@ namespace GOGOFOOD.Controllers
 
             if (existingItem != null)
             {
-                existingItem.Quantity++;
+                existingItem.Quantity += peopleCount;
             }
             else
             {
@@ -88,15 +105,26 @@ namespace GOGOFOOD.Controllers
                     CartItemKey = Guid.NewGuid().ToString(),
                     MenuItemId = menuItem.MenuItemId,
                     Name = menuItem.Name,
+                    Category = menuItem.Category,
+                    RestaurantName = menuItem.Caretaker?.RestaurantName ?? string.Empty,
                     ImageUrl = menuItem.ImageUrl ?? string.Empty,
                     Price = menuItem.Price,
-                    Quantity = 1,
+                    Quantity = peopleCount,
                     Customization = customizationName,
                     CustomizationPrice = customizationPrice
                 });
             }
 
             SaveCart(cart);
+
+            TempData["SelectedCategory"] = menuItem.Category;
+            TempData["SelectedMenuName"] = menuItem.Name;
+            TempData["MenuMessage"] = menuItem.Category + " selected: " + menuItem.Name;
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
 
             return RedirectToAction("Index", "Cart");
         }
@@ -109,7 +137,7 @@ namespace GOGOFOOD.Controllers
 
             if (item != null)
             {
-                item.Quantity++;
+                item.Quantity += 100;
             }
 
             SaveCart(cart);
@@ -125,7 +153,7 @@ namespace GOGOFOOD.Controllers
 
             if (item != null)
             {
-                item.Quantity--;
+                item.Quantity -= 100;
 
                 if (item.Quantity <= 0)
                 {

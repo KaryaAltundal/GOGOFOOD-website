@@ -1,38 +1,64 @@
 @model GOGOFOOD.Models.User
 
-<h2>Register</h2>
+@{
+    ViewData["Title"] = "Register";
+}
 
-<form asp-action="Register" method="post">
-    @Html.AntiForgeryToken()
+<div class="auth-page-clean">
+    <div class="auth-card-clean">
+        <h1>Register</h1>
 
-    <div>
-        <label>Name</label>
-        <input asp-for="Name" />
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert-modern alert-danger-modern">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form asp-controller="Account" asp-action="Register" method="post" class="auth-form-clean">
+            <div class="auth-field-clean">
+                <label>Name</label>
+                <input asp-for="Name"
+                       placeholder="Enter your name"
+                       autocomplete="off"
+                       required />
+            </div>
+
+            <div class="auth-field-clean">
+                <label>Email</label>
+                <input asp-for="Email"
+                       type="email"
+                       placeholder="Enter your email"
+                       autocomplete="off"
+                       required />
+            </div>
+
+            <div class="auth-field-clean">
+                <label>Password</label>
+                <input asp-for="Password"
+                       type="password"
+                       placeholder="Create a password"
+                       autocomplete="off"
+                       required />
+            </div>
+
+            <div class="auth-field-clean">
+                <label>Role</label>
+                <select asp-for="Role" required>
+                    <option value="User">User</option>
+                    <option value="Caretaker">Caterer</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-pink auth-submit-clean">
+                Register
+            </button>
+
+            <p class="auth-link-text-clean">
+                Already have an account?
+                <a asp-controller="Account" asp-action="Login">Login</a>
+            </p>
+        </form>
     </div>
-
-    <div>
-        <label>Email</label>
-        <input asp-for="Email" />
-    </div>
-
-    <div>
-        <label>Password</label>
-        <input asp-for="Password" type="password" />
-    </div>
-
-    <div>
-        <label>Role</label>
-        <select asp-for="Role">
-            <option value="User">User</option>
-            <option value="Caretaker">Caretaker</option>
-            <option value="Admin">Admin</option>
-        </select>
-    </div>
-
-    <button type="submit">Register</button>
-</form>
-
-<p>
-    Already have an account?
-    <a asp-controller="Account" asp-action="Login">Login</a>
-</p>
+</div>

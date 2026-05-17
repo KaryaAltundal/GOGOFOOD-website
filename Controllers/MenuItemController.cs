@@ -12,8 +12,9 @@ namespace GOGOFOOD.Controllers
         private readonly GoogleMapsService _googleMapsService;
         private readonly LogService _logService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
-        private const long MaxImageSize = 2 * 1024 * 1024; // 2 MB
+        private const long MaxImageSize = 2 * 1024 * 1024;
 
         private readonly string[] _allowedExtensions =
         {
@@ -25,20 +26,35 @@ namespace GOGOFOOD.Controllers
             "image/jpeg", "image/png", "image/webp"
         };
 
+        private readonly string[] _categories =
+        {
+            "Starter",
+            "Main Course",
+            "Dessert",
+            "Drink"
+        };
+
         public MenuItemController(
             GogoFoodContext context,
             GoogleMapsService googleMapsService,
             LogService logService,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            IConfiguration configuration)
         {
             _context = context;
             _googleMapsService = googleMapsService;
             _logService = logService;
             _environment = environment;
+            _configuration = configuration;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(double? maxDistanceKm, string? searchText, int page = 1)
+        public async Task<IActionResult> Index(
+            double? maxDistanceKm,
+            string? searchText,
+            string? categoryFilter,
+            int? selectedCatererId,
+            int page = 1)
         {
             var role = HttpContext.Session.GetString("UserRole");
             var caretakerId = HttpContext.Session.GetInt32("CaretakerId");
@@ -48,7 +64,7 @@ namespace GOGOFOOD.Controllers
                 .Include(m => m.CustomizationOptions)
                 .Include(m => m.MenuItemRatings)
                 .Include(m => m.Caretaker)
-                .ThenInclude(c => c.CaretakerRatings)
+                    .ThenInclude(c => c!.CaretakerRatings)
                 .Where(m => !m.IsDeleted)
                 .AsQueryable();
 
@@ -62,50 +78,75 @@ namespace GOGOFOOD.Controllers
                 menuItemsQuery = menuItemsQuery.Where(m => m.CaretakerId == caretakerId.Value);
             }
 
+            if (selectedCatererId != null && role == "User")
+            {
+                menuItemsQuery = menuItemsQuery.Where(m => m.CaretakerId == selectedCatererId.Value);
+            }
+
             var menuItems = menuItemsQuery.ToList();
 
             var distances = new Dictionary<int, double>();
+            var catererDistances = new Dictionary<int, double>();
+            var nearbyRestaurants = new List<object>();
 
-            if (role == "User" && maxDistanceKm != null && userId != null)
+            double? userLatitude = null;
+            double? userLongitude = null;
+
+            if (role == "User" && userId != null)
             {
                 var user = _context.Users.FirstOrDefault(x => x.UserId == userId.Value);
 
-                if (user == null || user.Latitude == null || user.Longitude == null)
+                if (user != null && user.Latitude != null && user.Longitude != null)
+                {
+                    userLatitude = user.Latitude.Value;
+                    userLongitude = user.Longitude.Value;
+
+                    var catererGroupsForDistance = menuItems
+                        .Where(x =>
+                            x.Caretaker != null &&
+                            x.Caretaker.Latitude != null &&
+                            x.Caretaker.Longitude != null)
+                        .GroupBy(x => x.Caretaker!.CaretakerId)
+                        .ToList();
+
+                    foreach (var group in catererGroupsForDistance)
+                    {
+                        var firstItem = group.First();
+                        var caterer = firstItem.Caretaker!;
+
+                        var distance = await _googleMapsService.GetDistanceInKmAsync(
+                            user.Latitude.Value,
+                            user.Longitude.Value,
+                            caterer.Latitude!.Value,
+                            caterer.Longitude!.Value
+                        );
+
+                        if (distance != null)
+                        {
+                            catererDistances[caterer.CaretakerId] = distance.Value;
+
+                            foreach (var item in group)
+                            {
+                                distances[item.MenuItemId] = distance.Value;
+                            }
+                        }
+                    }
+
+                    if (maxDistanceKm != null)
+                    {
+                        menuItems = menuItems
+                            .Where(item =>
+                                item.CaretakerId != null &&
+                                catererDistances.ContainsKey(item.CaretakerId.Value) &&
+                                catererDistances[item.CaretakerId.Value] <= maxDistanceKm.Value)
+                            .ToList();
+                    }
+                }
+                else if (maxDistanceKm != null)
                 {
                     TempData["LocationWarning"] = "Please enter your address first.";
                     return RedirectToAction("Location", "User");
                 }
-
-                var filteredItems = new List<MenuItem>();
-
-                foreach (var item in menuItems)
-                {
-                    if (item.Caretaker == null ||
-                        item.Caretaker.Latitude == null ||
-                        item.Caretaker.Longitude == null)
-                    {
-                        continue;
-                    }
-
-                    var distance = await _googleMapsService.GetDistanceInKmAsync(
-                        user.Latitude.Value,
-                        user.Longitude.Value,
-                        item.Caretaker.Latitude.Value,
-                        item.Caretaker.Longitude.Value
-                    );
-
-                    if (distance != null)
-                    {
-                        distances[item.MenuItemId] = distance.Value;
-
-                        if (distance.Value <= maxDistanceKm.Value)
-                        {
-                            filteredItems.Add(item);
-                        }
-                    }
-                }
-
-                menuItems = filteredItems;
             }
 
             if (!string.IsNullOrWhiteSpace(searchText))
@@ -116,25 +157,129 @@ namespace GOGOFOOD.Controllers
                     .Where(m =>
                         m.Name.ToLower().Contains(search) ||
                         m.Description.ToLower().Contains(search) ||
+                        m.Category.ToLower().Contains(search) ||
                         (m.Caretaker != null &&
-                         m.Caretaker.RestaurantName.ToLower().Contains(search)))
+                         (
+                             m.Caretaker.RestaurantName.ToLower().Contains(search) ||
+                             m.Caretaker.Name.ToLower().Contains(search) ||
+                             m.Caretaker.City.ToLower().Contains(search) ||
+                             m.Caretaker.District.ToLower().Contains(search)
+                         )))
                     .ToList();
             }
 
-            int pageSize = 6;
-            int totalItems = menuItems.Count;
-            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            if (!string.IsNullOrWhiteSpace(categoryFilter))
+            {
+                menuItems = menuItems
+                    .Where(m => m.Category == categoryFilter)
+                    .ToList();
+            }
 
-            menuItems = menuItems
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+            nearbyRestaurants = menuItems
+                .Where(x =>
+                    x.Caretaker != null &&
+                    x.Caretaker.Latitude != null &&
+                    x.Caretaker.Longitude != null)
+                .GroupBy(x => x.Caretaker!.CaretakerId)
+                .Select(group =>
+                {
+                    var firstItem = group.First();
+                    var caretaker = firstItem.Caretaker!;
+
+                    double? restaurantDistance = null;
+
+                    if (catererDistances.ContainsKey(caretaker.CaretakerId))
+                    {
+                        restaurantDistance = catererDistances[caretaker.CaretakerId];
+                    }
+
+                    return new
+                    {
+                        RestaurantName = caretaker.RestaurantName,
+                        Address = caretaker.Address,
+                        Latitude = caretaker.Latitude,
+                        Longitude = caretaker.Longitude,
+                        Distance = restaurantDistance,
+                        MenuCount = group.Count()
+                    };
+                })
+                .ToList<object>();
+
+            var caterersForCards = menuItems
+                .Where(x => x.Caretaker != null)
+                .Select(x => x.Caretaker!)
+                .GroupBy(x => x.CaretakerId)
+                .Select(x => x.First())
+                .OrderBy(x => x.RestaurantName)
                 .ToList();
+
+            var catererMenuCounts = menuItems
+                .Where(x => x.CaretakerId != null)
+                .GroupBy(x => x.CaretakerId!.Value)
+                .ToDictionary(x => x.Key, x => x.Count());
+
+            Caretaker? selectedCaterer = null;
+
+            if (selectedCatererId != null)
+            {
+                selectedCaterer = _context.Caretakers
+                    .Include(x => x.CaretakerRatings)
+                    .FirstOrDefault(x => x.CaretakerId == selectedCatererId.Value);
+            }
+
+            if (role == "User")
+            {
+                menuItems = menuItems
+                    .OrderBy(x => Array.IndexOf(_categories, x.Category))
+                    .ThenBy(x => x.Name)
+                    .ToList();
+
+                ViewBag.CurrentPage = 1;
+                ViewBag.TotalPages = 1;
+            }
+            else
+            {
+                int pageSize = 8;
+                int totalItems = menuItems.Count;
+                int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                if (page < 1)
+                {
+                    page = 1;
+                }
+
+                if (totalPages > 0 && page > totalPages)
+                {
+                    page = totalPages;
+                }
+
+                menuItems = menuItems
+                    .OrderBy(x => x.Caretaker != null ? x.Caretaker.RestaurantName : "")
+                    .ThenBy(x => Array.IndexOf(_categories, x.Category))
+                    .ThenBy(x => x.Name)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
+            }
 
             ViewBag.MaxDistanceKm = maxDistanceKm;
             ViewBag.Distances = distances;
+            ViewBag.CatererDistances = catererDistances;
             ViewBag.SearchText = searchText;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
+            ViewBag.CategoryFilter = categoryFilter;
+            ViewBag.SelectedCatererId = selectedCatererId;
+            ViewBag.SelectedCaterer = selectedCaterer;
+            ViewBag.Categories = _categories;
+            ViewBag.CaterersForCards = caterersForCards;
+            ViewBag.CatererMenuCounts = catererMenuCounts;
+
+            ViewBag.GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"] ?? string.Empty;
+            ViewBag.NearbyRestaurants = nearbyRestaurants;
+            ViewBag.UserLatitude = userLatitude;
+            ViewBag.UserLongitude = userLongitude;
 
             return View(menuItems);
         }
@@ -153,6 +298,8 @@ namespace GOGOFOOD.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            ViewBag.Categories = _categories;
 
             return View();
         }
@@ -181,8 +328,14 @@ namespace GOGOFOOD.Controllers
 
             if (item.Price <= 0)
             {
-                ViewBag.ImageError = "Price must be greater than 0.";
+                ViewBag.Categories = _categories;
+                ViewBag.ImageError = "Price per person must be greater than 0.";
                 return View(item);
+            }
+
+            if (!_categories.Contains(item.Category))
+            {
+                item.Category = "Main Course";
             }
 
             if (imageFile != null && imageFile.Length > 0)
@@ -191,6 +344,7 @@ namespace GOGOFOOD.Controllers
 
                 if (!uploadResult.Success)
                 {
+                    ViewBag.Categories = _categories;
                     ViewBag.ImageError = uploadResult.ErrorMessage;
                     return View(item);
                 }
@@ -209,8 +363,8 @@ namespace GOGOFOOD.Controllers
             _context.SaveChanges();
 
             _logService.AddLog(
-                "Menu Item Created",
-                "Caretaker created a new menu item: " + item.Name,
+                "Catering Menu Created",
+                "Caretaker created a new catering menu option: " + item.Name,
                 HttpContext.Session.GetString("UserEmail"),
                 role
             );
@@ -251,9 +405,11 @@ namespace GOGOFOOD.Controllers
 
             if (item == null)
             {
-                TempData["MenuMessage"] = "Menu item could not be found or you are not allowed to edit it.";
+                TempData["MenuMessage"] = "Catering menu option could not be found or you are not allowed to edit it.";
                 return RedirectToAction("Index", "MenuItem");
             }
+
+            ViewBag.Categories = _categories;
 
             return View(item);
         }
@@ -293,19 +449,21 @@ namespace GOGOFOOD.Controllers
 
             if (existingItem == null)
             {
-                TempData["MenuMessage"] = "Menu item could not be found or you are not allowed to edit it.";
+                TempData["MenuMessage"] = "Catering menu option could not be found or you are not allowed to edit it.";
                 return RedirectToAction("Index", "MenuItem");
             }
 
             if (item.Price <= 0)
             {
-                ViewBag.ImageError = "Price must be greater than 0.";
+                ViewBag.Categories = _categories;
+                ViewBag.ImageError = "Price per person must be greater than 0.";
                 return View(existingItem);
             }
 
             existingItem.Name = item.Name;
             existingItem.Description = item.Description;
             existingItem.Price = item.Price;
+            existingItem.Category = _categories.Contains(item.Category) ? item.Category : "Main Course";
 
             if (imageFile != null && imageFile.Length > 0)
             {
@@ -313,6 +471,7 @@ namespace GOGOFOOD.Controllers
 
                 if (!uploadResult.Success)
                 {
+                    ViewBag.Categories = _categories;
                     ViewBag.ImageError = uploadResult.ErrorMessage;
                     return View(existingItem);
                 }
@@ -324,13 +483,13 @@ namespace GOGOFOOD.Controllers
             _context.SaveChanges();
 
             _logService.AddLog(
-                "Menu Item Updated",
-                role + " updated menu item: " + existingItem.Name,
+                "Catering Menu Updated",
+                role + " updated catering menu option: " + existingItem.Name,
                 userEmail,
                 role
             );
 
-            TempData["MenuMessage"] = "Menu item updated successfully.";
+            TempData["MenuMessage"] = "Catering menu option updated successfully.";
 
             return RedirectToAction("Index", "MenuItem");
         }
@@ -372,7 +531,7 @@ namespace GOGOFOOD.Controllers
 
             if (item == null)
             {
-                TempData["MenuMessage"] = "Menu item could not be found or you are not allowed to delete it.";
+                TempData["MenuMessage"] = "Catering menu option could not be found or you are not allowed to delete it.";
                 return RedirectToAction("Index", "MenuItem");
             }
 
@@ -382,13 +541,13 @@ namespace GOGOFOOD.Controllers
             _context.SaveChanges();
 
             _logService.AddLog(
-                "Menu Item Deleted",
-                role + " deleted menu item: " + item.Name,
+                "Catering Menu Deleted",
+                role + " deleted catering menu option: " + item.Name,
                 userEmail,
                 role
             );
 
-            TempData["MenuMessage"] = "Menu item deleted successfully.";
+            TempData["MenuMessage"] = "Catering menu option deleted successfully.";
 
             return RedirectToAction("Index", "MenuItem");
         }

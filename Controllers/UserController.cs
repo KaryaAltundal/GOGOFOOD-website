@@ -1,3 +1,4 @@
+using System.Globalization;
 using GOGOFOOD.Data;
 using GOGOFOOD.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -9,15 +10,18 @@ namespace GOGOFOOD.Controllers
         private readonly GogoFoodContext _context;
         private readonly GoogleMapsService _googleMapsService;
         private readonly LogService _logService;
+        private readonly IConfiguration _configuration;
 
         public UserController(
             GogoFoodContext context,
             GoogleMapsService googleMapsService,
-            LogService logService)
+            LogService logService,
+            IConfiguration configuration)
         {
             _context = context;
             _googleMapsService = googleMapsService;
             _logService = logService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -37,6 +41,8 @@ namespace GOGOFOOD.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            ViewBag.GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"] ?? string.Empty;
+
             return View(user);
         }
 
@@ -46,7 +52,9 @@ namespace GOGOFOOD.Controllers
             string district,
             string neighborhood,
             string street,
-            string addressDetail)
+            string addressDetail,
+            string latitude,
+            string longitude)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             var userEmail = HttpContext.Session.GetString("UserEmail");
@@ -72,20 +80,29 @@ namespace GOGOFOOD.Controllers
                 city
             );
 
-            var coordinates = await _googleMapsService.GetCoordinatesFromAddressAsync(fullAddress);
+            double? selectedLatitude = TryParseCoordinate(latitude);
+            double? selectedLongitude = TryParseCoordinate(longitude);
 
-            if (coordinates == null)
+            if (selectedLatitude == null || selectedLongitude == null)
             {
-                TempData["LocationError"] = "Location could not be found by Google Maps. Please check your address.";
+                var coordinates = await _googleMapsService.GetCoordinatesFromAddressAsync(fullAddress);
 
-                _logService.AddLog(
-                    "Google Maps Error",
-                    "User address could not be converted to coordinates: " + fullAddress,
-                    userEmail,
-                    userRole
-                );
+                if (coordinates == null)
+                {
+                    TempData["LocationError"] = "Location could not be found by Google Maps. Please check your address or select a point on the map.";
 
-                return RedirectToAction("Location");
+                    _logService.AddLog(
+                        "Google Maps Error",
+                        "User address could not be converted to coordinates: " + fullAddress,
+                        userEmail,
+                        userRole
+                    );
+
+                    return RedirectToAction("Location");
+                }
+
+                selectedLatitude = coordinates.Value.Latitude;
+                selectedLongitude = coordinates.Value.Longitude;
             }
 
             user.City = city ?? string.Empty;
@@ -93,22 +110,37 @@ namespace GOGOFOOD.Controllers
             user.Neighborhood = neighborhood ?? string.Empty;
             user.Street = street ?? string.Empty;
             user.AddressDetail = addressDetail ?? string.Empty;
-            user.Latitude = coordinates.Value.Latitude;
-            user.Longitude = coordinates.Value.Longitude;
+            user.Latitude = selectedLatitude;
+            user.Longitude = selectedLongitude;
 
             _context.Users.Update(user);
             _context.SaveChanges();
 
             _logService.AddLog(
                 "Location Updated",
-                "User location updated using Google Geocoding API.",
+                "User location updated using Google Maps.",
                 userEmail,
                 userRole
             );
 
-            TempData["LocationMessage"] = "Your location was updated successfully using Google Maps.";
+            TempData["LocationMessage"] = "Your location was updated successfully.";
 
             return RedirectToAction("Location");
+        }
+
+        private double? TryParseCoordinate(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double result))
+            {
+                return result;
+            }
+
+            return null;
         }
 
         private string BuildFullAddress(

@@ -8,20 +8,21 @@
 <div class="payment-page">
     <div class="payment-left-card">
         <div class="payment-heading">
-            <span class="payment-badge">Secure Checkout</span>
-            <h1>Payment Simulation</h1>
-            <p>Review your order and complete the simulated payment.</p>
+            <span class="payment-badge">Secure Catering Checkout</span>
+            <h1>Payment</h1>
+            <p>Review your catering order and complete your payment securely.</p>
         </div>
 
-        <h2>Order Summary</h2>
+        <h2>Catering Order Summary</h2>
 
         <div class="payment-table-wrapper">
             <table class="payment-table">
                 <thead>
                     <tr>
-                        <th>Item</th>
+                        <th>Menu Option</th>
+                        <th>Category</th>
                         <th>Customization</th>
-                        <th>Quantity</th>
+                        <th>People</th>
                         <th>Total</th>
                     </tr>
                 </thead>
@@ -41,13 +42,21 @@
                                         <div class="payment-item-placeholder">🍽️</div>
                                     }
 
-                                    <strong>@item.Name</strong>
+                                    <div>
+                                        <strong>@item.Name</strong>
+
+                                        @if (!string.IsNullOrWhiteSpace(item.RestaurantName))
+                                        {
+                                            <small>@item.RestaurantName</small>
+                                        }
+                                    </div>
                                 </div>
                             </td>
 
+                            <td>@item.Category</td>
                             <td>@item.Customization</td>
                             <td>@item.Quantity</td>
-                            <td class="payment-price">₺@item.TotalPrice</td>
+                            <td class="payment-price">₺@item.TotalPrice.ToString("N2")</td>
                         </tr>
                     }
                 </tbody>
@@ -55,25 +64,40 @@
         </div>
 
         <div class="payment-total-box">
-            <span>Total Price</span>
-            <strong>₺@totalPrice</strong>
+            <span>Total Catering Price</span>
+            <strong>₺@totalPrice.ToString("N2")</strong>
         </div>
 
         <div class="payment-note">
-            🔒 This is a payment simulation. No real transaction will be processed.
-            Card information is only used for this demo form and must not be stored or logged.
+            🔒 Your catering order will be confirmed after payment.
         </div>
     </div>
 
     <div class="payment-right-card">
         <h2>Card Information</h2>
 
-        <form asp-controller="Payment" asp-action="CompletePayment" method="post" class="payment-form" autocomplete="off">
+        @if (ViewBag.PaymentError != null)
+        {
+            <div class="alert-modern alert-danger-modern">
+                @ViewBag.PaymentError
+            </div>
+        }
+
+        <div id="paymentClientError" class="alert-modern alert-danger-modern" style="display:none;"></div>
+
+        <form asp-controller="Payment"
+              asp-action="CompletePayment"
+              method="post"
+              class="payment-form"
+              id="paymentForm"
+              autocomplete="off">
+
             @Html.AntiForgeryToken()
 
             <div class="payment-form-group">
                 <label>Card Holder Name</label>
                 <input type="text"
+                       id="cardHolder"
                        name="cardHolder"
                        placeholder="Name Surname"
                        autocomplete="off"
@@ -121,11 +145,11 @@
             </div>
 
             <button type="submit" class="payment-button">
-                Pay Now ₺@totalPrice
+                Complete Payment ₺@totalPrice.ToString("N2")
             </button>
 
             <p class="payment-secure-text">
-                ✅ Demo only — no real card payment is processed.
+                ✅ Secure payment confirmation
             </p>
         </form>
     </div>
@@ -133,9 +157,19 @@
 
 @section Scripts {
     <script>
+        const paymentForm = document.getElementById("paymentForm");
+        const paymentClientError = document.getElementById("paymentClientError");
+
+        const cardHolderInput = document.getElementById("cardHolder");
         const cardNumberInput = document.getElementById("cardNumber");
         const expirationDateInput = document.getElementById("expirationDate");
         const cvvInput = document.getElementById("cvv");
+
+        cardHolderInput.addEventListener("input", function () {
+            this.value = this.value
+                .replace(/[^a-zA-ZçÇğĞıİöÖşŞüÜ\s]/g, "")
+                .replace(/\s{2,}/g, " ");
+        });
 
         cardNumberInput.addEventListener("input", function () {
             this.value = this.value
@@ -160,5 +194,73 @@
                 .replace(/\D/g, "")
                 .slice(0, 3);
         });
+
+        paymentForm.addEventListener("submit", function (event) {
+            const validationMessage = validatePaymentForm();
+
+            if (validationMessage !== "") {
+                event.preventDefault();
+                showPaymentError(validationMessage);
+            }
+        });
+
+        function validatePaymentForm() {
+            const cardHolder = cardHolderInput.value.trim();
+            const cardNumber = cardNumberInput.value.trim();
+            const expirationDate = expirationDateInput.value.trim();
+            const cvv = cvvInput.value.trim();
+
+            if (cardHolder.length < 3) {
+                return "Please enter the card holder name.";
+            }
+
+            if (!/^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$/.test(cardHolder)) {
+                return "Card holder name can only contain letters.";
+            }
+
+            if (!/^\d{16}$/.test(cardNumber)) {
+                return "Card number must contain exactly 16 digits.";
+            }
+
+            if (!/^\d{2}\/\d{2}$/.test(expirationDate)) {
+                return "Expiration date must be in MM/YY format.";
+            }
+
+            if (!isExpirationDateValid(expirationDate)) {
+                return "The card expiration date is invalid or expired.";
+            }
+
+            if (!/^\d{3}$/.test(cvv)) {
+                return "CVV must contain exactly 3 digits.";
+            }
+
+            return "";
+        }
+
+        function isExpirationDateValid(expirationDate) {
+            const parts = expirationDate.split("/");
+            const month = parseInt(parts[0], 10);
+            const year = parseInt(parts[1], 10);
+
+            if (isNaN(month) || isNaN(year)) {
+                return false;
+            }
+
+            if (month < 1 || month > 12) {
+                return false;
+            }
+
+            const fullYear = 2000 + year;
+            const expirationLimit = new Date(fullYear, month, 1);
+            const today = new Date();
+
+            return expirationLimit > today;
+        }
+
+        function showPaymentError(message) {
+            paymentClientError.textContent = message;
+            paymentClientError.style.display = "block";
+            paymentClientError.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
     </script>
 }

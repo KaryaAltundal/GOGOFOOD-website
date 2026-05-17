@@ -2,11 +2,14 @@
 
 @{
     ViewData["Title"] = "My Location";
+    var mapsApiKey = ViewBag.GoogleMapsApiKey as string ?? "";
+    var startLat = Model.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "39.9208";
+    var startLng = Model.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "32.8541";
 }
 
 <div class="page-title">
     <h1>My Location 📍</h1>
-    <p>Enter your address so nearby restaurants can be filtered correctly.</p>
+    <p>Enter your address or choose your location from the map.</p>
 </div>
 
 @if (TempData["LocationMessage"] != null)
@@ -23,37 +26,63 @@
     </div>
 }
 
-<div class="modern-form-card location-form-card">
-    <form asp-controller="User" asp-action="Location" method="post" class="vertical-form">
-        <div class="form-group-modern">
-            <label>City</label>
-            <input type="text" name="city" value="@Model.City" placeholder="Example: Ankara" required />
+<div class="location-two-column">
+    <div class="modern-form-card location-form-card">
+        <form asp-controller="User" asp-action="Location" method="post" class="vertical-form" id="locationForm">
+            <input type="hidden" id="Latitude" name="latitude" value="@startLat" />
+            <input type="hidden" id="Longitude" name="longitude" value="@startLng" />
+
+            <div class="form-group-modern">
+                <label>City</label>
+                <input type="text" id="City" name="city" value="@Model.City" placeholder="Example: Ankara" required />
+            </div>
+
+            <div class="form-group-modern">
+                <label>District</label>
+                <input type="text" id="District" name="district" value="@Model.District" placeholder="Example: Çankaya" required />
+            </div>
+
+            <div class="form-group-modern">
+                <label>Neighborhood</label>
+                <input type="text" id="Neighborhood" name="neighborhood" value="@Model.Neighborhood" placeholder="Example: Kızılay" required />
+            </div>
+
+            <div class="form-group-modern">
+                <label>Street</label>
+                <input type="text" id="Street" name="street" value="@Model.Street" placeholder="Example: Atatürk Boulevard" />
+            </div>
+
+            <div class="form-group-modern">
+                <label>Address Detail</label>
+                <input type="text" id="AddressDetail" name="addressDetail" value="@Model.AddressDetail" placeholder="Apartment, building, door number..." />
+            </div>
+
+            <button type="button" class="btn-outline-pink location-map-button" onclick="showTypedAddressOnMap()">
+                Show Address on Map
+            </button>
+
+            <button type="submit" class="btn-pink">
+                Save Location
+            </button>
+        </form>
+    </div>
+
+    <div class="location-map-card">
+        <div class="location-map-heading">
+            <h3>Choose From Map 🗺️</h3>
+            <p>Drag the marker or click on the map. The address fields will update automatically.</p>
         </div>
 
-        <div class="form-group-modern">
-            <label>District</label>
-            <input type="text" name="district" value="@Model.District" placeholder="Example: Çankaya" required />
-        </div>
+        @if (string.IsNullOrWhiteSpace(mapsApiKey))
+        {
+            <div class="alert-modern alert-danger-modern">
+                Google Maps API key is missing. Add it to appsettings.json under GoogleMaps:ApiKey.
+            </div>
+        }
 
-        <div class="form-group-modern">
-            <label>Neighborhood</label>
-            <input type="text" name="neighborhood" value="@Model.Neighborhood" placeholder="Example: Kızılay" required />
-        </div>
-
-        <div class="form-group-modern">
-            <label>Street</label>
-            <input type="text" name="street" value="@Model.Street" placeholder="Example: Atatürk Boulevard" />
-        </div>
-
-        <div class="form-group-modern">
-            <label>Address Detail</label>
-            <input type="text" name="addressDetail" value="@Model.AddressDetail" placeholder="Apartment, building, door number..." />
-        </div>
-
-        <button type="submit" class="btn-pink">
-            Save Location
-        </button>
-    </form>
+        <div id="locationMap" class="location-map"></div>
+        <small class="map-help-text">Selected coordinates are saved silently in the form.</small>
+    </div>
 </div>
 
 @if (!string.IsNullOrEmpty(Model.City) || !string.IsNullOrEmpty(Model.District) || !string.IsNullOrEmpty(Model.Neighborhood))
@@ -79,6 +108,131 @@
                 <span>@Model.City</span>
             }
         </p>
-        <small>This address was checked and saved using Google Maps.</small>
+
+        @if (Model.Latitude != null && Model.Longitude != null)
+        {
+            <small>Map location: @Model.Latitude, @Model.Longitude</small>
+        }
     </div>
+}
+
+@section Scripts {
+    @if (!string.IsNullOrWhiteSpace(mapsApiKey))
+    {
+        <script>
+            let map;
+            let marker;
+            let geocoder;
+
+            const defaultLat = parseFloat('@startLat');
+            const defaultLng = parseFloat('@startLng');
+
+            function initLocationMap() {
+                geocoder = new google.maps.Geocoder();
+
+                const startPosition = {
+                    lat: defaultLat,
+                    lng: defaultLng
+                };
+
+                map = new google.maps.Map(document.getElementById('locationMap'), {
+                    center: startPosition,
+                    zoom: 15
+                });
+
+                marker = new google.maps.Marker({
+                    position: startPosition,
+                    map: map,
+                    draggable: true,
+                    title: 'Drag me to change location'
+                });
+
+                updateHiddenCoordinates(startPosition.lat, startPosition.lng);
+
+                marker.addListener('dragend', function () {
+                    const position = marker.getPosition();
+                    updateLocationFromMap(position.lat(), position.lng());
+                });
+
+                map.addListener('click', function (event) {
+                    marker.setPosition(event.latLng);
+                    updateLocationFromMap(event.latLng.lat(), event.latLng.lng());
+                });
+            }
+
+            function updateHiddenCoordinates(lat, lng) {
+                document.getElementById('Latitude').value = lat.toFixed(7);
+                document.getElementById('Longitude').value = lng.toFixed(7);
+            }
+
+            function updateLocationFromMap(lat, lng) {
+                updateHiddenCoordinates(lat, lng);
+
+                geocoder.geocode({ location: { lat: lat, lng: lng } }, function (results, status) {
+                    if (status === 'OK' && results[0]) {
+                        fillAddressFields(results[0]);
+                    }
+                });
+            }
+
+            function showTypedAddressOnMap() {
+                const address = [
+                    document.getElementById('AddressDetail').value,
+                    document.getElementById('Street').value,
+                    document.getElementById('Neighborhood').value,
+                    document.getElementById('District').value,
+                    document.getElementById('City').value,
+                    'Turkey'
+                ].filter(x => x && x.trim() !== '').join(', ');
+
+                if (address.trim() === '') {
+                    alert('Please write an address first.');
+                    return;
+                }
+
+                geocoder.geocode({ address: address }, function (results, status) {
+                    if (status === 'OK' && results[0]) {
+                        const location = results[0].geometry.location;
+
+                        map.setCenter(location);
+                        marker.setPosition(location);
+
+                        updateHiddenCoordinates(location.lat(), location.lng());
+                    } else {
+                        alert('Address could not be found on Google Maps.');
+                    }
+                });
+            }
+
+            function fillAddressFields(result) {
+                const components = result.address_components;
+
+                const city = getComponent(components, ['administrative_area_level_1']);
+                const district = getComponent(components, ['administrative_area_level_2', 'locality']);
+                const neighborhood = getComponent(components, ['neighborhood', 'sublocality', 'sublocality_level_1']);
+                const street = getComponent(components, ['route']);
+                const streetNumber = getComponent(components, ['street_number']);
+
+                if (city) document.getElementById('City').value = city;
+                if (district) document.getElementById('District').value = district;
+                if (neighborhood) document.getElementById('Neighborhood').value = neighborhood;
+                if (street) document.getElementById('Street').value = street;
+                if (streetNumber) document.getElementById('AddressDetail').value = streetNumber;
+            }
+
+            function getComponent(components, types) {
+                for (let i = 0; i < components.length; i++) {
+                    for (let j = 0; j < types.length; j++) {
+                        if (components[i].types.includes(types[j])) {
+                            return components[i].long_name;
+                        }
+                    }
+                }
+
+                return '';
+            }
+        </script>
+
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&callback=initLocationMap"></script>
+    }
 }

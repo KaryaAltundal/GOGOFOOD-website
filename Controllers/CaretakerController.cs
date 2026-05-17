@@ -1,3 +1,4 @@
+using System.Globalization;
 using GOGOFOOD.Data;
 using GOGOFOOD.Models;
 using GOGOFOOD.Services;
@@ -10,15 +11,18 @@ namespace GOGOFOOD.Controllers
         private readonly GogoFoodContext _context;
         private readonly GoogleMapsService _googleMapsService;
         private readonly LogService _logService;
+        private readonly IConfiguration _configuration;
 
         public CaretakerController(
             GogoFoodContext context,
             GoogleMapsService googleMapsService,
-            LogService logService)
+            LogService logService,
+            IConfiguration configuration)
         {
             _context = context;
             _googleMapsService = googleMapsService;
             _logService = logService;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -40,11 +44,13 @@ namespace GOGOFOOD.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            ViewBag.GoogleMapsApiKey = _configuration["GoogleMaps:ApiKey"] ?? string.Empty;
+
             return View(caretaker);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Profile(Caretaker caretaker)
+        public async Task<IActionResult> Profile(Caretaker caretaker, string latitude, string longitude)
         {
             var role = HttpContext.Session.GetString("UserRole");
             var caretakerId = HttpContext.Session.GetInt32("CaretakerId");
@@ -71,20 +77,29 @@ namespace GOGOFOOD.Controllers
                 caretaker.City
             );
 
-            var coordinates = await _googleMapsService.GetCoordinatesFromAddressAsync(fullAddress);
+            double? selectedLatitude = TryParseCoordinate(latitude);
+            double? selectedLongitude = TryParseCoordinate(longitude);
 
-            if (coordinates == null)
+            if (selectedLatitude == null || selectedLongitude == null)
             {
-                TempData["ProfileError"] = "Restaurant location could not be found by Google Maps. Please check the address.";
+                var coordinates = await _googleMapsService.GetCoordinatesFromAddressAsync(fullAddress);
 
-                _logService.AddLog(
-                    "Google Maps Error",
-                    "Caretaker restaurant address could not be converted to coordinates: " + fullAddress,
-                    userEmail,
-                    role
-                );
+                if (coordinates == null)
+                {
+                    TempData["ProfileError"] = "Restaurant location could not be found by Google Maps. Please check the address or select a point on the map.";
 
-                return RedirectToAction("Profile");
+                    _logService.AddLog(
+                        "Google Maps Error",
+                        "Caretaker restaurant address could not be converted to coordinates: " + fullAddress,
+                        userEmail,
+                        role
+                    );
+
+                    return RedirectToAction("Profile");
+                }
+
+                selectedLatitude = coordinates.Value.Latitude;
+                selectedLongitude = coordinates.Value.Longitude;
             }
 
             existingCaretaker.Name = caretaker.Name;
@@ -95,22 +110,37 @@ namespace GOGOFOOD.Controllers
             existingCaretaker.Street = caretaker.Street ?? string.Empty;
             existingCaretaker.AddressDetail = caretaker.AddressDetail ?? string.Empty;
             existingCaretaker.Address = fullAddress;
-            existingCaretaker.Latitude = coordinates.Value.Latitude;
-            existingCaretaker.Longitude = coordinates.Value.Longitude;
+            existingCaretaker.Latitude = selectedLatitude;
+            existingCaretaker.Longitude = selectedLongitude;
 
             _context.Caretakers.Update(existingCaretaker);
             _context.SaveChanges();
 
             _logService.AddLog(
                 "Restaurant Profile Updated",
-                "Caretaker restaurant profile and location updated using Google Geocoding API.",
+                "Caretaker restaurant profile and location updated using Google Maps.",
                 userEmail,
                 role
             );
 
-            TempData["ProfileMessage"] = "Restaurant profile updated successfully using Google Maps.";
+            TempData["ProfileMessage"] = "Restaurant profile updated successfully.";
 
             return RedirectToAction("Profile");
+        }
+
+        private double? TryParseCoordinate(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double result))
+            {
+                return result;
+            }
+
+            return null;
         }
 
         private string BuildFullAddress(

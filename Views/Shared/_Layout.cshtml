@@ -15,6 +15,31 @@
 </head>
 
 <body>
+    @{
+        var currentRole = Context.Session.GetString("UserRole");
+        var currentEmail = Context.Session.GetString("UserEmail");
+        var currentName = Context.Session.GetString("UserName");
+        var isLoggedIn = !string.IsNullOrEmpty(currentEmail);
+
+        var displayName = currentName;
+
+        
+if (currentRole == "Admin")
+{
+    displayName = "Admin";
+}
+else if (currentRole == "Caretaker")
+{
+    displayName = "Caterer";
+}
+else if (!string.IsNullOrEmpty(displayName))
+{
+    displayName = displayName
+        .Replace("Caretaker", "Caterer")
+        .Replace("caretaker", "Caterer");
+}
+    }
+
     <header>
         <nav class="navbar-custom">
             <a asp-controller="Home" asp-action="Index" class="logo brand-logo">
@@ -23,34 +48,37 @@
 
             <ul class="nav-links">
                 <li><a asp-controller="Home" asp-action="Index">🏠 Home</a></li>
-                <li><a asp-controller="MenuItem" asp-action="Index">🍽 Menu</a></li>
 
-                @if (!string.IsNullOrEmpty(Context.Session.GetString("UserEmail"))
-                    && Context.Session.GetString("UserRole") != "Caretaker")
+                @if (!isLoggedIn || currentRole == "User")
+                {
+                    <li><a asp-controller="MenuItem" asp-action="Index">🏪 Caterers</a></li>
+                }
+
+                @if (isLoggedIn && currentRole == "User")
                 {
                     <li><a asp-controller="Cart" asp-action="Index">🛒 Cart</a></li>
                     <li><a asp-controller="Order" asp-action="Index">📦 Orders</a></li>
-
-                    @if (Context.Session.GetString("UserRole") == "User")
-                    {
-                        <li><a asp-controller="User" asp-action="Location">📍 Location</a></li>
-                    }
+                    <li><a asp-controller="User" asp-action="Location">📍 Location</a></li>
                 }
 
-                @if (Context.Session.GetString("UserRole") == "Caretaker")
+                @if (currentRole == "Caretaker")
                 {
+                    <li><a asp-controller="MenuItem" asp-action="Index">🍽 My Menus</a></li>
                     <li><a asp-controller="MenuItem" asp-action="Create">➕ Add Menu</a></li>
-                    <li><a asp-controller="Caretaker" asp-action="Profile">🏪 Profile</a></li>
+                    <li><a asp-controller="Order" asp-action="Index">📦 Orders</a></li>
+                    <li><a asp-controller="Caretaker" asp-action="Profile">🏪 Caterer Profile</a></li>
                 }
 
-                @if (Context.Session.GetString("UserRole") == "Admin")
+                @if (currentRole == "Admin")
                 {
+                    <li><a asp-controller="Order" asp-action="Index">📦 Orders</a></li>
+                    <li><a asp-controller="Admin" asp-action="Users">👥 Users</a></li>
                     <li><a asp-controller="Admin" asp-action="Logs">📋 Logs</a></li>
                 }
             </ul>
 
             <div class="nav-right">
-                @if (string.IsNullOrEmpty(Context.Session.GetString("UserEmail")))
+                @if (!isLoggedIn)
                 {
                     <a asp-controller="Account" asp-action="Login" class="btn-login">Login</a>
                     <a asp-controller="Account" asp-action="Register" class="btn-signup">Register</a>
@@ -58,7 +86,7 @@
                 else
                 {
                     <span class="welcome-user">
-                        👋 @Context.Session.GetString("UserName")
+                        👋 @displayName
                     </span>
 
                     <a asp-controller="Account" asp-action="Logout" class="btn-logout">Logout</a>
@@ -84,9 +112,8 @@
                     <span class="brand-logo inline-brand">
                         <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
                     </span>
-                    is a fast, modern and reliable food ordering platform.
-                    Discover delicious meals, customize your order and enjoy a smooth
-                    catering experience.
+                    is a modern catering platform for events, companies and large groups.
+                    Users can choose caterers, build full event menus and order for flexible guest counts.
                 </p>
 
                 <div class="footer-contact">
@@ -99,16 +126,40 @@
             <div class="footer-column">
                 <h3>Quick Links</h3>
                 <a asp-controller="Home" asp-action="Index">Home</a>
-                <a asp-controller="MenuItem" asp-action="Index">Menu</a>
-                <a asp-controller="Cart" asp-action="Index">Cart</a>
-                <a asp-controller="Order" asp-action="Index">Orders</a>
+
+                @if (!isLoggedIn || currentRole == "User")
+                {
+                    <a asp-controller="MenuItem" asp-action="Index">Caterers</a>
+                }
+
+                @if (currentRole == "User")
+                {
+                    <a asp-controller="Cart" asp-action="Index">Cart</a>
+                    <a asp-controller="Order" asp-action="Index">Orders</a>
+                    <a asp-controller="User" asp-action="Location">Location</a>
+                }
+
+                @if (currentRole == "Caretaker")
+                {
+                    <a asp-controller="MenuItem" asp-action="Index">My Menus</a>
+                    <a asp-controller="MenuItem" asp-action="Create">Add Menu</a>
+                    <a asp-controller="Order" asp-action="Index">Orders</a>
+                    <a asp-controller="Caretaker" asp-action="Profile">Caterer Profile</a>
+                }
+
+                @if (currentRole == "Admin")
+                {
+                    <a asp-controller="Order" asp-action="Index">Admin Orders</a>
+                    <a asp-controller="Admin" asp-action="Users">Users</a>
+                    <a asp-controller="Admin" asp-action="Logs">System Logs</a>
+                }
             </div>
 
             <div class="footer-column">
                 <h3>About Us</h3>
                 <p>
-                    Our mission is to bring quality meals to users quickly and easily.
-                    We focus on simple ordering, clear tracking and user satisfaction.
+                    Our mission is to make catering planning easier for events of every size.
+                    We focus on clear menus, flexible quantities, and smooth order management.
                 </p>
             </div>
 
@@ -116,10 +167,27 @@
                 <h3>Follow Us</h3>
                 <p>Stay updated on social media.</p>
 
-                <div class="social-links">
-                    <a href="#">📸 Instagram</a>
-                    <a href="#">🐦 Twitter</a>
-                    <a href="#">📘 Facebook</a>
+                <div class="social-links social-icon-links">
+                    <a href="#" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" class="social-svg">
+                            <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 4.2A3.8 3.8 0 1 1 12 15.8a3.8 3.8 0 0 1 0-7.6Zm0 2A1.8 1.8 0 1 0 12 13.8a1.8 1.8 0 0 0 0-3.6ZM17.4 7a1 1 0 1 1-1 1a1 1 0 0 1 1-1Z" />
+                        </svg>
+                        Instagram
+                    </a>
+
+                    <a href="#" aria-label="Twitter">
+                        <svg viewBox="0 0 24 24" class="social-svg">
+                            <path d="M18.9 2.8h3.1l-6.8 7.8l8 10.6h-6.3l-4.9-6.4l-5.6 6.4H3.2l7.3-8.4L2.8 2.8h6.4l4.4 5.9l5.3-5.9Zm-1.1 16.5h1.7L8.3 4.6H6.5l11.3 14.7Z" />
+                        </svg>
+                        Twitter
+                    </a>
+
+                    <a href="#" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24" class="social-svg">
+                            <path d="M14 8.5V6.8c0-.8.5-1 1.1-1H18V2h-3.9C10.7 2 9 4.1 9 6.5v2H6v4h3V22h5v-9.5h3.4l.6-4H14Z" />
+                        </svg>
+                        Facebook
+                    </a>
                 </div>
             </div>
         </div>

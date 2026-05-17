@@ -1,7 +1,7 @@
 using GOGOFOOD.Data;
+using GOGOFOOD.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace GOGOFOOD.Controllers
 {
@@ -14,7 +14,14 @@ namespace GOGOFOOD.Controllers
             _context = context;
         }
 
-        public IActionResult Index(string? searchText, int page = 1)
+        public IActionResult Index(
+            string? searchText,
+            string? statusFilter,
+            decimal? minTotal,
+            decimal? maxTotal,
+            DateTime? startDate,
+            DateTime? endDate,
+            int page = 1)
         {
             var role = HttpContext.Session.GetString("UserRole");
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -25,13 +32,12 @@ namespace GOGOFOOD.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var ordersQuery = _context.Orders
+            IQueryable<Order> ordersQuery = _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem)
-                .ThenInclude(m => m.Caretaker)
-                .OrderByDescending(o => o.OrderDate)
-                .AsQueryable();
+                    .ThenInclude(oi => oi.MenuItem)
+                        .ThenInclude(m => m.Caretaker)
+                .OrderByDescending(o => o.OrderDate);
 
             if (role == "User" && userId != null)
             {
@@ -49,14 +55,90 @@ namespace GOGOFOOD.Controllers
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {
+                var search = searchText.ToLower();
+
                 ordersQuery = ordersQuery.Where(o =>
-                    o.Status.Contains(searchText) ||
-                    o.User.Name.Contains(searchText) ||
-                    o.User.Email.Contains(searchText) ||
-                    o.OrderItems.Any(oi => oi.MenuItem.Name.Contains(searchText)));
+                    o.Status.ToLower().Contains(search) ||
+                    (o.User != null && o.User.Name.ToLower().Contains(search)) ||
+                    (o.User != null && o.User.Email.ToLower().Contains(search)) ||
+                    o.OrderItems.Any(oi =>
+                        oi.MenuItem != null &&
+                        (
+                            oi.MenuItem.Name.ToLower().Contains(search) ||
+                            oi.MenuItem.Description.ToLower().Contains(search) ||
+                            (
+                                oi.MenuItem.Caretaker != null &&
+                                oi.MenuItem.Caretaker.RestaurantName.ToLower().Contains(search)
+                            )
+                        )));
             }
 
-            int pageSize = 5;
+            if (!string.IsNullOrWhiteSpace(statusFilter))
+            {
+                ordersQuery = ordersQuery.Where(o => o.Status == statusFilter);
+            }
+
+            if (minTotal != null)
+            {
+                ordersQuery = ordersQuery.Where(o => o.TotalPrice >= minTotal.Value);
+            }
+
+            if (maxTotal != null)
+            {
+                ordersQuery = ordersQuery.Where(o => o.TotalPrice <= maxTotal.Value);
+            }
+
+            if (startDate != null)
+            {
+                var start = startDate.Value.Date;
+                ordersQuery = ordersQuery.Where(o => o.OrderDate >= start);
+            }
+
+            if (endDate != null)
+            {
+                var end = endDate.Value.Date.AddDays(1);
+                ordersQuery = ordersQuery.Where(o => o.OrderDate < end);
+            }
+
+            if (role == "Admin")
+            {
+                var allAdminOrders = ordersQuery.ToList();
+
+                ViewBag.AdminTotalOrders = allAdminOrders.Count;
+
+                ViewBag.AdminTotalRevenue = allAdminOrders.Sum(o => o.TotalPrice);
+
+                ViewBag.AdminTotalItems = allAdminOrders
+                    .Where(o => o.OrderItems != null)
+                    .Sum(o => o.OrderItems!.Sum(oi => oi.Quantity));
+
+                ViewBag.AdminCompletedOrders = allAdminOrders
+                    .Count(o => o.Status == "Completed");
+
+                ViewBag.AdminTodayOrders = allAdminOrders
+                    .Count(o => o.OrderDate.Date == DateTime.Today);
+
+                ViewBag.AdminUniqueCustomers = allAdminOrders
+                    .Where(o => o.User != null)
+                    .Select(o => o.UserId)
+                    .Distinct()
+                    .Count();
+
+                ViewBag.AdminUniqueRestaurants = allAdminOrders
+                    .Where(o => o.OrderItems != null)
+                    .SelectMany(o => o.OrderItems!)
+                    .Where(oi => oi.MenuItem != null && oi.MenuItem.CaretakerId != null)
+                    .Select(oi => oi.MenuItem!.CaretakerId)
+                    .Distinct()
+                    .Count();
+
+                ViewBag.AdminAverageOrderValue = allAdminOrders.Count > 0
+                    ? allAdminOrders.Average(o => o.TotalPrice)
+                    : 0;
+            }
+
+            int pageSize = role == "Admin" ? 8 : 5;
+
             int totalOrders = ordersQuery.Count();
             int totalPages = (int)Math.Ceiling(totalOrders / (double)pageSize);
 
@@ -76,6 +158,11 @@ namespace GOGOFOOD.Controllers
                 .ToList();
 
             ViewBag.SearchText = searchText;
+            ViewBag.StatusFilter = statusFilter;
+            ViewBag.MinTotal = minTotal;
+            ViewBag.MaxTotal = maxTotal;
+            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
             ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
 

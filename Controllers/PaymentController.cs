@@ -8,6 +8,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace GOGOFOOD.Controllers
 {
@@ -113,6 +114,27 @@ namespace GOGOFOOD.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
+            string? paymentValidationError = ValidatePaymentInformation(
+                cardHolder,
+                cardNumber,
+                expirationDate,
+                cvv
+            );
+
+            if (!string.IsNullOrWhiteSpace(paymentValidationError))
+            {
+                _logService.AddLog(
+                    "Payment Failed",
+                    "Payment validation failed. Reason: " + paymentValidationError,
+                    userEmail,
+                    userRole
+                );
+
+                ViewBag.PaymentError = paymentValidationError;
+
+                return View("Checkout", cart);
+            }
+
             decimal total = cart.Sum(x => x.TotalPrice);
 
             var order = new Order
@@ -164,6 +186,88 @@ namespace GOGOFOOD.Controllers
             return RedirectToAction("Success");
         }
 
+        private string? ValidatePaymentInformation(
+            string cardHolder,
+            string cardNumber,
+            string expirationDate,
+            string cvv)
+        {
+            if (string.IsNullOrWhiteSpace(cardHolder) || cardHolder.Trim().Length < 3)
+            {
+                return "Please enter the card holder name.";
+            }
+
+            if (!Regex.IsMatch(cardHolder.Trim(), @"^[a-zA-ZçÇğĞıİöÖşŞüÜ\s]+$"))
+            {
+                return "Card holder name can only contain letters.";
+            }
+
+            if (string.IsNullOrWhiteSpace(cardNumber) ||
+                cardNumber.Length != 16 ||
+                !cardNumber.All(char.IsDigit))
+            {
+                return "Card number must contain exactly 16 digits.";
+            }
+
+            if (!IsExpirationDateValid(expirationDate))
+            {
+                return "The card expiration date is invalid or expired.";
+            }
+
+            if (string.IsNullOrWhiteSpace(cvv) ||
+                cvv.Length != 3 ||
+                !cvv.All(char.IsDigit))
+            {
+                return "CVV must contain exactly 3 digits.";
+            }
+
+            return null;
+        }
+
+        private bool IsExpirationDateValid(string expirationDate)
+        {
+            if (string.IsNullOrWhiteSpace(expirationDate))
+            {
+                return false;
+            }
+
+            var parts = expirationDate.Split('/');
+
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            if (!int.TryParse(parts[0], out int month))
+            {
+                return false;
+            }
+
+            if (!int.TryParse(parts[1], out int year))
+            {
+                return false;
+            }
+
+            if (month < 1 || month > 12)
+            {
+                return false;
+            }
+
+            int fullYear = 2000 + year;
+
+            try
+            {
+                var expirationLimit = new DateTime(fullYear, month, 1).AddMonths(1);
+                var today = DateTime.Now.Date;
+
+                return expirationLimit > today;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private void SendOrderEmails(int orderId)
         {
             var order = _context.Orders
@@ -181,23 +285,35 @@ namespace GOGOFOOD.Controllers
             var userAgreementPdf = GenerateAgreementPdf(order, null, order.OrderItems.ToList());
             var userEmailBody = BuildUserOrderEmailBody(order);
 
-            _emailService.SendEmail(
-                order.User.Email,
-                "GOGOFOOD Order Confirmation - Order #" + order.OrderId,
-                userEmailBody,
-                new List<(string FileName, byte[] Content, string ContentType)>
-                {
-                    ("GOGOFOOD-Receipt-Order-" + order.OrderId + ".pdf", receiptPdf, "application/pdf"),
-                    ("GOGOFOOD-Agreement-Order-" + order.OrderId + ".pdf", userAgreementPdf, "application/pdf")
-                }
-            );
+            if (!IsDemoEmail(order.User.Email))
+            {
+                _emailService.SendEmail(
+                    order.User.Email,
+                    "GOGOFOOD Order Confirmation - Order #" + order.OrderId,
+                    userEmailBody,
+                    new List<(string FileName, byte[] Content, string ContentType)>
+                    {
+                        ("GOGOFOOD-Receipt-Order-" + order.OrderId + ".pdf", receiptPdf, "application/pdf"),
+                        ("GOGOFOOD-Catering-Sozlesmesi-Siparis-" + order.OrderId + ".pdf", userAgreementPdf, "application/pdf")
+                    }
+                );
 
-            _logService.AddLog(
-                "PDF Sent",
-                "Receipt PDF and agreement PDF were sent to user for Order ID: " + order.OrderId,
-                order.User.Email,
-                "System"
-            );
+                _logService.AddLog(
+                    "PDF Sent",
+                    "Receipt PDF and agreement PDF were sent to user for Order ID: " + order.OrderId,
+                    order.User.Email,
+                    "System"
+                );
+            }
+            else
+            {
+                _logService.AddLog(
+                    "Email Skipped",
+                    "User email was skipped because it is a demo email address: " + order.User.Email,
+                    order.User.Email,
+                    "System"
+                );
+            }
 
             var caretakerIds = order.OrderItems
                 .Where(x => x.MenuItem != null && x.MenuItem.CaretakerId != null)
@@ -215,8 +331,20 @@ namespace GOGOFOOD.Controllers
                 {
                     _logService.AddLog(
                         "Email Error",
-                        "Caretaker email could not be sent because caretaker user was not found. CaretakerId: " + caretakerId,
+                        "Caterer email could not be sent because caterer user was not found. CaretakerId: " + caretakerId,
                         order.User.Email,
+                        "System"
+                    );
+
+                    continue;
+                }
+
+                if (IsDemoEmail(caretaker.User.Email))
+                {
+                    _logService.AddLog(
+                        "Email Skipped",
+                        "Caterer email was skipped because it is a demo email address: " + caretaker.User.Email,
+                        caretaker.User.Email,
                         "System"
                     );
 
@@ -236,17 +364,27 @@ namespace GOGOFOOD.Controllers
                     caretakerEmailBody,
                     new List<(string FileName, byte[] Content, string ContentType)>
                     {
-                        ("GOGOFOOD-Caretaker-Agreement-Order-" + order.OrderId + ".pdf", caretakerAgreementPdf, "application/pdf")
+                        ("GOGOFOOD-Caterer-Sozlesmesi-Siparis-" + order.OrderId + ".pdf", caretakerAgreementPdf, "application/pdf")
                     }
                 );
 
                 _logService.AddLog(
                     "PDF Sent",
-                    "Agreement PDF was sent to caretaker for Order ID: " + order.OrderId + " CaretakerId: " + caretakerId,
+                    "Agreement PDF was sent to caterer for Order ID: " + order.OrderId + " CaretakerId: " + caretakerId,
                     caretaker.User.Email,
                     "System"
                 );
             }
+        }
+
+        private bool IsDemoEmail(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return true;
+            }
+
+            return email.Trim().EndsWith("@gogofood.test", StringComparison.OrdinalIgnoreCase);
         }
 
         private byte[] GenerateReceiptPdf(Order order)
@@ -341,11 +479,37 @@ namespace GOGOFOOD.Controllers
 
         private byte[] GenerateAgreementPdf(Order order, Caretaker? caretaker, List<OrderItem> items)
         {
-            var agreementTitle = caretaker == null
-                ? "GOGOFOOD CUSTOMER AGREEMENT"
-                : "GOGOFOOD RESTAURANT AGREEMENT";
+            var agreementNo = caretaker == null
+                ? "GOGO-" + order.OrderId + "-CUSTOMER"
+                : "GOGO-" + order.OrderId + "-CATERER-" + caretaker.CaretakerId;
 
+            var agreementDate = order.OrderDate.ToString("dd.MM.yyyy");
+            var agreementDateTime = order.OrderDate.ToString("dd.MM.yyyy HH:mm");
             var agreementTotal = items.Sum(x => (x.UnitPrice + x.CustomizationPrice) * x.Quantity);
+
+            var customerName = order.User?.Name ?? "Bilinmiyor";
+            var customerEmail = order.User?.Email ?? "Bilinmiyor";
+            var customerAddress = BuildUserAddress(order.User);
+
+            var providerName = caretaker == null
+                ? "GOGOFOOD Platformu ve Siparişte Yer Alan Catering Firmaları"
+                : caretaker.RestaurantName;
+
+            var providerResponsibleName = caretaker == null
+                ? "GOGOFOOD"
+                : caretaker.Name;
+
+            var providerEmail = caretaker?.User?.Email ?? "Sistemde kayıtlı değil";
+
+            var providerAddress = caretaker == null
+                ? "GOGOFOOD online catering sistemi"
+                : BuildCaretakerAddress(caretaker);
+
+            var serviceLocation = customerAddress == "No address information"
+                ? "Müşteri tarafından sistemde belirtilen teslimat/hizmet adresi"
+                : customerAddress;
+
+            var maxGuestCount = items.Count > 0 ? items.Max(x => x.Quantity) : 0;
 
             return Document.Create(container =>
             {
@@ -353,53 +517,130 @@ namespace GOGOFOOD.Controllers
                 {
                     page.Size(PageSizes.A4);
                     page.Margin(35);
-                    page.DefaultTextStyle(x => x.FontSize(11));
+                    page.DefaultTextStyle(x => x.FontSize(9));
 
                     page.Header().Column(column =>
                     {
-                        column.Item().Text(agreementTitle)
-                            .FontSize(22)
+                        column.Item().AlignCenter().Text("CATERING HİZMET SÖZLEŞMESİ")
+                            .FontSize(18)
                             .Bold()
                             .FontColor(Colors.Pink.Medium);
 
-                        column.Item().Text("This agreement PDF is generated dynamically with order-specific data.")
-                            .FontSize(10)
-                            .FontColor(Colors.Grey.Darken1);
+                        column.Item().PaddingTop(6).Row(row =>
+                        {
+                            row.RelativeItem().Text("Sözleşme Tarihi: " + agreementDate).FontSize(9);
+                            row.RelativeItem().AlignRight().Text("Sözleşme No: " + agreementNo).FontSize(9);
+                        });
+
+                        column.Item().PaddingTop(8).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
                     });
 
-                    page.Content().PaddingVertical(20).Column(column =>
+                    page.Content().PaddingVertical(15).Column(column =>
                     {
-                        column.Spacing(12);
+                        column.Spacing(9);
 
-                        column.Item().Text("Agreement Details").FontSize(16).Bold();
-                        column.Item().Text("Order ID: " + order.OrderId);
-                        column.Item().Text("Order Date: " + order.OrderDate.ToString("dd.MM.yyyy HH:mm"));
-                        column.Item().Text("Customer: " + (order.User?.Name ?? "Unknown"));
-                        column.Item().Text("Customer Email: " + (order.User?.Email ?? "Unknown"));
+                        column.Item().Text(
+                            "Bu Catering Hizmet Sözleşmesi, aşağıda bilgileri yer alan taraflar arasında, " +
+                            "6098 sayılı Türk Borçlar Kanunu, 6502 sayılı Tüketicinin Korunması Hakkında Kanun " +
+                            "ve ilgili mevzuat çerçevesinde, GOGOFOOD sistemi üzerinden oluşturulan catering siparişine " +
+                            "ilişkin esasların belirlenmesi amacıyla elektronik olarak oluşturulmuştur.")
+                            .FontSize(9);
 
-                        if (caretaker != null)
-                        {
-                            column.Item().Text("Restaurant: " + caretaker.RestaurantName);
-                            column.Item().Text("Caretaker: " + caretaker.Name);
-                            column.Item().Text("Address: " + BuildCaretakerAddress(caretaker));
-                        }
-                        else
-                        {
-                            column.Item().Text("Agreement Type: Customer order agreement");
-                        }
+                        column.Item().Element(AgreementSectionTitle).Text("1. TARAFLAR");
 
-                        column.Item().LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+                        column.Item().Text("Hizmet Alan (Müşteri):").Bold();
+                        column.Item().Text("Adı-Soyadı / Unvanı: " + customerName);
+                        column.Item().Text("T.C. Kimlik No / Vergi No: Sistemde kayıtlı değil");
+                        column.Item().Text("Adres: " + customerAddress);
+                        column.Item().Text("Telefon: Sistemde kayıtlı değil");
+                        column.Item().Text("E-posta: " + customerEmail);
 
-                        column.Item().Text("Agreement Terms").FontSize(16).Bold();
-                        column.Item().Text("1. This document confirms that the order was created through the GOGOFOOD system.");
-                        column.Item().Text("2. The listed items, quantities, prices, and customizations belong only to this order.");
-                        column.Item().Text("3. The payment process is a simulation for the course project and no real transaction is processed.");
-                        column.Item().Text("4. The restaurant is responsible for preparing the listed menu items according to the selected customizations.");
-                        column.Item().Text("5. The customer may use the receipt and this agreement as order documentation.");
+                        column.Item().PaddingTop(4).Text("Hizmet Sağlayıcı (Catering Firması):").Bold();
+                        column.Item().Text("Adı-Soyadı / Unvanı: " + providerName);
+                        column.Item().Text("Yetkili Kişi: " + providerResponsibleName);
+                        column.Item().Text("T.C. Kimlik No / Vergi No: Sistemde kayıtlı değil");
+                        column.Item().Text("Adres: " + providerAddress);
+                        column.Item().Text("Telefon: Sistemde kayıtlı değil");
+                        column.Item().Text("E-posta: " + providerEmail);
 
-                        column.Item().LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+                        column.Item().Text(
+                            "Taraflar işbu sözleşmede “Müşteri” ve “Catering Firması” olarak anılacaktır.");
 
-                        column.Item().Text("Items Included in This Agreement").FontSize(16).Bold();
+                        column.Item().Element(AgreementSectionTitle).Text("2. SÖZLEŞMENİN KONUSU");
+
+                        column.Item().Text(
+                            "Bu sözleşmenin konusu, Catering Firması tarafından Müşteri’ye, GOGOFOOD sistemi üzerinden " +
+                            "oluşturulan sipariş kapsamında yemek ve içecek hizmetlerinin sağlanmasıdır.");
+
+                        column.Item().Text("Hizmet Türü: Organizasyon catering / yemek ve içecek hizmeti");
+                        column.Item().Text("Hizmet Lokasyonu: " + serviceLocation);
+                        column.Item().Text("Hizmet Tarihi: " + agreementDateTime);
+                        column.Item().Text("Servis Günleri ve Saatleri: Sipariş detaylarına göre belirlenmiştir.");
+                        column.Item().Text("Kişi Sayısı: " + maxGuestCount + " kişi. Kalem bazlı adetler aşağıdaki tabloda gösterilmiştir.");
+                        column.Item().Text("Menü İçeriği: GOGOFOOD sipariş detaylarında belirtilen ürünlerden oluşmaktadır.");
+                        column.Item().Text("Teslim Şekli: Catering hizmeti / organizasyon teslimatı");
+
+                        column.Item().Element(AgreementSectionTitle).Text("3. CATERING FİRMASININ YÜKÜMLÜLÜKLERİ");
+
+                        column.Item().Text("3.1 Kalite ve Sağlık Standartları").Bold();
+                        column.Item().Text("Catering Firması, Türk Gıda Kodeksi ve ilgili hijyen yönetmeliklerine uygun üretim yapmakla yükümlüdür.");
+                        column.Item().Text("Yemekler, mümkün olduğunca günlük ve taze malzemelerle hazırlanacaktır.");
+                        column.Item().Text("Yemeklerin hazırlanması, taşınması ve servisi sırasında hijyen kurallarına uyulacaktır.");
+
+                        column.Item().Text("3.2 Zamanında Teslimat ve Servis").Bold();
+                        column.Item().Text("Yemekler, siparişte belirtilen gün ve saat aralığına uygun şekilde hazırlanacaktır.");
+                        column.Item().Text("Catering Firması, teslimat ve servis sürecinde sipariş detaylarına uygun hareket etmekle yükümlüdür.");
+
+                        column.Item().Text("3.3 Menü Değişiklikleri ve Alerjen İçerikler").Bold();
+                        column.Item().Text("Menüde değişiklik yapılması gerekiyorsa, Müşteri’ye uygun süre içinde bilgi verilmelidir.");
+                        column.Item().Text("Catering Firması, menü içeriğinde alerjen bileşenler bulunuyorsa bunları açıkça belirtmekle yükümlüdür.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("4. MÜŞTERİNİN YÜKÜMLÜLÜKLERİ");
+
+                        column.Item().Text("4.1 Ödeme Şartları").Bold();
+                        column.Item().Text("Toplam Hizmet Bedeli: ₺" + agreementTotal);
+                        column.Item().Text("Ödeme Planı: Bu proje kapsamında ödeme işlemi simülasyon olarak tamamlanmıştır.");
+                        column.Item().Text("Ödeme Durumu: Completed");
+
+                        column.Item().Text("4.2 Kişi Sayısı ve Bilgilendirme").Bold();
+                        column.Item().Text("Müşteri, sipariş kişi sayısı ve teslimat bilgilerini doğru girmekle yükümlüdür.");
+                        column.Item().Text("Kişi sayısında veya hizmet bilgilerinde değişiklik yapılması durumunda Catering Firması’na uygun süre içinde bilgi verilmelidir.");
+
+                        column.Item().Text("4.3 Servis Alanı Hazırlığı").Bold();
+                        column.Item().Text("Müşteri, yemek servisinin yapılacağı alanın güvenli, erişilebilir ve hijyenik olmasını sağlamakla yükümlüdür.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("5. HİZMETİN AKSAMASI VE CEZAİ ŞARTLAR");
+
+                        column.Item().Text("Catering Firması, siparişin eksik veya hatalı hazırlanması durumunda Müşteri ile iletişime geçerek durumu çözmekle yükümlüdür.");
+                        column.Item().Text("Yemeklerin hijyenik şartlara uygun olmadığı resmi belgelerle tespit edilirse, Müşteri sözleşmeyi feshetme ve zararının karşılanmasını talep etme hakkına sahiptir.");
+                        column.Item().Text("Müşteri, ödeme ve sipariş bilgilerini zamanında ve doğru şekilde sağlamaktan sorumludur.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("6. SÖZLEŞMENİN FESHİ VE MÜCBİR SEBEPLER");
+
+                        column.Item().Text("6.1 Fesih Koşulları").Bold();
+                        column.Item().Text("Müşteri, hizmet kalitesinden memnun kalmaması veya sipariş detaylarında önemli bir problem yaşanması durumunda Catering Firması ile iletişime geçebilir.");
+                        column.Item().Text("Catering Firması, gerekli sipariş bilgilerinin sağlanmaması veya ödeme sürecinde problem oluşması durumunda hizmeti durdurma hakkına sahiptir.");
+
+                        column.Item().Text("6.2 Mücbir Sebepler").Bold();
+                        column.Item().Text("Doğal afetler, salgın hastalıklar, grev, savaş, kamu düzenini etkileyen olaylar gibi mücbir sebepler nedeniyle hizmetin aksaması durumunda taraflar sorumlu tutulamaz.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("7. GİZLİLİK VE TİCARİ SIRLAR");
+
+                        column.Item().Text("Taraflar, işbu sözleşme kapsamında edindikleri kişisel ve ticari bilgileri üçüncü kişilerle paylaşamaz.");
+                        column.Item().Text("Catering Firması, müşteriye özel menü, hizmet detayı ve sipariş bilgilerini izinsiz kullanamaz.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("8. UYUŞMAZLIKLARIN ÇÖZÜMÜ");
+
+                        column.Item().Text("Taraflar, işbu sözleşmeden doğabilecek ihtilafları öncelikle müzakere yoluyla çözmeye çalışacaktır.");
+                        column.Item().Text("Taraflar arasında çözülemeyen ihtilaflarda, ilgili Türkiye Cumhuriyeti Mahkemeleri ve İcra Daireleri yetkilidir.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("9. SON HÜKÜMLER");
+
+                        column.Item().Text("İşbu sözleşme, GOGOFOOD sistemi tarafından elektronik olarak oluşturulmuştur.");
+                        column.Item().Text("Taraflardan herhangi biri, yazılı veya sistem üzerinden kayıtlı bildirim olmadan sözleşme hükümlerinde değişiklik yapamaz.");
+                        column.Item().Text("Taraflar, siparişin tamamlanması ile birlikte sözleşme maddelerini kabul etmiş sayılır.");
+
+                        column.Item().Element(AgreementSectionTitle).Text("10. SİPARİŞE DAHİL ÜRÜNLER");
 
                         column.Item().Table(table =>
                         {
@@ -407,16 +648,16 @@ namespace GOGOFOOD.Controllers
                             {
                                 columns.RelativeColumn(3);
                                 columns.ConstantColumn(55);
-                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(3);
                                 columns.RelativeColumn(2);
                             });
 
                             table.Header(header =>
                             {
-                                header.Cell().Element(HeaderCellStyle).Text("Item");
-                                header.Cell().Element(HeaderCellStyle).Text("Qty");
-                                header.Cell().Element(HeaderCellStyle).Text("Customization");
-                                header.Cell().Element(HeaderCellStyle).Text("Total");
+                                header.Cell().Element(HeaderCellStyle).Text("Ürün");
+                                header.Cell().Element(HeaderCellStyle).Text("Kişi");
+                                header.Cell().Element(HeaderCellStyle).Text("Özelleştirme");
+                                header.Cell().Element(HeaderCellStyle).Text("Toplam");
                             });
 
                             foreach (var item in items)
@@ -424,24 +665,42 @@ namespace GOGOFOOD.Controllers
                                 var lineTotal = (item.UnitPrice + item.CustomizationPrice) * item.Quantity;
 
                                 var customization = string.IsNullOrWhiteSpace(item.CustomizationName)
-                                    ? "No customization"
+                                    ? "Özelleştirme yok"
                                     : item.CustomizationName;
 
-                                table.Cell().Element(BodyCellStyle).Text(item.MenuItem?.Name ?? "Menu Item");
+                                table.Cell().Element(BodyCellStyle).Text(item.MenuItem?.Name ?? "Menü Ürünü");
                                 table.Cell().Element(BodyCellStyle).Text(item.Quantity.ToString());
                                 table.Cell().Element(BodyCellStyle).Text(customization);
                                 table.Cell().Element(BodyCellStyle).Text("₺" + lineTotal);
                             }
                         });
 
-                        column.Item().AlignRight().Text("Agreement Total: ₺" + agreementTotal)
-                            .FontSize(18)
+                        column.Item().AlignRight().Text("Toplam Hizmet Bedeli: ₺" + agreementTotal)
+                            .FontSize(13)
                             .Bold()
                             .FontColor(Colors.Pink.Medium);
+
+                        column.Item().PaddingTop(15).Row(row =>
+                        {
+                            row.RelativeItem().Column(left =>
+                            {
+                                left.Item().Text("HİZMET SAĞLAYICI").Bold();
+                                left.Item().Text("Adı-Soyadı / Unvanı: " + providerName);
+                                left.Item().PaddingTop(20).Text("İmza: ____________________");
+                            });
+
+                            row.RelativeItem().Column(right =>
+                            {
+                                right.Item().Text("MÜŞTERİ").Bold();
+                                right.Item().Text("Adı-Soyadı / Unvanı: " + customerName);
+                                right.Item().PaddingTop(20).Text("İmza: ____________________");
+                            });
+                        });
                     });
 
-                    page.Footer().AlignCenter().Text("Generated by GOGOFOOD Document Generation System")
-                        .FontSize(10)
+                    page.Footer().AlignCenter().Text(
+                        "Bu belge GOGOFOOD sistemi tarafından elektronik olarak oluşturulmuştur.")
+                        .FontSize(8)
                         .FontColor(Colors.Grey.Darken1);
                 });
             }).GeneratePdf();
@@ -464,6 +723,15 @@ namespace GOGOFOOD.Controllers
                 .Padding(6);
         }
 
+        private static IContainer AgreementSectionTitle(IContainer container)
+        {
+            return container
+                .PaddingTop(7)
+                .PaddingBottom(3)
+                .BorderBottom(1)
+                .BorderColor(Colors.Pink.Lighten2);
+        }
+
         private string BuildCaretakerAddress(Caretaker caretaker)
         {
             var parts = new List<string>();
@@ -478,13 +746,31 @@ namespace GOGOFOOD.Controllers
             return parts.Count == 0 ? "No address information" : string.Join(", ", parts);
         }
 
+        private string BuildUserAddress(User? user)
+        {
+            if (user == null)
+            {
+                return "No address information";
+            }
+
+            var parts = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(user.AddressDetail)) parts.Add(user.AddressDetail);
+            if (!string.IsNullOrWhiteSpace(user.Street)) parts.Add(user.Street);
+            if (!string.IsNullOrWhiteSpace(user.Neighborhood)) parts.Add(user.Neighborhood);
+            if (!string.IsNullOrWhiteSpace(user.District)) parts.Add(user.District);
+            if (!string.IsNullOrWhiteSpace(user.City)) parts.Add(user.City);
+
+            return parts.Count == 0 ? "No address information" : string.Join(", ", parts);
+        }
+
         private string BuildUserOrderEmailBody(Order order)
         {
             var body = new StringBuilder();
 
             body.Append("<h2>Thank you for your order!</h2>");
             body.Append("<p>Your GOGOFOOD order has been completed successfully.</p>");
-            body.Append("<p>Your receipt PDF and agreement PDF are attached to this email.</p>");
+            body.Append("<p>Your receipt PDF and catering agreement PDF are attached to this email.</p>");
 
             body.Append("<p><strong>Order ID:</strong> " + order.OrderId + "</p>");
             body.Append("<p><strong>Order Date:</strong> " + order.OrderDate.ToString("dd.MM.yyyy HH:mm") + "</p>");
@@ -524,7 +810,7 @@ namespace GOGOFOOD.Controllers
 
             body.Append("<h2>New Order Received</h2>");
             body.Append("<p>A new order has been placed for your restaurant.</p>");
-            body.Append("<p>The agreement PDF for this order is attached to this email.</p>");
+            body.Append("<p>The catering agreement PDF for this order is attached to this email.</p>");
 
             body.Append("<p><strong>Restaurant:</strong> " + caretaker.RestaurantName + "</p>");
             body.Append("<p><strong>Order ID:</strong> " + order.OrderId + "</p>");

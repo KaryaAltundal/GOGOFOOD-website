@@ -1,0 +1,457 @@
+@using GOGOFOOD.Models
+
+@{
+    ViewData["Title"] = "Users";
+
+    var activeTab = ViewBag.ActiveTab as string ?? "users";
+    var searchText = ViewBag.SearchText as string ?? "";
+
+    var users = ViewBag.Users as List<User> ?? new List<User>();
+    var caretakers = ViewBag.Caretakers as List<Caretaker> ?? new List<Caretaker>();
+}
+
+<div class="page-title admin-users-title">
+    <h1>Admin Users Panel 👥</h1>
+    <p>Manage users, caterers, locations, account status and restaurant profiles from one clean admin area.</p>
+</div>
+
+@if (TempData["AdminUsersMessage"] != null)
+{
+    <div class="alert-modern alert-success-modern">
+        @TempData["AdminUsersMessage"]
+    </div>
+}
+
+@if (TempData["AdminUsersError"] != null)
+{
+    <div class="alert-modern alert-danger-modern">
+        @TempData["AdminUsersError"]
+    </div>
+}
+
+<div class="admin-users-stats">
+    <div class="admin-users-stat-card">
+        <span>Total Users</span>
+        <strong>@ViewBag.TotalUsers</strong>
+        <small>@ViewBag.ActiveUsers active / @ViewBag.DeletedUsers deleted</small>
+    </div>
+
+    <div class="admin-users-stat-card">
+        <span>Total Caterers</span>
+        <strong>@ViewBag.TotalCaretakers</strong>
+        <small>@ViewBag.ActiveCaretakers active / @ViewBag.DeletedCaretakers deleted</small>
+    </div>
+
+    <div class="admin-users-stat-card">
+        <span>Current View</span>
+        <strong>@(activeTab == "caretakers" ? "Caterers" : "Users")</strong>
+        <small>Switch between account and restaurant management.</small>
+    </div>
+</div>
+
+<div class="admin-users-toolbar">
+    <div class="admin-users-tabs">
+        <a asp-controller="Admin"
+           asp-action="Users"
+           asp-route-tab="users"
+           asp-route-searchText="@searchText"
+           class="@(activeTab == "users" ? "admin-tab active" : "admin-tab")">
+            Users
+        </a>
+
+        <a asp-controller="Admin"
+           asp-action="Users"
+           asp-route-tab="caretakers"
+           asp-route-searchText="@searchText"
+           class="@(activeTab == "caretakers" ? "admin-tab active" : "admin-tab")">
+            Caterers
+        </a>
+    </div>
+
+    <form asp-controller="Admin" asp-action="Users" method="get" class="admin-users-search">
+        <input type="hidden" name="tab" value="@activeTab" />
+
+        <input type="text"
+               name="searchText"
+               value="@searchText"
+               placeholder="Search name, email, role, city, restaurant..." />
+
+        <button type="submit">
+            Search
+        </button>
+    </form>
+</div>
+
+@if (activeTab == "users")
+{
+    <div class="admin-users-grid">
+        @if (users.Count == 0)
+        {
+            <div class="empty-state">
+                <h3>No users found</h3>
+                <p>No account matches the current search.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var user in users)
+            {
+                <div class="admin-user-card @(user.IsDeleted ? "deleted" : "")">
+                    <div class="admin-user-card-header">
+                        <div>
+                            <span class="admin-user-id">User ID #@user.UserId</span>
+                            <h2>@user.Name</h2>
+                            <p>@user.Email</p>
+                        </div>
+
+                        <div class="admin-user-status-area">
+                            <span class="admin-role-pill">@user.Role</span>
+
+                            @if (user.IsDeleted)
+                            {
+                                <span class="admin-status-pill deleted">Deleted</span>
+                            }
+                            else
+                            {
+                                <span class="admin-status-pill active">Active</span>
+                            }
+                        </div>
+                    </div>
+
+                    <form asp-controller="Admin"
+                          asp-action="UpdateUser"
+                          method="post"
+                          class="admin-user-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="userId" value="@user.UserId" />
+                        <input type="hidden" name="tab" value="users" />
+                        <input type="hidden" name="searchText" value="@searchText" />
+
+                        <div class="admin-user-form-grid">
+                            <div class="admin-field">
+                                <label>Name</label>
+                                <input type="text" name="name" value="@user.Name" required />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Email</label>
+                                <input type="email" name="email" value="@user.Email" required />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Role</label>
+                                <select name="role">
+                                    @if (user.Role == "User")
+                                    {
+                                        <option value="User" selected>User</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="User">User</option>
+                                    }
+
+                                    @if (user.Role == "Caretaker")
+                                    {
+                                        <option value="Caretaker" selected>Caretaker</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Caretaker">Caretaker</option>
+                                    }
+
+                                    @if (user.Role == "Admin")
+                                    {
+                                        <option value="Admin" selected>Admin</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Admin">Admin</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="admin-field">
+                                <label>City</label>
+                                <input type="text" name="city" value="@user.City" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>District</label>
+                                <input type="text" name="district" value="@user.District" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Neighborhood</label>
+                                <input type="text" name="neighborhood" value="@user.Neighborhood" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Street</label>
+                                <input type="text" name="street" value="@user.Street" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Address Detail</label>
+                                <input type="text" name="addressDetail" value="@user.AddressDetail" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Latitude</label>
+                                <input type="text" name="latitude" value="@user.Latitude" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Longitude</label>
+                                <input type="text" name="longitude" value="@user.Longitude" />
+                            </div>
+                        </div>
+
+                        <div class="admin-user-footer">
+                            <div class="admin-user-note">
+                                @if (user.Caretaker != null)
+                                {
+                                    <span>Linked restaurant: @user.Caretaker.RestaurantName</span>
+                                }
+                                else
+                                {
+                                    <span>No linked restaurant profile.</span>
+                                }
+                            </div>
+
+                            <div class="admin-user-actions">
+                                <button type="submit" class="admin-save-btn">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="admin-user-danger-zone">
+                        @if (!user.IsDeleted)
+                        {
+                            <form asp-controller="Admin"
+                                  asp-action="SoftDeleteUser"
+                                  method="post"
+                                  onsubmit="return confirm('This will soft delete the user. It will stay in the database. Continue?');">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <input type="hidden" name="tab" value="users" />
+                                <input type="hidden" name="searchText" value="@searchText" />
+
+                                <button type="submit" class="admin-soft-delete-btn">
+                                    Soft Delete
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Admin"
+                                  asp-action="RestoreUser"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <input type="hidden" name="tab" value="users" />
+                                <input type="hidden" name="searchText" value="@searchText" />
+
+                                <button type="submit" class="admin-restore-btn">
+                                    Restore
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <div class="admin-users-grid">
+        @if (caretakers.Count == 0)
+        {
+            <div class="empty-state">
+                <h3>No caterers found</h3>
+                <p>No restaurant profile matches the current search.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var caretaker in caretakers)
+            {
+                var menuCount = caretaker.MenuItems != null
+                    ? caretaker.MenuItems.Count
+                    : 0;
+
+                var ratingCount = caretaker.CaretakerRatings != null
+                    ? caretaker.CaretakerRatings.Count
+                    : 0;
+
+                var ratingAverage = caretaker.CaretakerRatings != null && caretaker.CaretakerRatings.Count > 0
+                    ? caretaker.CaretakerRatings.Average(x => x.RatingValue).ToString("0.0")
+                    : "No ratings";
+
+                <div class="admin-user-card @(caretaker.IsDeleted ? "deleted" : "")">
+                    <div class="admin-user-card-header">
+                        <div>
+                            <span class="admin-user-id">Caretaker ID #@caretaker.CaretakerId</span>
+                            <h2>@caretaker.RestaurantName</h2>
+                            <p>@caretaker.Name</p>
+                        </div>
+
+                        <div class="admin-user-status-area">
+                            @if (caretaker.IsDeleted)
+                            {
+                                <span class="admin-status-pill deleted">Deleted</span>
+                            }
+                            else
+                            {
+                                <span class="admin-status-pill active">Active</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="admin-caterer-mini-info">
+                        <div>
+                            <span>Linked User</span>
+
+                            @if (caretaker.User != null)
+                            {
+                                <strong>@caretaker.User.Email</strong>
+                            }
+                            else
+                            {
+                                <strong>No linked user</strong>
+                            }
+                        </div>
+
+                        <div>
+                            <span>Menu Items</span>
+                            <strong>@menuCount</strong>
+                        </div>
+
+                        <div>
+                            <span>Rating</span>
+                            <strong>@ratingAverage</strong>
+                            <small>@ratingCount review(s)</small>
+                        </div>
+                    </div>
+
+                    <form asp-controller="Admin"
+                          asp-action="UpdateCaretaker"
+                          method="post"
+                          class="admin-user-form">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="caretakerId" value="@caretaker.CaretakerId" />
+                        <input type="hidden" name="tab" value="caretakers" />
+                        <input type="hidden" name="searchText" value="@searchText" />
+
+                        <div class="admin-user-form-grid">
+                            <div class="admin-field">
+                                <label>Caretaker Name</label>
+                                <input type="text" name="name" value="@caretaker.Name" required />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Restaurant Name</label>
+                                <input type="text" name="restaurantName" value="@caretaker.RestaurantName" required />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>City</label>
+                                <input type="text" name="city" value="@caretaker.City" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>District</label>
+                                <input type="text" name="district" value="@caretaker.District" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Neighborhood</label>
+                                <input type="text" name="neighborhood" value="@caretaker.Neighborhood" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Street</label>
+                                <input type="text" name="street" value="@caretaker.Street" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Address Detail</label>
+                                <input type="text" name="addressDetail" value="@caretaker.AddressDetail" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Latitude</label>
+                                <input type="text" name="latitude" value="@caretaker.Latitude" />
+                            </div>
+
+                            <div class="admin-field">
+                                <label>Longitude</label>
+                                <input type="text" name="longitude" value="@caretaker.Longitude" />
+                            </div>
+                        </div>
+
+                        <div class="admin-user-footer">
+                            <div class="admin-user-note">
+                                <span>@caretaker.Address</span>
+                            </div>
+
+                            <div class="admin-user-actions">
+                                <button type="submit" class="admin-save-btn">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="admin-user-danger-zone">
+                        @if (!caretaker.IsDeleted)
+                        {
+                            <form asp-controller="Admin"
+                                  asp-action="SoftDeleteCaretaker"
+                                  method="post"
+                                  onsubmit="return confirm('This will soft delete the caterer and hide related menu items. Continue?');">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="caretakerId" value="@caretaker.CaretakerId" />
+                                <input type="hidden" name="tab" value="caretakers" />
+                                <input type="hidden" name="searchText" value="@searchText" />
+
+                                <button type="submit" class="admin-soft-delete-btn">
+                                    Soft Delete
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Admin"
+                                  asp-action="RestoreCaretaker"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="caretakerId" value="@caretaker.CaretakerId" />
+                                <input type="hidden" name="tab" value="caretakers" />
+                                <input type="hidden" name="searchText" value="@searchText" />
+
+                                <button type="submit" class="admin-restore-btn">
+                                    Restore
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}

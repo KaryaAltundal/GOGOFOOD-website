@@ -12,15 +12,18 @@ namespace GOGOFOOD.Controllers
         private readonly LogService _logService;
         private readonly EmailService _emailService;
         private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IWebHostEnvironment _environment;
 
         public AccountController(
             GogoFoodContext context,
             LogService logService,
-            EmailService emailService)
+            EmailService emailService,
+            IWebHostEnvironment environment)
         {
             _context = context;
             _logService = logService;
             _emailService = emailService;
+            _environment = environment;
             _passwordHasher = new PasswordHasher<User>();
         }
 
@@ -51,8 +54,7 @@ namespace GOGOFOOD.Controllers
                     return View(user);
                 }
 
-                // Hash password before saving.
-                // The real password will not be stored in the database.
+                user.IsDeleted = false;
                 user.Password = _passwordHasher.HashPassword(user, user.Password);
 
                 _context.Users.Add(user);
@@ -65,6 +67,14 @@ namespace GOGOFOOD.Controllers
                         Name = user.Name,
                         RestaurantName = user.Name + "'s Restaurant",
                         Address = "Address not entered yet",
+                        City = user.City ?? string.Empty,
+                        District = user.District ?? string.Empty,
+                        Neighborhood = user.Neighborhood ?? string.Empty,
+                        Street = user.Street ?? string.Empty,
+                        AddressDetail = user.AddressDetail ?? string.Empty,
+                        Latitude = user.Latitude,
+                        Longitude = user.Longitude,
+                        IsDeleted = false,
                         UserId = user.UserId
                     };
 
@@ -101,7 +111,7 @@ namespace GOGOFOOD.Controllers
         [HttpPost]
         public IActionResult Login(string email, string password)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Email == email);
+            var user = _context.Users.FirstOrDefault(x => x.Email == email && !x.IsDeleted);
 
             if (user != null)
             {
@@ -110,6 +120,15 @@ namespace GOGOFOOD.Controllers
                 if (passwordResult == PasswordVerificationResult.Success ||
                     passwordResult == PasswordVerificationResult.SuccessRehashNeeded)
                 {
+                    if (IsDemoAccount(user))
+                    {
+                        return CompleteLogin(
+                            user,
+                            "Login Success",
+                            "Demo account logged in without two-factor authentication."
+                        );
+                    }
+
                     var random = new Random();
                     var verificationCode = random.Next(100000, 999999).ToString();
 
@@ -216,53 +235,21 @@ namespace GOGOFOOD.Controllers
                 return View();
             }
 
-            HttpContext.Session.SetInt32("UserId", pendingUserId.Value);
-            HttpContext.Session.SetString("UserEmail", pendingEmail);
-            HttpContext.Session.SetString("UserRole", pendingRole);
-            HttpContext.Session.SetString("UserName", pendingName);
+            var user = _context.Users.FirstOrDefault(x =>
+                x.UserId == pendingUserId.Value &&
+                !x.IsDeleted);
 
-            if (pendingRole == "Caretaker")
+            if (user == null)
             {
-                var caretaker = _context.Caretakers.FirstOrDefault(x => x.UserId == pendingUserId.Value);
-
-                if (caretaker == null)
-                {
-                    caretaker = new Caretaker
-                    {
-                        Name = pendingName,
-                        RestaurantName = pendingName + "'s Restaurant",
-                        Address = "Address not entered yet",
-                        UserId = pendingUserId.Value
-                    };
-
-                    _context.Caretakers.Add(caretaker);
-                    _context.SaveChanges();
-                }
-
-                HttpContext.Session.SetInt32("CaretakerId", caretaker.CaretakerId);
+                ClearTwoFactorSession();
+                return RedirectToAction("Login");
             }
 
-            ClearTwoFactorSession();
-
-            _logService.AddLog(
+            return CompleteLogin(
+                user,
                 "Login Success",
-                "User logged in successfully with two-factor authentication: " + pendingEmail,
-                pendingEmail,
-                pendingRole
+                "User logged in successfully with two-factor authentication."
             );
-
-            if (pendingRole == "Caretaker")
-            {
-                return RedirectToAction("Create", "MenuItem");
-            }
-            else if (pendingRole == "Admin")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
         }
 
         [HttpPost]
@@ -307,6 +294,255 @@ namespace GOGOFOOD.Controllers
             return RedirectToAction("VerifyTwoFactor");
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ForgotPassword(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                ViewBag.Error = "Please enter your email address.";
+                return View();
+            }
+
+            var trimmedEmail = email.Trim();
+
+            var user = _context.Users.FirstOrDefault(x =>
+                x.Email == trimmedEmail &&
+                !x.IsDeleted);
+
+            if (user == null)
+            {
+                _logService.AddLog(
+                    "Password Reset Failed",
+                    "Password reset requested for non-existing or deleted email: " + trimmedEmail,
+                    trimmedEmail,
+                    "Unknown"
+                );
+
+                ViewBag.Error = "No active account was found with this email.";
+                return View();
+            }
+
+            if (IsDemoEmail(user.Email))
+            {
+                _logService.AddLog(
+                    "Password Reset Failed",
+                    "Password reset email was not sent because this is a demo email address: " + user.Email,
+                    user.Email,
+                    user.Role
+                );
+
+                ViewBag.Error = "Password reset email cannot be sent to demo accounts. Please use a real email address.";
+                return View();
+            }
+
+            var random = new Random();
+            var resetCode = random.Next(100000, 999999).ToString();
+
+            HttpContext.Session.SetInt32("ResetUserId", user.UserId);
+            HttpContext.Session.SetString("ResetUserEmail", user.Email);
+            HttpContext.Session.SetString("ResetUserRole", user.Role);
+            HttpContext.Session.SetString("ResetPasswordCode", resetCode);
+            HttpContext.Session.SetString("ResetPasswordExpireTime", DateTime.Now.AddMinutes(5).ToString());
+
+            string emailBody = BuildPasswordResetEmailBody(user.Name, resetCode);
+
+            _emailService.SendEmail(
+                user.Email,
+                "GOGOFOOD Password Reset Code",
+                emailBody
+            );
+
+            _logService.AddLog(
+                "Password Reset Code Sent",
+                "Password reset code sent to: " + user.Email,
+                user.Email,
+                user.Role
+            );
+
+            TempData["ResetMessage"] = "A password reset code was sent to your email.";
+
+            return RedirectToAction("ResetPassword");
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword()
+        {
+            var resetEmail = HttpContext.Session.GetString("ResetUserEmail");
+
+            if (string.IsNullOrWhiteSpace(resetEmail))
+            {
+                return RedirectToAction("ForgotPassword");
+            }
+
+            ViewBag.Email = resetEmail;
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ResetPassword(string code, string newPassword, string confirmPassword)
+        {
+            var resetUserId = HttpContext.Session.GetInt32("ResetUserId");
+            var resetEmail = HttpContext.Session.GetString("ResetUserEmail");
+            var resetRole = HttpContext.Session.GetString("ResetUserRole");
+            var savedCode = HttpContext.Session.GetString("ResetPasswordCode");
+            var expireTimeText = HttpContext.Session.GetString("ResetPasswordExpireTime");
+
+            if (resetUserId == null ||
+                string.IsNullOrWhiteSpace(resetEmail) ||
+                string.IsNullOrWhiteSpace(resetRole) ||
+                string.IsNullOrWhiteSpace(savedCode) ||
+                string.IsNullOrWhiteSpace(expireTimeText))
+            {
+                return RedirectToAction("ForgotPassword");
+            }
+
+            ViewBag.Email = resetEmail;
+
+            DateTime expireTime = DateTime.Parse(expireTimeText);
+
+            if (DateTime.Now > expireTime)
+            {
+                ClearResetPasswordSession();
+
+                _logService.AddLog(
+                    "Password Reset Failed",
+                    "Password reset failed because the reset code expired.",
+                    resetEmail,
+                    resetRole
+                );
+
+                ViewBag.Error = "Reset code expired. Please request a new code.";
+                return View();
+            }
+
+            if (string.IsNullOrWhiteSpace(code) || code.Trim() != savedCode)
+            {
+                _logService.AddLog(
+                    "Password Reset Failed",
+                    "Password reset failed because the reset code was incorrect.",
+                    resetEmail,
+                    resetRole
+                );
+
+                ViewBag.Error = "Invalid reset code.";
+                return View();
+            }
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+            {
+                ViewBag.Error = "New password must be at least 6 characters.";
+                return View();
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                ViewBag.Error = "New password and confirm password do not match.";
+                return View();
+            }
+
+            var user = _context.Users.FirstOrDefault(x =>
+                x.UserId == resetUserId.Value &&
+                !x.IsDeleted);
+
+            if (user == null)
+            {
+                ClearResetPasswordSession();
+                return RedirectToAction("ForgotPassword");
+            }
+
+            user.Password = _passwordHasher.HashPassword(user, newPassword);
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            _logService.AddLog(
+                "Password Reset Success",
+                "Password was reset successfully for: " + user.Email,
+                user.Email,
+                user.Role
+            );
+
+            ClearResetPasswordSession();
+
+            TempData["LoginMessage"] = "Your password was changed successfully. You can login with your new password.";
+
+            return RedirectToAction("Login");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ResendPasswordResetCode()
+        {
+            var resetUserId = HttpContext.Session.GetInt32("ResetUserId");
+            var resetEmail = HttpContext.Session.GetString("ResetUserEmail");
+            var resetRole = HttpContext.Session.GetString("ResetUserRole");
+
+            if (resetUserId == null ||
+                string.IsNullOrWhiteSpace(resetEmail) ||
+                string.IsNullOrWhiteSpace(resetRole))
+            {
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var user = _context.Users.FirstOrDefault(x =>
+                x.UserId == resetUserId.Value &&
+                !x.IsDeleted);
+
+            if (user == null)
+            {
+                ClearResetPasswordSession();
+                return RedirectToAction("ForgotPassword");
+            }
+
+            if (IsDemoEmail(user.Email))
+            {
+                ClearResetPasswordSession();
+
+                _logService.AddLog(
+                    "Password Reset Failed",
+                    "Password reset code was not resent because this is a demo email address: " + user.Email,
+                    user.Email,
+                    user.Role
+                );
+
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var random = new Random();
+            var resetCode = random.Next(100000, 999999).ToString();
+
+            HttpContext.Session.SetString("ResetPasswordCode", resetCode);
+            HttpContext.Session.SetString("ResetPasswordExpireTime", DateTime.Now.AddMinutes(5).ToString());
+
+            string emailBody = BuildPasswordResetEmailBody(user.Name, resetCode);
+
+            _emailService.SendEmail(
+                user.Email,
+                "GOGOFOOD New Password Reset Code",
+                emailBody
+            );
+
+            _logService.AddLog(
+                "Password Reset Code Resent",
+                "Password reset code resent to: " + user.Email,
+                user.Email,
+                user.Role
+            );
+
+            TempData["ResetMessage"] = "A new password reset code was sent to your email.";
+
+            return RedirectToAction("ResetPassword");
+        }
+
         public IActionResult Logout()
         {
             var email = HttpContext.Session.GetString("UserEmail");
@@ -324,6 +560,74 @@ namespace GOGOFOOD.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        private IActionResult CompleteLogin(User user, string logTitle, string logMessage)
+        {
+            HttpContext.Session.SetInt32("UserId", user.UserId);
+            HttpContext.Session.SetString("UserEmail", user.Email);
+            HttpContext.Session.SetString("UserRole", user.Role);
+            HttpContext.Session.SetString("UserName", user.Name);
+
+            if (user.Role == "Caretaker")
+            {
+                var caretaker = _context.Caretakers
+                    .FirstOrDefault(x => x.UserId == user.UserId && !x.IsDeleted);
+
+                if (caretaker == null)
+                {
+                    ClearTwoFactorSession();
+
+                    _logService.AddLog(
+                        "Login Blocked",
+                        "Caretaker login blocked because caretaker profile is inactive. Email: " + user.Email,
+                        user.Email,
+                        user.Role
+                    );
+
+                    ViewBag.Error = "Your caretaker profile is inactive. Please contact admin.";
+                    return View("Login");
+                }
+
+                HttpContext.Session.SetInt32("CaretakerId", caretaker.CaretakerId);
+            }
+
+            ClearTwoFactorSession();
+
+            _logService.AddLog(
+                logTitle,
+                logMessage + " Email: " + user.Email,
+                user.Email,
+                user.Role
+            );
+
+            if (user.Role == "Caretaker")
+            {
+                return RedirectToAction("Create", "MenuItem");
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        private bool IsDemoAccount(User user)
+        {
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                return false;
+            }
+
+            return _environment.IsDevelopment() &&
+                   user.Email.EndsWith("@gogofood.test", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsDemoEmail(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return true;
+            }
+
+            return email.Trim().EndsWith("@gogofood.test", StringComparison.OrdinalIgnoreCase);
+        }
+
         private string BuildTwoFactorEmailBody(string name, string code)
         {
             return @"
@@ -339,6 +643,21 @@ namespace GOGOFOOD.Controllers
                 </div>";
         }
 
+        private string BuildPasswordResetEmailBody(string name, string code)
+        {
+            return @"
+                <div style='font-family: Arial, sans-serif; padding: 24px;'>
+                    <h2 style='color:#FF0569;'>GOGOFOOD Password Reset</h2>
+                    <p>Hello " + name + @",</p>
+                    <p>You requested to reset your password. Please use the verification code below:</p>
+                    <div style='font-size: 32px; font-weight: bold; color:#FF0569; background:#fff0f6; padding: 18px; border-radius: 14px; width: fit-content;'>
+                        " + code + @"
+                    </div>
+                    <p>This code will expire in 5 minutes.</p>
+                    <p>If you did not request a password reset, you can ignore this email.</p>
+                </div>";
+        }
+
         private void ClearTwoFactorSession()
         {
             HttpContext.Session.Remove("PendingUserId");
@@ -347,6 +666,15 @@ namespace GOGOFOOD.Controllers
             HttpContext.Session.Remove("PendingUserName");
             HttpContext.Session.Remove("TwoFactorCode");
             HttpContext.Session.Remove("TwoFactorExpireTime");
+        }
+
+        private void ClearResetPasswordSession()
+        {
+            HttpContext.Session.Remove("ResetUserId");
+            HttpContext.Session.Remove("ResetUserEmail");
+            HttpContext.Session.Remove("ResetUserRole");
+            HttpContext.Session.Remove("ResetPasswordCode");
+            HttpContext.Session.Remove("ResetPasswordExpireTime");
         }
     }
 }

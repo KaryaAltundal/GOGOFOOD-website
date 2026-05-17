@@ -5,18 +5,18 @@
 }
 
 <div class="page-title cart-page-title">
-    <h1>Your Cart 🛒</h1>
-    <p>Review your selected meals before payment.</p>
+    <h1>Your Catering Cart 🛒</h1>
+    <p>Review your selected catering menus and guest counts before payment.</p>
 </div>
 
 @if (Model.Count == 0)
 {
     <div class="empty-state">
-        <h3>Your cart is empty</h3>
-        <p>Add delicious meals from the menu to see them here.</p>
+        <h3>Your catering cart is empty</h3>
+        <p>Add catering menu options from a caterer to see them here.</p>
 
         <a asp-controller="MenuItem" asp-action="Index" class="btn-pink">
-            Go to Menu
+            Go to Catering Menus
         </a>
     </div>
 }
@@ -41,25 +41,32 @@ else
                     </div>
 
                     <div class="cart-item-info">
+                        <span class="cart-category-pill">@item.Category</span>
+
                         <h3>@item.Name</h3>
+
+                        @if (!string.IsNullOrWhiteSpace(item.RestaurantName))
+                        {
+                            <p class="cart-caterer-name">🏪 @item.RestaurantName</p>
+                        }
 
                         <p class="cart-customization">
                             <strong>Custom:</strong> @item.Customization
                         </p>
 
                         <div class="cart-price-row">
-                            <span>Base Price</span>
+                            <span>Price Per Person</span>
                             <strong>₺@item.Price</strong>
                         </div>
 
                         <div class="cart-price-row">
-                            <span>Customization</span>
+                            <span>Customization Per Person</span>
                             <strong>₺@item.CustomizationPrice</strong>
                         </div>
                     </div>
 
                     <div class="cart-quantity-box">
-                        <p>Quantity</p>
+                        <p>People Count</p>
 
                         <div class="quantity-controls">
                             <a asp-controller="Cart"
@@ -78,6 +85,8 @@ else
                                 +
                             </a>
                         </div>
+
+                        <small>Buttons change by 100 people.</small>
                     </div>
 
                     <div class="cart-total-box">
@@ -96,10 +105,15 @@ else
         </div>
 
         <div class="cart-summary-card">
-            <h2>Order Summary</h2>
+            <h2>Catering Summary</h2>
 
             <div class="summary-line">
-                <span>Items</span>
+                <span>Menu Options</span>
+                <strong>@Model.Count</strong>
+            </div>
+
+            <div class="summary-line">
+                <span>Total People Count</span>
                 <strong>@Model.Sum(x => x.Quantity)</strong>
             </div>
 
@@ -118,7 +132,7 @@ else
             </a>
 
             <a asp-controller="MenuItem" asp-action="Index" class="continue-shopping-link">
-                Continue Shopping
+                Continue Choosing Menus
             </a>
         </div>
     </div>

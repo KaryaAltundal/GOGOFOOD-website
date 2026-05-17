@@ -1,12 +1,13 @@
 @model GOGOFOOD.Models.MenuItem
 
 @{
-    ViewData["Title"] = "Add Menu Item";
+    ViewData["Title"] = "Add Catering Menu";
+    var categories = ViewBag.Categories as string[] ?? new[] { "Starter", "Main Course", "Dessert", "Drink" };
 }
 
 <div class="page-title">
-    <h1>Add Menu Item 🍽️</h1>
-    <p>Create a new food item for your restaurant menu.</p>
+    <h1>Add Catering Menu 🍽️</h1>
+    <p>Create a catering menu option that users can order for 100, 1000 or even larger guest groups.</p>
 </div>
 
 <div class="modern-form-card">
@@ -17,32 +18,44 @@
         </div>
     }
 
-    <form asp-controller="MenuItem" asp-action="Create" method="post" enctype="multipart/form-data">
+    <form asp-controller="MenuItem" asp-action="Create" method="post" enctype="multipart/form-data" class="vertical-form">
         @Html.AntiForgeryToken()
 
         <div class="form-group-modern">
-            <label>Food Name</label>
-            <input asp-for="Name" placeholder="Example: California Roll" required />
+            <label>Menu Option Name</label>
+            <input asp-for="Name" placeholder="Example: Mini Bruschetta Starter Set" required />
+        </div>
+
+        <div class="form-group-modern">
+            <label>Category</label>
+            <select asp-for="Category" required>
+                @foreach (var category in categories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+            <small>Choose where this option belongs in your catering menu.</small>
         </div>
 
         <div class="form-group-modern">
             <label>Description</label>
-            <input asp-for="Description" placeholder="Example: Fresh sushi roll with avocado" required />
+            <input asp-for="Description" placeholder="Example: Bite-sized starter selection for corporate events" required />
         </div>
 
         <div class="form-group-modern">
-            <label>Price</label>
+            <label>Price Per Person</label>
             <input asp-for="Price" type="number" step="0.01" min="0.01" placeholder="Example: 250" required />
+            <small>This price will be multiplied by the guest count selected by the user.</small>
         </div>
 
         <div class="form-group-modern">
-            <label>Food Photo</label>
+            <label>Menu Photo</label>
             <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
-            <small>Choose a food image from your computer. JPG, JPEG, PNG and WEBP are supported. Maximum size: 2 MB.</small>
+            <small>Choose a catering menu image. JPG, JPEG, PNG and WEBP are supported. Maximum size: 2 MB.</small>
         </div>
 
         <button type="submit" class="btn-pink">
-            Add Menu Item
+            Add Catering Menu
         </button>
     </form>
 </div>

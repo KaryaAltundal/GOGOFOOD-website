@@ -1,67 +1,68 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
 <div class="home-hero-modern">
     <div class="home-hero-content">
-        <span class="home-badge">Fresh • Fast • Modern</span>
+        <span class="home-badge">Corporate • Event • Bulk Catering</span>
 
         <h1>
-    Welcome to
-    <span class="home-brand-title">
-        <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
-    </span>
-</h1>
+            Catering made simple with
+            <span class="home-brand-title">
+                <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
+            </span>
+        </h1>
 
         <p>
             <span class="brand-logo inline-brand">
                 <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
             </span>
-            is a modern catering and food ordering platform that connects users
-            with nearby restaurants. You can explore meals, customize your order,
-            complete a simulated payment, track your orders, and rate both meals
-            and restaurants.
+            is a modern catering management platform that connects users with caterers.
+            Instead of ordering single meals, users can choose full catering menus,
+            select starters, main courses, desserts and drinks, customize options,
+            and set the guest count for small or large events.
         </p>
 
         <div class="home-actions">
             <a asp-controller="MenuItem" asp-action="Index" class="btn-pink">
-                Explore Menu
+                Explore Caterers
             </a>
 
             <a asp-controller="Account" asp-action="Register" class="btn-outline-pink join-brand-btn">
-    Join <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
-</a>
+                Join <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
+            </a>
         </div>
     </div>
 
     <div class="home-hero-card">
-        <h3>Why Choose 
+        <h3>
+            Why Choose
             <span class="brand-logo inline-brand">
                 <span class="brand-gogo">GOGO</span><span class="brand-food">FOOD</span>
             </span>?
         </h3>
 
         <div class="home-feature">
+            <span>🏢</span>
+            <div>
+                <strong>Event-Based Catering</strong>
+                <p>Order menus for meetings, parties, company events, weddings or large organizations.</p>
+            </div>
+        </div>
+
+        <div class="home-feature">
             <span>🍽️</span>
             <div>
-                <strong>Rich Menu Options</strong>
-                <p>Browse meals from different restaurants and choose custom ingredients.</p>
+                <strong>Structured Menu Categories</strong>
+                <p>Choose starters, main courses, desserts and drinks from each caterer.</p>
             </div>
         </div>
 
         <div class="home-feature">
-            <span>📍</span>
+            <span>👥</span>
             <div>
-                <strong>Location Based Filtering</strong>
-                <p>Find restaurants near your address with distance-based filtering.</p>
-            </div>
-        </div>
-
-        <div class="home-feature">
-            <span>⭐</span>
-            <div>
-                <strong>Rating System</strong>
-                <p>Rate meals and restaurants after completed orders.</p>
+                <strong>Flexible Guest Count</strong>
+                <p>Select catering quantities for 100, 1000 or even larger events.</p>
             </div>
         </div>
     </div>
@@ -69,33 +70,33 @@
 
 <div class="home-section">
     <div class="home-section-title">
-        <h2>How It Works</h2>
-        <p>Order your favorite meals in a few simple steps.</p>
+        <h2>How Catering Works</h2>
+        <p>Plan your event menu in a few clean steps.</p>
     </div>
 
     <div class="home-steps-grid">
         <div class="home-step-card">
             <span>1</span>
-            <h3>Choose Meal</h3>
-            <p>Explore the menu and select the food you want.</p>
+            <h3>Choose Caterer</h3>
+            <p>Browse caterers and review their catering menu options.</p>
         </div>
 
         <div class="home-step-card">
             <span>2</span>
-            <h3>Customize</h3>
-            <p>Add extra ingredients and personalize your order.</p>
+            <h3>Build Menu</h3>
+            <p>Select starters, main courses, desserts and drinks for your event.</p>
         </div>
 
         <div class="home-step-card">
             <span>3</span>
-            <h3>Pay</h3>
-            <p>Complete the simulated payment process safely.</p>
+            <h3>Set People Count</h3>
+            <p>Enter how many guests you are ordering for and customize options.</p>
         </div>
 
         <div class="home-step-card">
             <span>4</span>
-            <h3>Rate</h3>
-            <p>Share your experience by rating meals and restaurants.</p>
+            <h3>Confirm Order</h3>
+            <p>Complete simulated payment and receive order documents.</p>
         </div>
     </div>
 </div>

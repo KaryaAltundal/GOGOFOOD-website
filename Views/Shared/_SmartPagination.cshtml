@@ -1,0 +1,176 @@
+@model GOGOFOOD.Models.ViewModels.PaginationViewModel
+
+@{
+    int currentPage = Model.CurrentPage;
+    int totalPages = Model.TotalPages;
+
+    int startPage = Math.Max(2, currentPage - 1);
+    int endPage = Math.Min(totalPages - 1, currentPage + 1);
+
+    string GetPageUrl(int page)
+    {
+        var routeValues = new Dictionary<string, object?>
+        {
+            { "page", page }
+        };
+
+        if (!string.IsNullOrWhiteSpace(Model.SearchText))
+        {
+            routeValues.Add("searchText", Model.SearchText);
+        }
+
+        if (Model.MaxDistanceKm != null)
+        {
+            routeValues.Add("maxDistanceKm", Model.MaxDistanceKm);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Model.StatusFilter))
+        {
+            routeValues.Add("statusFilter", Model.StatusFilter);
+        }
+
+        if (Model.MinTotal != null)
+        {
+            routeValues.Add("minTotal", Model.MinTotal);
+        }
+
+        if (Model.MaxTotal != null)
+        {
+            routeValues.Add("maxTotal", Model.MaxTotal);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Model.StartDate))
+        {
+            routeValues.Add("startDate", Model.StartDate);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Model.EndDate))
+        {
+            routeValues.Add("endDate", Model.EndDate);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Model.Tab))
+        {
+            routeValues.Add("tab", Model.Tab);
+        }
+
+        return Url.Action(Model.ActionName, Model.ControllerName, routeValues) ?? "#";
+    }
+}
+
+@if (totalPages > 1)
+{
+    <div class="smart-pagination-wrapper">
+        <div class="smart-pagination">
+            @if (currentPage > 1)
+            {
+                <a href="@GetPageUrl(currentPage - 1)" class="smart-page-arrow">
+                    ‹ Previous
+                </a>
+            }
+            else
+            {
+                <span class="smart-page-arrow disabled">
+                    ‹ Previous
+                </span>
+            }
+
+            <a href="@GetPageUrl(1)" class="smart-page-number @(currentPage == 1 ? "active" : "")">
+                1
+            </a>
+
+            @if (startPage > 2)
+            {
+                <span class="smart-page-dots">...</span>
+            }
+
+            @for (int i = startPage; i <= endPage; i++)
+            {
+                <a href="@GetPageUrl(i)" class="smart-page-number @(currentPage == i ? "active" : "")">
+                    @i
+                </a>
+            }
+
+            @if (endPage < totalPages - 1)
+            {
+                <span class="smart-page-dots">...</span>
+            }
+
+            @if (totalPages > 1)
+            {
+                <a href="@GetPageUrl(totalPages)" class="smart-page-number @(currentPage == totalPages ? "active" : "")">
+                    @totalPages
+                </a>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <a href="@GetPageUrl(currentPage + 1)" class="smart-page-arrow">
+                    Next ›
+                </a>
+            }
+            else
+            {
+                <span class="smart-page-arrow disabled">
+                    Next ›
+                </span>
+            }
+        </div>
+
+        <form asp-controller="@Model.ControllerName"
+              asp-action="@Model.ActionName"
+              method="get"
+              class="smart-page-jump">
+
+            @if (!string.IsNullOrWhiteSpace(Model.SearchText))
+            {
+                <input type="hidden" name="searchText" value="@Model.SearchText" />
+            }
+
+            @if (Model.MaxDistanceKm != null)
+            {
+                <input type="hidden" name="maxDistanceKm" value="@Model.MaxDistanceKm" />
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.StatusFilter))
+            {
+                <input type="hidden" name="statusFilter" value="@Model.StatusFilter" />
+            }
+
+            @if (Model.MinTotal != null)
+            {
+                <input type="hidden" name="minTotal" value="@Model.MinTotal" />
+            }
+
+            @if (Model.MaxTotal != null)
+            {
+                <input type="hidden" name="maxTotal" value="@Model.MaxTotal" />
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.StartDate))
+            {
+                <input type="hidden" name="startDate" value="@Model.StartDate" />
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.EndDate))
+            {
+                <input type="hidden" name="endDate" value="@Model.EndDate" />
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.Tab))
+            {
+                <input type="hidden" name="tab" value="@Model.Tab" />
+            }
+
+            <label>Go to page</label>
+
+            <input type="number"
+                   name="page"
+                   min="1"
+                   max="@totalPages"
+                   value="@currentPage" />
+
+            <button type="submit">Go</button>
+        </form>
+    </div>
+}

@@ -8,10 +8,16 @@ namespace GOGOFOOD.Models
 
         public string Name { get; set; } = string.Empty;
 
+        public string Category { get; set; } = "Main Course";
+
+        public string RestaurantName { get; set; } = string.Empty;
+
         public string ImageUrl { get; set; } = string.Empty;
 
+        // Price per person for catering.
         public decimal Price { get; set; }
 
+        // In the catering system, Quantity means people count.
         public int Quantity { get; set; }
 
         public string Customization { get; set; } = "No customization";
