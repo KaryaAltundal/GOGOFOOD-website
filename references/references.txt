@@ -27,3 +27,7 @@ Accessed: May 10, 2026.
 [7] OpenAI, “week10 chat" ChatGPT shared conversation. [Online].
 Available:https://chatgpt.com/share/6a007a35-f000-8396-a1aa-6d95d6b8b836
 Accessed: May 10, 2026.
+
+[8] OpenAI, “added last feautures" ChatGPT shared conversation. [Online].
+Available:https://chatgpt.com/share/6a09c715-61a4-8390-8822-6d92377040bf
+Accessed: May 17, 2026.
