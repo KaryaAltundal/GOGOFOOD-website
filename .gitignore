@@ -1,0 +1,19 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.lscache
+
+# Local settings and secrets
+appsettings.Local.json
+secrets.json
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
